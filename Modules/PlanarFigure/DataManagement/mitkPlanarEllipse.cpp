@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <algorithm>
 
 #include "mitkPlanarEllipse.h"
 #include "mitkGeometry2D.h"
@@ -29,8 +28,8 @@ mitk::PlanarEllipse::PlanarEllipse()
       m_TreatAsCircle(true)
 {
     // Ellipse has three control points
-    this->ResetNumberOfControlPoints( 4 );
-    this->SetNumberOfPolyLines( 2 );
+    this->ResetNumberOfControlPoints( 3 );
+    this->SetNumberOfPolyLines( 1 );
     this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
 
@@ -46,19 +45,15 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         const Point2D &centerPoint = GetControlPoint( 0 );
         Point2D boundaryPoint1 = GetControlPoint( 1 );
         Point2D boundaryPoint2 = GetControlPoint( 2 );
-        Point2D boundaryPoint3 = GetControlPoint( 3 );
         vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
         boundaryPoint1[0] += vec[0];
         boundaryPoint1[1] += vec[1];
         boundaryPoint2[0] += vec[0];
         boundaryPoint2[1] += vec[1];
-        boundaryPoint3[0] += vec[0];
-        boundaryPoint3[1] += vec[1];
         PlanarFigure::SetControlPoint( 0, point, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 1, boundaryPoint1, createIfDoesNotExist );
         PlanarFigure::SetControlPoint( 2, boundaryPoint2, createIfDoesNotExist );
-        PlanarFigure::SetControlPoint( 3, boundaryPoint3, createIfDoesNotExist );
         return true;
     }
     else if (index < 3)
@@ -70,7 +65,6 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
         const Point2D &centerPoint = GetControlPoint( 0 );
         Point2D otherPoint = GetControlPoint( otherIndex );
-        Point2D point3 = GetControlPoint( 3 );
 
         Vector2D vec1 = point - centerPoint;
         Vector2D vec2;
@@ -89,24 +83,6 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
             otherPoint = centerPoint+vec2;
             PlanarFigure::SetControlPoint( otherIndex, otherPoint, createIfDoesNotExist );
             float r = centerPoint.EuclideanDistanceTo(otherPoint);
-
-            // adjust additional third control point
-            Point2D p3 = this->GetControlPoint(3);
-            Vector2D vec3;
-            vec3[0] = p3[0]-centerPoint[0];
-            vec3[1] = p3[1]-centerPoint[1];
-            if (vec3[0]!=0 || vec3[1]!=0)
-            {
-                vec3.Normalize();
-                vec3 *= r;
-            }
-            else
-            {
-                vec3[0] = r;
-                vec3[1] = 0;
-            }
-            point3 = centerPoint + vec3;
-            PlanarFigure::SetControlPoint( 3, point3, createIfDoesNotExist );
         }
         else if ( vec1.GetNorm() > 0 )
         {
@@ -128,26 +104,8 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
                 PlanarFigure::SetControlPoint( otherIndex, otherPoint, createIfDoesNotExist );
             }
 
-            // adjust third control point
-            Vector2D vec3 = point3 - centerPoint; vec3.Normalize();
-            double r1 = centerPoint.EuclideanDistanceTo( GetControlPoint( 1 ) );
-            double r2 = centerPoint.EuclideanDistanceTo( GetControlPoint( 2 ) );
-            Point2D newPoint = centerPoint + vec3*std::max(r1, r2);
-            PlanarFigure::SetControlPoint( 3, newPoint, createIfDoesNotExist );
-
             m_TreatAsCircle = false;
         }
-        return true;
-    }
-    else if (index == 3)
-    {
-        Point2D centerPoint = GetControlPoint( 0 );
-        Vector2D vec3 = point - centerPoint; vec3.Normalize();
-        double r1 = centerPoint.EuclideanDistanceTo( GetControlPoint( 1 ) );
-        double r2 = centerPoint.EuclideanDistanceTo( GetControlPoint( 2 ) );
-        Point2D newPoint = centerPoint + vec3*std::max(r1, r2);
-        PlanarFigure::SetControlPoint( index, newPoint, createIfDoesNotExist );
-        m_TreatAsCircle = false;
         return true;
     }
     return false;
@@ -254,8 +212,8 @@ void mitk::PlanarEllipse::GeneratePolyLine()
         AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
     }
 
-    AppendPointToPolyLine( 1, PolyLineElement( centerPoint, 0 ) );
-    AppendPointToPolyLine( 1, PolyLineElement( GetControlPoint( 3 ), 0 ) );
+//     AppendPointToPolyLine( 1, PolyLineElement( centerPoint, 0 ) );
+//     AppendPointToPolyLine( 1, PolyLineElement( GetControlPoint( 3 ), 0 ) );
 }
 
 void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

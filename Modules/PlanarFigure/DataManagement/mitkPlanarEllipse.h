@@ -52,14 +52,14 @@ public:
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 4;
+    return 3;
   }
 
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return 4;
+    return 3;
   }
 
   /** \brief Sets the minimum radius
