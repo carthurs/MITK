@@ -147,11 +147,18 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
 
     // Color
     {
-      mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "color", renderer);
-      if(p.IsNotNull())
+      mitk::ColorProperty::Pointer colorProperty;
+      if (node->IsSelected()) {
+          node->GetProperty(colorProperty, "color.selected", renderer);
+      }
+      if (colorProperty.IsNull()) {
+          // If not selected or failed to obtain selected color
+          node->GetProperty(colorProperty, "color", renderer);
+      }
+
+      if(colorProperty.IsNotNull())
       {
-        mitk::Color c = p->GetColor();
+        mitk::Color c = colorProperty->GetColor();
         ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
         // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
@@ -486,8 +493,9 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
-  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0), renderer, overwrite );
+  node->AddProperty("color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+  node->AddProperty("color.selected", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);
+  node->AddProperty("opacity", mitk::FloatProperty::New(1.0), renderer, overwrite);
 
   mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading
 

@@ -1016,7 +1016,7 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
       node->SetBoolProperty("selected", true);
   }
   //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)

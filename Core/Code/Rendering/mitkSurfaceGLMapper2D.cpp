@@ -510,7 +510,12 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   node->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
 
   // check for color and opacity properties, use it for rendering if they exists
-  node->GetColor(m_LineColor, renderer, "color");
+  if (node->IsSelected()) {
+      node->GetColor(m_LineColor, renderer, "color.selected");
+  }
+  else {
+      node->GetColor(m_LineColor, renderer, "color");
+  }
   node->GetOpacity(m_LineColor[3], renderer, "opacity");
 
   bool invertNormals(false);
