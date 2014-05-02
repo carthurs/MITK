@@ -53,6 +53,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkImageGradientMagnitude.h>
+#include <vtkImageHistogramStatistics.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -286,6 +288,25 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
   }
 
+  bool showGradientMagnitude = false;
+  datanode->GetBoolProperty("show gradient magnitude", showGradientMagnitude, renderer);
+  if (showGradientMagnitude) {
+      vtkSmartPointer<vtkImageGradientMagnitude> magFilter = vtkSmartPointer<vtkImageGradientMagnitude>::New();
+      magFilter->SetInputData(localStorage->m_ReslicedImage);
+      magFilter->Update();
+      localStorage->m_ReslicedImage = magFilter->GetOutput();
+      
+      vtkSmartPointer<vtkImageHistogramStatistics> stats = vtkSmartPointer<vtkImageHistogramStatistics>::New();
+      stats->SetInputData(localStorage->m_ReslicedImage);
+      stats->Update();
+      stats->GetAutoRange();
+
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetRangeMinMax(stats->GetAutoRange()[0], stats->GetAutoRange()[1]);
+      levelWindow.SetWindowBounds(stats->GetAutoRange()[0], stats->GetAutoRange()[1]);
+      datanode->SetLevelWindow(levelWindow, renderer, "levelwindow_grad");
+  }
+
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
@@ -437,7 +458,10 @@ void mitk::ImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = this->GetLocalStorage( renderer );
 
   LevelWindow levelWindow;
-  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, "levelwindow" );
+
+  bool showGradientMagnitude = false;
+  GetDataNode()->GetBoolProperty("show gradient magnitude", showGradientMagnitude, renderer);
+  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, showGradientMagnitude ? "levelwindow_grad" : "levelwindow" );
   localStorage->m_LevelWindowFilter->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
 
   mitk::LevelWindow opacLevelWindow;
