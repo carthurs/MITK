@@ -59,6 +59,7 @@ if(NOT DEFINED VTK_DIR)
           -DModule_vtkGUISupportQtWebkit:BOOL=ON
           -DModule_vtkGUISupportQtSQL:BOOL=ON
           -DModule_vtkRenderingQt:BOOL=ON
+          -DModule_vtkFiltersParallelStatistics:BOOL=ON 
           -DVTK_Group_Qt:BOOL=ON
        )
      endif()
