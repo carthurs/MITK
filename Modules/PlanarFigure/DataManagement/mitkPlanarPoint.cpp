@@ -1,0 +1,35 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+
+#include "mitkPlanarPoint.h"
+#include "mitkGeometry2D.h"
+
+#include "mitkProperties.h"
+
+
+mitk::PlanarPoint::PlanarPoint()
+{
+  // Circle has two control points
+  this->ResetNumberOfControlPoints( 1 );
+  this->SetNumberOfPolyLines( 0 );
+  this->SetProperty( "closed", mitk::BoolProperty::New(true) );
+}
+
+
+mitk::PlanarPoint::~PlanarPoint()
+{
+}

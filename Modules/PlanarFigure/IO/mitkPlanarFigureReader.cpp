@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureReader.h"
 
 #include "mitkPlanarAngle.h"
+#include "mitkPlanarPoint.h"
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarLine.h"
 #include "mitkPlanarArrow.h"
@@ -143,6 +144,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarCircle")
     {
       planarFigure = mitk::PlanarCircle::New();
+    }
+    else if (type == "PlanarPoint")
+    {
+      planarFigure = mitk::PlanarPoint::New();
     }
     else if (type == "PlanarEllipse")
     {
