@@ -37,16 +37,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
-   *
-   * Must be implemented in sub-classes.
-   */
-  //virtual void Initialize();
-
-  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false );
-
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
