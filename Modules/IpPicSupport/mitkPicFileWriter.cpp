@@ -142,7 +142,7 @@ void mitk::PicFileWriter::GenerateData()
   if (ret != 0)
   {
     PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
-    throw std::ios_base::failure("Error during .pic file writing in "__FILE__);
+    throw std::ios_base::failure("Error during .pic file writing in " __FILE__);
   }
 
   PicFileReader::ConvertHandedness(picImage); // flip back from upside-down state
