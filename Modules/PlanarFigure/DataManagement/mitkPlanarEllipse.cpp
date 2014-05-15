@@ -82,7 +82,6 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
             otherPoint = centerPoint+vec2;
             PlanarFigure::SetControlPoint( otherIndex, otherPoint, createIfDoesNotExist );
-            float r = centerPoint.EuclideanDistanceTo(otherPoint);
         }
         else if ( vec1.GetNorm() > 0 )
         {

@@ -317,9 +317,6 @@ function(mitk_create_module)
           # directives for the third-party headers between "#pragma visibility push/pop"
           # statements, it is generally safer to just use default visibility with
           # gcc < 4.5.
-          if(${GCC_VERSION} VERSION_LESS "4.5" OR MINGW)
-            set(use_visibility_flags 0)
-          endif()
         endif()
 
         if(use_visibility_flags)

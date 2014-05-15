@@ -63,7 +63,7 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 //       || !m_DataStorage->Exists(node)
 //       || m_Root->Find(node) != 0)
 //       return;
-// 
+//
 //     bool isHelperObject (false);
 //     bool isHidden(false);
 //     NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
@@ -72,7 +72,7 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 //         command->SetCallbackFunction(this, &QmitkDataStorageFilterProxyModel::UpdateNodeVisibility);
 //         m_HelperObjectObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("helper object")->AddObserver( itk::ModifiedEvent(), command ) ) );
 //     }
-// 
+//
 //     if (m_Predicate->CheckNode(node))
 //       this->AddNodeInternal(node);
 // }
@@ -82,7 +82,7 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 // {
 //     if (node == 0)
 //         return;
-// 
+//
 //     //Removing Observer
 //     bool isHelperObject (false);
 //     NodeTagMapType::iterator searchIter = m_HelperObjectObserverTags.find( const_cast<mitk::DataNode*>(node) );
@@ -90,7 +90,7 @@ QmitkDataStorageFilterProxyModel::~QmitkDataStorageFilterProxyModel()
 //         (*searchIter).first->GetProperty("helper object")->RemoveObserver( (*searchIter).second );
 //         m_HelperObjectObserverTags.erase(const_cast<mitk::DataNode*>(node));
 //     }
-// 
+//
 //     this->RemoveNodeInternal(node);
 // }
 
@@ -150,7 +150,7 @@ void QmitkDataStorageFilterProxyModel::UpdateNodeVisibility()
 
 bool QmitkDataStorageFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    auto model = dynamic_cast<QmitkDataStorageTreeModel*>(this->sourceModel());
+    QmitkDataStorageTreeModel* model = dynamic_cast<QmitkDataStorageTreeModel*>(this->sourceModel());
     assert(model);
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
