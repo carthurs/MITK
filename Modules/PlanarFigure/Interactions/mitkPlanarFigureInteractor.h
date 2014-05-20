@@ -46,7 +46,8 @@ class StateMachineAction;
 itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
 itkEventMacro( StartPlacementPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndPlacementPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( SelectPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
 itkEventMacro( StartInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
@@ -184,7 +185,10 @@ protected:
 
   virtual void ConfigurationChanged();
 
+  virtual void SetDataNode(NodeType);
+
 private:
+    void CheckUndoPlace();
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
@@ -196,6 +200,8 @@ private:
   bool m_IsHovering;
 
   bool m_LastPointWasValid;
+
+  unsigned long m_ObserverTag;
 
   //mitk::PlanarFigure::Pointer m_PlanarFigure;
 };

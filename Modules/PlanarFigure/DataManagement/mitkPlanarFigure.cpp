@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
+#include "mitkPlanarFigureOperation.h"
+#include "mitkInteractionConst.h"
 #include <mitkProportionalTimeGeometry.h>
 
 #include "algorithm"
@@ -107,6 +109,16 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 
   m_FigurePlaced = true;
   m_SelectedControlPoint = 1;
+  this->Modified();
+}
+
+void mitk::PlanarFigure::CancelPlaceFigure()
+{
+    m_NumberOfControlPoints = 2;
+    m_ControlPoints.resize(0);
+    m_FigurePlaced = false;
+    m_SelectedControlPoint = -1;
+    this->Modified();
 }
 
 
@@ -728,3 +740,45 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
   }
 }
 
+void mitk::PlanarFigure::ExecuteOperation(Operation* operation)
+{
+    mitkCheckOperationTypeMacro(PlanarFigureOperation, operation, planarFigureOp);
+
+    switch (operation->GetOperationType())
+    {
+    case OpNOTHING:
+        break;
+
+    case OpINSERT://inserts the point at the given position and selects it.
+        this->AddControlPoint(planarFigureOp->GetPoint(), planarFigureOp->GetIndex());
+        break;
+
+    case OpMOVE://moves the point given by index
+        this->SetControlPoint(planarFigureOp->GetIndex(), planarFigureOp->GetPoint());
+        break;
+
+    case OpREMOVE://removes the point at given by position
+        this->RemoveControlPoint(planarFigureOp->GetIndex());
+        break;
+
+    case OpSELECTPOINT://select the given point
+        this->SelectControlPoint(planarFigureOp->GetIndex());
+        break;
+
+    case OpDESELECTPOINT://unselect the given point
+        this->DeselectControlPoint();
+        break;
+
+    case OpADD:
+        this->PlaceFigure(planarFigureOp->GetPoint());
+        break;
+
+    case OpUNDOADD:
+        this->CancelPlaceFigure();
+        break;
+
+    default:
+        itkWarningMacro("mitkPlanarFigure could not understrand the operation. Please check!");
+        break;
+    }
+}

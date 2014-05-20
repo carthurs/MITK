@@ -112,6 +112,7 @@ public:
    * Can be re-implemented in sub-classes as needed.
    */
   virtual void PlaceFigure( const Point2D& point );
+  virtual void CancelPlaceFigure();
 
   /**
   * \brief Adds / inserts new control-points
@@ -283,7 +284,8 @@ public:
   * the points are constrained by the image bounds. */
   virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
-
+  /** \brief executes the given Operation */
+  virtual void ExecuteOperation(Operation* operation);
 
 protected:
   PlanarFigure();

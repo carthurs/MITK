@@ -20,9 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigureInteractor.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"
+#include "mitkPlanarFigureOperation.h"
 
 #include "mitkInteractionPositionEvent.h"
 #include "mitkInternalEvent.h"
+#include "mitkInteractionConst.h"
+
+#include "mitkOperationEvent.h"
+#include "mitkUndoController.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
@@ -36,11 +41,13 @@ mitk::PlanarFigureInteractor::PlanarFigureInteractor()
 , m_MinimumPointDistance( 25.0 )
 , m_IsHovering( false )
 , m_LastPointWasValid( false )
+, m_ObserverTag(0)
 {
 }
 
 mitk::PlanarFigureInteractor::~PlanarFigureInteractor()
 {
+    SetDataNode(NULL);
 }
 
 void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
@@ -74,6 +81,41 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "end_hovering", EndHovering );
 }
 
+void mitk::PlanarFigureInteractor::SetDataNode(NodeType node)
+{
+    if (GetDataNode()) {
+        // Unsubscribe from old change events
+        GetDataNode()->GetData()->RemoveObserver(m_ObserverTag);
+        m_ObserverTag = 0;
+    }
+
+    Superclass::SetDataNode(node);
+
+    // Listen to change events
+    if (GetDataNode()) {
+        // Subscribe to change events
+        itk::SimpleMemberCommand<PlanarFigureInteractor>::Pointer modifiedCommand = itk::SimpleMemberCommand<PlanarFigureInteractor>::New();
+        modifiedCommand->SetCallbackFunction(this, &PlanarFigureInteractor::CheckUndoPlace);
+        m_ObserverTag = GetDataNode()->GetData()->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+    }
+}
+
+void mitk::PlanarFigureInteractor::CheckUndoPlace()
+{
+    mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+    if (!planarFigure->IsPlaced()) {
+        if (HandleEvent(mitk::InternalEvent::New(nullptr, this, "Undo-Placement-Event"), GetDataNode())) {
+            planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", false);
+            planarFigure->InvokeEvent(CancelPlacementPlanarFigureEvent());
+        }
+    }
+    else {
+        if (HandleEvent(mitk::InternalEvent::New(nullptr, this, "Undo-Placement-Event"), GetDataNode())) {
+            planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
+            planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
+        }
+    }
+}
 
 bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*interactionEvent*/ )
 {
@@ -305,7 +347,22 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
     point2D = planarFigure->GetPreviewControlPoint();
   }
 
-  planarFigure->AddControlPoint( point2D, nextIndex );
+  mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+      OpINSERT, point2D, nextIndex);
+
+  if (m_UndoEnabled)
+  {
+      mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+          OpREMOVE, point2D, nextIndex);
+
+      OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Add point");
+      m_UndoController->SetOperationEvent(operationEvent);
+  }
+
+  planarFigure->ExecuteOperation(doOp);
+
+  if (!m_UndoEnabled)
+      delete doOp;
 
   if ( planarFigure->IsPreviewControlPointVisible() )
   {
@@ -359,8 +416,22 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
     return false;
   }
 
-  // Place PlanarFigure at this point
-  planarFigure->PlaceFigure( point2D );
+  mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+      OpADD, point2D, -1);
+
+  if (m_UndoEnabled)
+  {
+      mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+          OpUNDOADD, point2D, -1);
+
+      OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Add initial point");
+      m_UndoController->SetOperationEvent(operationEvent);
+  }
+
+  planarFigure->ExecuteOperation(doOp);
+
+  if (!m_UndoEnabled)
+      delete doOp;
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();
@@ -589,7 +660,22 @@ bool mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, Inte
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
 
   int selectedControlPoint = planarFigure->GetSelectedControlPoint();
-  planarFigure->RemoveControlPoint( selectedControlPoint );
+  Point2D point2D = planarFigure->GetControlPoint(selectedControlPoint);
+
+  mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+      OpREMOVE, point2D, selectedControlPoint);
+
+  if (m_UndoEnabled)
+  {
+      mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+          OpINSERT, point2D, selectedControlPoint);
+
+      OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Remove point");
+      m_UndoController->SetOperationEvent(operationEvent);
+  }
+
+  planarFigure->ExecuteOperation(doOp);
+
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();
