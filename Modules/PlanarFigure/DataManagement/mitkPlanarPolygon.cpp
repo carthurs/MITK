@@ -28,7 +28,6 @@ mitk::PlanarPolygon::PlanarPolygon()
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
   // Polygon has at least two control points
-  this->ResetNumberOfControlPoints( 2 );
   this->SetNumberOfPolyLines( 1 );
 
   // Polygon is closed by default

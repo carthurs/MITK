@@ -40,23 +40,6 @@ class BaseRenderer;
 class InteractionPositionEvent;
 class StateMachineAction;
 
-#pragma GCC visibility push(default)
-
-// Define events for PlanarFigure interaction notifications
-itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
-itkEventMacro( StartPlacementPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndPlacementPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
-itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
-itkEventMacro( StartInteractionPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
-
-#pragma GCC visibility pop
-
-
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
   *
@@ -74,6 +57,8 @@ public:
 
   /** \brief Sets the minimal distance between two control points. */
   void SetMinimumPointDistance( ScalarType minimumDistance );
+
+  void FinalizeFigure();
 
 protected:
 
@@ -185,10 +170,12 @@ protected:
 
   virtual void ConfigurationChanged();
 
-  virtual void SetDataNode(NodeType);
+  virtual void DataNodeChanged();
 
 private:
-    void CheckUndoPlace();
+    void ProcessExternalCancelPlace();
+    void ProcessExternalPlace();
+    void RemoveObservers();
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
@@ -201,7 +188,13 @@ private:
 
   bool m_LastPointWasValid;
 
-  unsigned long m_ObserverTag;
+  struct ObserverTagInfo {
+      itk::Object* object;
+      std::vector<unsigned long> observerTags;
+  } m_ObserverTagInfo;
+
+  mitk::Point2D m_StartMovePosition;
+  bool m_PointMoved;
 
   //mitk::PlanarFigure::Pointer m_PlanarFigure;
 };

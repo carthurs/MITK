@@ -37,6 +37,11 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
+  unsigned int GetPlacementNumberOfControlPoints() const
+  {
+      return 1;
+  }
+
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {

@@ -93,7 +93,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
     }
   }
 
-  bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
+  bool isInitiallyPlaced = this->IsFinalized();
 
   unsigned int i;
   ControlPointListType::iterator it;

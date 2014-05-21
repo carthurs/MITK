@@ -100,6 +100,10 @@ public:
    * displayed/interacted with). */
   virtual bool IsPlaced() const { return m_FigurePlaced; };
 
+  /** \brief True if the planar figure has been placed (and can be
+  * displayed/interacted with). */
+  virtual bool IsFinalized() const { return m_FigureFinalized; }
+  virtual void SetFigureFinalized(bool finalized) { m_FigureFinalized = finalized; }
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.
@@ -133,6 +137,15 @@ public:
 
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
+
+
+  /** \brief Returns the number of control points automatically filled upon
+  * figure placement.
+  *
+  * Must be implemented in sub-classes.
+  */
+  virtual unsigned int GetPlacementNumberOfControlPoints() const = 0;
+  virtual unsigned int GetPlacementSelectedPointId() const { return 1; }
 
 
   /** \brief Returns the minimum number of control points needed to represent
@@ -264,7 +277,7 @@ public:
   virtual bool ResetOnPointSelect();
 
   /** \brief removes the point with the given index from the list of controlpoints. */
-  virtual void RemoveControlPoint( unsigned int index );
+  virtual void RemoveControlPoint( int index );
 
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
@@ -292,9 +305,6 @@ protected:
   virtual ~PlanarFigure();
 
   PlanarFigure(const Self& other);
-
-  /** \brief Set the initial number of control points of the planar figure */
-  void ResetNumberOfControlPoints( int numberOfControlPoints );
 
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.
@@ -355,7 +365,6 @@ protected:
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
   ControlPointListType m_ControlPoints;
-  unsigned int m_NumberOfControlPoints;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
@@ -372,6 +381,7 @@ protected:
   bool m_PreviewControlPointVisible;
 
   bool m_FigurePlaced;
+  bool m_FigureFinalized;
 
 private:
 
@@ -414,6 +424,23 @@ private:
   std::pair<double, unsigned int> m_DisplaySize;
 
 };
+
+#pragma GCC visibility push(default)
+
+// Define events for PlanarFigure interaction notifications
+itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
+itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+
+#pragma GCC visibility pop
+
 
 } // namespace mitk
 

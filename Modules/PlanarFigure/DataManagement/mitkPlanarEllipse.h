@@ -40,14 +40,12 @@ public:
   itkCloneMacro(Self)
 
 
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
-   *
-   * Must be implemented in sub-classes.
-   */
-  virtual void PlaceFigure( const Point2D &point );
-
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true );
+
+  unsigned int GetPlacementNumberOfControlPoints() const
+  {
+      return 3;
+  }
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const

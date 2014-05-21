@@ -51,6 +51,11 @@ public:
   //virtual void Initialize();
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const
+  {
+      return 2;
+  }
+
   /** \brief Four point angle has 4 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {

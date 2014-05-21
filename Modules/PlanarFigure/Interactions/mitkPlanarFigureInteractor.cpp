@@ -41,13 +41,13 @@ mitk::PlanarFigureInteractor::PlanarFigureInteractor()
 , m_MinimumPointDistance( 25.0 )
 , m_IsHovering( false )
 , m_LastPointWasValid( false )
-, m_ObserverTag(0)
+, m_PointMoved(false)
 {
 }
 
 mitk::PlanarFigureInteractor::~PlanarFigureInteractor()
 {
-    SetDataNode(NULL);
+    RemoveObservers();
 }
 
 void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
@@ -81,38 +81,50 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "end_hovering", EndHovering );
 }
 
-void mitk::PlanarFigureInteractor::SetDataNode(NodeType node)
+void mitk::PlanarFigureInteractor::RemoveObservers()
 {
-    if (GetDataNode()) {
-        // Unsubscribe from old change events
-        GetDataNode()->GetData()->RemoveObserver(m_ObserverTag);
-        m_ObserverTag = 0;
+    for (int i = 0; i < m_ObserverTagInfo.observerTags.size(); ++i) {
+        m_ObserverTagInfo.object->RemoveObserver(m_ObserverTagInfo.observerTags[i]);
     }
+    m_ObserverTagInfo.object = nullptr;
+    m_ObserverTagInfo.observerTags.clear();
+}
 
-    Superclass::SetDataNode(node);
+void mitk::PlanarFigureInteractor::DataNodeChanged()
+{
+    RemoveObservers();
 
     // Listen to change events
     if (GetDataNode()) {
+        m_ObserverTagInfo.object = GetDataNode()->GetData();
+
         // Subscribe to change events
-        itk::SimpleMemberCommand<PlanarFigureInteractor>::Pointer modifiedCommand = itk::SimpleMemberCommand<PlanarFigureInteractor>::New();
-        modifiedCommand->SetCallbackFunction(this, &PlanarFigureInteractor::CheckUndoPlace);
-        m_ObserverTag = GetDataNode()->GetData()->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+        itk::SimpleMemberCommand<PlanarFigureInteractor>::Pointer cancelPlaceCommand = itk::SimpleMemberCommand<PlanarFigureInteractor>::New();
+        cancelPlaceCommand->SetCallbackFunction(this, &PlanarFigureInteractor::ProcessExternalCancelPlace);
+        m_ObserverTagInfo.observerTags.push_back(m_ObserverTagInfo.object->AddObserver(CancelPlacementPlanarFigureEvent(), cancelPlaceCommand));
+
+        itk::SimpleMemberCommand<PlanarFigureInteractor>::Pointer placeCommand = itk::SimpleMemberCommand<PlanarFigureInteractor>::New();
+        placeCommand->SetCallbackFunction(this, &PlanarFigureInteractor::ProcessExternalPlace);
+        m_ObserverTagInfo.observerTags.push_back(m_ObserverTagInfo.object->AddObserver(EndPlacementPlanarFigureEvent(), placeCommand));
     }
 }
 
-void mitk::PlanarFigureInteractor::CheckUndoPlace()
+void mitk::PlanarFigureInteractor::ProcessExternalCancelPlace()
 {
     mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
     if (!planarFigure->IsPlaced()) {
         if (HandleEvent(mitk::InternalEvent::New(nullptr, this, "Undo-Placement-Event"), GetDataNode())) {
-            planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", false);
-            planarFigure->InvokeEvent(CancelPlacementPlanarFigureEvent());
+//             planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", false);
         }
     }
-    else {
-        if (HandleEvent(mitk::InternalEvent::New(nullptr, this, "Undo-Placement-Event"), GetDataNode())) {
-            planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
-            planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
+}
+
+void mitk::PlanarFigureInteractor::ProcessExternalPlace()
+{
+    mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+    if (planarFigure->IsPlaced()) {
+        if (HandleEvent(mitk::InternalEvent::New(nullptr, this, "Placement-Event"), GetDataNode())) {
+//             planarFigure->GetPropertyList()->SetBoolProperty("initiallyplaced", true);
         }
     }
 }
@@ -121,10 +133,10 @@ bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
-  bool isFigureFinished = false;
-  planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
-
-  return planarFigure->IsPlaced() && isFigureFinished;
+//   bool isFigureFinished = false;
+//   planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
+// 
+  return planarFigure->IsPlaced() && planarFigure->IsFinalized();
 }
 
 bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -161,6 +173,7 @@ bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
 
   // Move current control point to this point
   planarFigure->SetCurrentControlPoint( point2D );
+  m_PointMoved = true;
 
   // Re-evaluate features
   planarFigure->EvaluateFeatures();
@@ -171,19 +184,61 @@ bool mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
   return true;
 }
 
+void mitk::PlanarFigureInteractor::FinalizeFigure()
+{
+    mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
+
+    planarFigure->Modified();
+    planarFigure->DeselectControlPoint();
+
+    //////////////////////////////////////////////////////////////////////////
+    // Remove last control point
+    int pointsBefore = planarFigure->GetNumberOfControlPoints();
+
+    mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+        OpREMOVE, mitk::Point2D(), planarFigure->GetNumberOfControlPoints() - 1);
+
+    planarFigure->ExecuteOperation(doOp);
+    int pointsAfter = planarFigure->GetNumberOfControlPoints();
+
+    if (m_UndoEnabled && pointsAfter != pointsBefore)
+    {
+        mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+            OpINSERT, planarFigure->GetControlPoint(planarFigure->GetNumberOfControlPoints() - 1), planarFigure->GetNumberOfControlPoints() - 1);
+
+        OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Remove point");
+        m_UndoController->SetOperationEvent(operationEvent);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    // Finalize figure
+    mitk::PlanarFigureOperation *finalizeOp = new mitk::PlanarFigureOperation(
+        OpCLOSECELL, mitk::Point2D());
+
+    if (m_UndoEnabled)
+    {
+        mitk::PlanarFigureOperation* undoFinalizeOp = new mitk::PlanarFigureOperation(
+            OpOPENCELL, mitk::Point2D());
+
+        OperationEvent *operationEvent = new OperationEvent(planarFigure, finalizeOp, undoFinalizeOp, "Finalize figure");
+        m_UndoController->SetOperationEvent(operationEvent);
+    }
+
+    planarFigure->ExecuteOperation(finalizeOp);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
+    GetDataNode()->Modified();
+    planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
+    planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
+}
+
 bool mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-
-  planarFigure->Modified();
-  planarFigure->DeselectControlPoint();
-  planarFigure->RemoveLastControlPoint();
-  planarFigure->SetProperty( "initiallyplaced", mitk::BoolProperty::New( true ) );
-  GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
-  GetDataNode()->Modified();
-  planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
-  planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
-
+    FinalizeFigure();
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
   return false;
@@ -220,7 +275,7 @@ bool mitk::PlanarFigureInteractor::EndHovering( StateMachineAction*, Interaction
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-  return ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()  );
+  return ( planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  );
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigureFinished( const InteractionEvent* /*interactionEvent*/ )
@@ -243,6 +298,7 @@ bool mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
 
+  int index = planarFigure->GetSelectedControlPoint();
   bool wasSelected = planarFigure->DeselectControlPoint();
   if ( wasSelected )
   {
@@ -253,6 +309,24 @@ bool mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
     GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
 //    GetDataNode()->SetBoolProperty( "planarfigure.ishovering", false );
     GetDataNode()->Modified();
+
+    if (m_PointMoved) {
+        m_PointMoved = false;
+        mitk::OperationEvent::IncCurrGroupEventId();
+        mitk::OperationEvent::IncCurrObjectEventId();
+        mitk::OperationEvent::ExecuteIncrement();
+        mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+            OpMOVE, planarFigure->GetControlPoint(index), index);
+
+        if (m_UndoEnabled)
+        {
+            mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+                OpMOVE, m_StartMovePosition, index);
+
+            OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Move point");
+            m_UndoController->SetOperationEvent(operationEvent);
+        }
+    }
   }
 
   return true;
@@ -320,13 +394,14 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   *
   * With this check here this problem can be avoided. However a redesign of the insertion logic should be considered
   */
-  bool isFigureFinished = false;
-  planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
+//   bool isFigureFinished = false;
+//   planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
+  // Replaced with IsFinalized
 
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
-  if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) && isFigureFinished)
+  if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) && planarFigure->IsFinalized())
   {
     nextIndex = this->IsPositionOverFigure(
       positionEvent,
@@ -347,6 +422,27 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
     point2D = planarFigure->GetPreviewControlPoint();
   }
 
+  int prevPointIndex = planarFigure->GetSelectedControlPoint();
+  if (prevPointIndex != -1 && m_PointMoved) {
+      m_PointMoved = false;
+      mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+          OpMOVE, planarFigure->GetControlPoint(prevPointIndex), prevPointIndex);
+
+      if (m_UndoEnabled)
+      {
+          mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+              OpMOVE, m_StartMovePosition, prevPointIndex);
+
+          OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Move point");
+          m_UndoController->SetOperationEvent(operationEvent);
+      }
+  }
+
+  if (planarFigure->IsFinalized()) {
+      mitk::OperationEvent::IncCurrGroupEventId();
+      mitk::OperationEvent::IncCurrObjectEventId();
+      mitk::OperationEvent::ExecuteIncrement();
+  }
   mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
       OpINSERT, point2D, nextIndex);
 
@@ -416,6 +512,10 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
     return false;
   }
 
+  mitk::OperationEvent::IncCurrGroupEventId();
+  mitk::OperationEvent::IncCurrObjectEventId();
+  mitk::OperationEvent::ExecuteIncrement();
+
   mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
       OpADD, point2D, -1);
 
@@ -429,6 +529,9 @@ bool mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
   }
 
   planarFigure->ExecuteOperation(doOp);
+
+  m_StartMovePosition = point2D;
+  m_PointMoved = false;
 
   if (!m_UndoEnabled)
       delete doOp;
@@ -622,10 +725,29 @@ bool mitk::PlanarFigureInteractor::SelectPoint( StateMachineAction*, Interaction
     projectionPlane,
     renderer->GetDisplayGeometry() );
 
+  int prevPointIndex = planarFigure->GetSelectedControlPoint();
+  if (prevPointIndex != -1 && m_PointMoved) {
+      // We need this due to place-by-drag
+      m_PointMoved = false;
+      mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
+            OpMOVE, planarFigure->GetControlPoint(prevPointIndex), prevPointIndex);
+
+        if (m_UndoEnabled)
+        {
+            mitk::PlanarFigureOperation* undoOp = new mitk::PlanarFigureOperation(
+                OpMOVE, m_StartMovePosition, prevPointIndex);
+
+            OperationEvent *operationEvent = new OperationEvent(planarFigure, doOp, undoOp, "Move point");
+            m_UndoController->SetOperationEvent(operationEvent);
+        }
+  }
+
   if ( pointIndex >= 0 )
   {
     // If mouse is above control point, mark it as selected
     planarFigure->SelectControlPoint( pointIndex );
+    m_StartMovePosition = planarFigure->GetControlPoint(pointIndex);
+    m_PointMoved = false;
   }
   else
   {
@@ -662,6 +784,9 @@ bool mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, Inte
   int selectedControlPoint = planarFigure->GetSelectedControlPoint();
   Point2D point2D = planarFigure->GetControlPoint(selectedControlPoint);
 
+  mitk::OperationEvent::IncCurrGroupEventId();
+  mitk::OperationEvent::IncCurrObjectEventId();
+  mitk::OperationEvent::ExecuteIncrement();
   mitk::PlanarFigureOperation *doOp = new mitk::PlanarFigureOperation(
       OpREMOVE, point2D, selectedControlPoint);
 

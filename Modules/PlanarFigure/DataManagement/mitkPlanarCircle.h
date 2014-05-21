@@ -49,6 +49,11 @@ public:
 
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false );
 
+  unsigned int GetPlacementNumberOfControlPoints() const
+  {
+      return 2;
+  }
+
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {

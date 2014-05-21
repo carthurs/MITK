@@ -28,7 +28,6 @@ mitk::PlanarEllipse::PlanarEllipse()
       m_TreatAsCircle(true)
 {
     // Ellipse has three control points
-    this->ResetNumberOfControlPoints( 3 );
     this->SetNumberOfPolyLines( 1 );
     this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
@@ -108,12 +107,6 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         return true;
     }
     return false;
-}
-
-void mitk::PlanarEllipse::PlaceFigure( const mitk::Point2D &point )
-{
-    PlanarFigure::PlaceFigure( point );
-    m_SelectedControlPoint = 1;
 }
 
 mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)

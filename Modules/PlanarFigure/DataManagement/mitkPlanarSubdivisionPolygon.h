@@ -39,19 +39,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
-  {
-    return 3;
-  }
-
-
-  /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const
-  {
-    return 1000;
-  }
-
   /** \brief How many times should we generate a round of subdivisions? */
   unsigned int GetSubdivisionRounds() const
   {

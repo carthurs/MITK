@@ -30,7 +30,6 @@ mitk::PlanarCircle::PlanarCircle()
   m_MinMaxRadiusContraintsActive(false)
 {
   // Circle has two control points
-  this->ResetNumberOfControlPoints( 2 );
   this->SetNumberOfPolyLines( 1 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
@@ -43,7 +42,7 @@ mitk::PlanarCircle::~PlanarCircle()
 bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/ )
 {
   // moving center point
-  if(index == 0)
+  if (index == 0)
   {
     const Point2D &centerPoint = GetControlPoint( 0 );
     Point2D boundaryPoint = GetControlPoint( 1 );
@@ -51,16 +50,10 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
-    PlanarFigure::SetControlPoint( 0, point );
     PlanarFigure::SetControlPoint( 1, boundaryPoint );
-    return true;
   }
-  else if ( index == 1 )
-  {
-    PlanarFigure::SetControlPoint( index, point );
-    return true;
-  }
-  return false;
+
+  return PlanarFigure::SetControlPoint( index, point );
 }
 
 mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int index, const Point2D &point)

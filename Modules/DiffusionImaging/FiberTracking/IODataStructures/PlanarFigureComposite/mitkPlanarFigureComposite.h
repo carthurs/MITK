@@ -58,6 +58,11 @@ namespace mitk {
 
     // ///MUST HAVE IMPLEMENTATION//////
     bool SetControlPoint(unsigned int, const Point2D &, bool);
+
+    unsigned int GetPlacementNumberOfControlPoints() const
+    {
+        return 0;
+    }
     unsigned int GetMinimumNumberOfControlPoints() const
     {
       return 0;

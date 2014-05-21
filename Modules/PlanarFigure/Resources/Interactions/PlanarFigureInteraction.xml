@@ -7,13 +7,10 @@
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="PlaceFigure"> <!-- Figure is not placed -->
       <condition name="figure_is_placed" inverted="true"/>
     </transition>
-
-    <transition event_class="InternalEvent" event_variant="Placement-Event" target="EditFigure" >
-     </transition>
   </state>
 
   <state name="FigurePlaced">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
     
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Start" >
@@ -58,7 +55,7 @@
   </state>
 
   <state name="ControlPointSelected">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="ControlPointSelected" >
@@ -74,10 +71,13 @@
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
       <action name="add_initial_point" ID="11" /> <!-- AcADD -->
     </transition>
+
+    <transition event_class="InternalEvent" event_variant="Placement-Event" target="EditFigure" >
+    </transition>
   </state>
 
   <state name="EditFigure">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
@@ -95,7 +95,7 @@
   </state>
 
   <state name="HoveringOverFigure">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
@@ -152,7 +152,7 @@
   </state>
 
   <state name="HoveringOverPoint">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
@@ -211,7 +211,7 @@
   </state>
 
   <state name="HoveringAfterPointRemovedGuardState">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="InternalEvent" event_variant="Dummy-Event" target="HoveringOverFigure" >
@@ -228,7 +228,7 @@
   </state>
 
   <state name="FigurePlacedByDrag">
-    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="Start" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
      </transition>
 
      <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >

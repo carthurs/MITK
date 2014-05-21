@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarPoint::PlanarPoint()
 {
   // Circle has two control points
-  this->ResetNumberOfControlPoints( 1 );
   this->SetNumberOfPolyLines( 0 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }

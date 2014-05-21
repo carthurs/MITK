@@ -27,7 +27,6 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
     m_ConstrainCircle(true),
     m_ConstrainThickness(true)
 {
-  this->ResetNumberOfControlPoints(4);
   this->SetNumberOfPolyLines(2);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
@@ -164,6 +163,11 @@ void mitk::PlanarDoubleEllipse::SetNumberOfSegments(unsigned int numSegments)
     this->GeneratePolyLine();
     this->Modified();
   }
+}
+
+unsigned int mitk::PlanarDoubleEllipse::GetPlacementNumberOfControlPoints() const
+{
+    return 4;
 }
 
 unsigned int mitk::PlanarDoubleEllipse::GetMaximumNumberOfControlPoints() const

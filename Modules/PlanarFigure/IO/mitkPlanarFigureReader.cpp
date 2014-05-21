@@ -242,8 +242,7 @@ void mitk::PlanarFigureReader::GenerateData()
     // If we load a planarFigure, it has definitely been placed correctly.
     // If we do not set this property here, we cannot load old planarFigures
     // without messing up the interaction (PF-Interactor needs this property.
-    planarFigure->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
-
+    planarFigure->SetFigureFinalized(true);
 
     // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");

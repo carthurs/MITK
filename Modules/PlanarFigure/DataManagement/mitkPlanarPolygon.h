@@ -54,6 +54,11 @@ public:
   //virtual void Initialize();
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const
+  {
+      return 2;
+  }
+
   /** \brief Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
