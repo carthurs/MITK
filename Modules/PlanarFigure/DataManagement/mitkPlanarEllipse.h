@@ -120,6 +120,12 @@ protected:
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
+  // Feature identifiers
+  const unsigned int FEATURE_ID_RADIUS1;
+  const unsigned int FEATURE_ID_RADIUS2;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
+  const unsigned int FEATURE_ID_AREA;
+
   //Member variables:
   double m_MinRadius;
   double m_MaxRadius;
