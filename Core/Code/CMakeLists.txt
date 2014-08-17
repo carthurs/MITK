@@ -25,6 +25,7 @@ MITK_CREATE_MODULE(Core
                   ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
                   VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkImagingStatistics+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
                   OpenGL
+                  CGAL
   EXPORT_DEFINE MITK_CORE_EXPORT
   WARNINGS_AS_ERRORS
   # Do not automatically create CppMicroServices initialization code.

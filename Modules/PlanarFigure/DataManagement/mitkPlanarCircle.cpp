@@ -24,7 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
   FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) ),
+  FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
+  FEATURE_ID_AREA(this->AddFeature("Area", "mm2")),
   m_MinRadius(0),
   m_MaxRadius(100),
   m_MinMaxRadiusContraintsActive(false)
@@ -144,11 +145,13 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
   const Point3D &p1 = this->GetWorldControlPoint( 1 );
 
   double radius = p0.EuclideanDistanceTo( p1 );
+  double circumference = 2.0 * vnl_math::pi * radius;
   double area = vnl_math::pi * radius * radius;
 
   this->SetQuantity( FEATURE_ID_RADIUS, radius );
   this->SetQuantity( FEATURE_ID_DIAMETER, 2*radius );
-  this->SetQuantity( FEATURE_ID_AREA, area );
+  this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference);
+  this->SetQuantity(FEATURE_ID_AREA, area);
 }
 
 

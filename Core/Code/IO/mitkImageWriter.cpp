@@ -220,7 +220,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
    }
 
    //use compression if available
-   imageIO->UseCompressionOn();
+   imageIO->UseCompressionOff();
 
    imageIO->SetIORegion(ioRegion);
    imageIO->SetFileName(fileName);

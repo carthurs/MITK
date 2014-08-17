@@ -22,7 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 mitk::PlanarEllipse::PlanarEllipse()
-    : m_MinRadius(0),
+    : FEATURE_ID_RADIUS1(this->AddFeature("Radius 1", "mm")),
+      FEATURE_ID_RADIUS2(this->AddFeature("Radius 2", "mm")),
+      FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
+      FEATURE_ID_AREA(this->AddFeature("Area", "mm2")), m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
       m_TreatAsCircle(true)
@@ -215,7 +218,21 @@ void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
+    // Calculate circle radius and area
+    const Point3D &p0 = this->GetWorldControlPoint(0);
+    const Point3D &p1 = this->GetWorldControlPoint(1);
+    const Point3D &p2 = this->GetWorldControlPoint(2);
 
+    double radius1 = p0.EuclideanDistanceTo(p1);
+    double radius2 = p0.EuclideanDistanceTo(p2);
+    double h = (radius1 - radius2) * (radius1 - radius2) / ((radius1 + radius2) * (radius1 + radius2));
+    double circumference = vnl_math::pi * (radius1 + radius2) * (1 + 3 * h / (10 + sqrt(4 - 3 * h)));
+    double area = vnl_math::pi * radius1 * radius2;
+
+    this->SetQuantity(FEATURE_ID_RADIUS1, radius1);
+    this->SetQuantity(FEATURE_ID_RADIUS2, radius2);
+    this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference);
+    this->SetQuantity(FEATURE_ID_AREA, area);
 }
 
 

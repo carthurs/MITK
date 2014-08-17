@@ -400,7 +400,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         {
           Poco::Zip::Compress zipper( file, true );
           Poco::Path tmpdir( m_WorkingDirectory );
-          zipper.addRecursive( tmpdir );
+          zipper.addRecursive(tmpdir, Poco::Zip::ZipCommon::CL_SUPERFAST);
           zipper.close();
         }
         try
