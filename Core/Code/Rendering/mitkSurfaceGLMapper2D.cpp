@@ -153,35 +153,12 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   //
-  // get the TimeGeometry of the input object
-  //
-  const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
-  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
-    return;
-
-  if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
-    m_LineWidth = 1;
-  else
-    m_LineWidth = dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
-
-  //
   // get the world time
   //
   Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
   assert( worldGeometry.IsNotNull() );
 
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-  int timestep=0;
-
-  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    timestep = inputTimeGeometry->TimePointToTimeStep( time );
-
- // int timestep = this->GetTimestep();
-
-  if( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
-    return;
-
-  vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
+  vtkPolyData * vtkpolydata = input->GetVtkPolyData(this->GetTimestep());
   if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
     return;
 
@@ -230,7 +207,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       lut = m_LUT;
     }
 
-    vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
+    vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
@@ -274,7 +251,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         vtk2itk(vp, points[i]);
     }
 
-    vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, timestep);
+    vtkSmartPointer<vtkPolyData> cutResult = input->CutWithPlane(points, this->GetTimestep());
 
 //     m_Cutter->SetInputData(vtkpolydata);
 //     m_Cutter->Update();
