@@ -164,6 +164,12 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 
+  if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
+      m_LineWidth = 1;
+  else
+      m_LineWidth = dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
+
+
   //apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
 

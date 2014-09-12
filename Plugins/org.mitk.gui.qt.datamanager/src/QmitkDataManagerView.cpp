@@ -166,7 +166,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsRemoved (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsRemoved( const QModelIndex&, int, int )) );
-  QObject::connect( m_NodeTreeView->selectionModel()
+  QObject::connect(m_NodeTreeView->selectionModel()
     , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
     , this
     , SLOT( NodeSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
@@ -828,9 +828,9 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
     {
       node = *it;
       this->GetDataStorage()->Remove(node);
-      if (m_GlobalReinitOnNodeDelete)
-          this->GlobalReinit(false);
     }
+    if (m_GlobalReinitOnNodeDelete)
+        this->GlobalReinit(false);
   }
 }
 
@@ -1034,9 +1034,25 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
   }
+
   //changing the selection does NOT require any rendering processes!
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+void QmitkDataManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+{
+    MITK_INFO << "QmitkDataManagerView::OnSelectionChanged " << nodes.size() << " nodes";
+    m_NodeTreeView->clearSelection();
+
+    for (int i = 0; i < nodes.size(); ++i) {
+        QModelIndex itemIndex = m_NodeTreeModel->GetIndex(nodes[i]);
+        m_NodeTreeView->selectionModel()->select(m_FilterModel->mapFromSource(itemIndex), QItemSelectionModel::Select);
+        m_NodeTreeView->scrollTo(m_FilterModel->mapFromSource(itemIndex));
+    }
+}
+
+
+
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)
 {
@@ -1059,6 +1075,7 @@ mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activat
 
 void QmitkDataManagerView::NodeChanged(const mitk::DataNode* node)
 {
-    m_FilterModel->invalidate();
+    QMetaObject::invokeMethod(m_FilterModel, "invalidate", Qt::QueuedConnection);
+//    m_FilterModel->invalidate();
 }
 

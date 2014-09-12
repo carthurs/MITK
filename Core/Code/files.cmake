@@ -281,6 +281,8 @@ set(CPP_FILES
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkXML2EventParser.cpp
+  Interactions/mitkPickingEventObserver.cpp
+  Interactions/mitkDataNodePickingEventObserver.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
@@ -400,6 +402,7 @@ Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
+#Interactions/DisplayConfigMITKPicking.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml
