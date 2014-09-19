@@ -104,8 +104,8 @@ private:
         return data == other.data && cellId == other.cellId;
     }
 
-    int cellId;
     vtkPolyData* data;
+    int cellId;
     CGAL_Triangle _cache;
 };
 
@@ -181,7 +181,7 @@ public:
         pointsOut->Allocate(2 * segments.size());
         pdOut->Allocate(segments.size());
 
-        for (int i = 0; i < segments.size(); ++i) {
+        for (size_t i = 0; i < segments.size(); ++i) {
             CGAL_Segment* s = boost::get<CGAL_Segment>(&segments[i].first);
 
             if (!s) {
