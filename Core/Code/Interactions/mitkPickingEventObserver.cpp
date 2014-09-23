@@ -21,7 +21,7 @@ PickingEventObserver::~PickingEventObserver()
 void PickingEventObserver::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
     auto pressEvent = dynamic_cast<const mitk::MousePressEvent*>(interactionEvent);
-    if (pressEvent != nullptr && pressEvent->GetEventButton() & InteractionEvent::LeftMouseButton) {
+    if (pressEvent != nullptr && pressEvent->GetEventButton() & InteractionEvent::LeftMouseButton && !isHandled) {
         m_startedDragging = true;
         return;
     }
@@ -34,7 +34,7 @@ void PickingEventObserver::Notify(InteractionEvent* interactionEvent, bool isHan
 
     auto releaseEvent = dynamic_cast<const mitk::MouseReleaseEvent*>(interactionEvent);
     if (releaseEvent != nullptr && m_startedDragging && releaseEvent->GetEventButton() & InteractionEvent::LeftMouseButton) {
-        if (!m_isDragging && !isHandled) {
+         if (!m_isDragging && !isHandled) {
             HandlePickingEvent(interactionEvent);
         }
 

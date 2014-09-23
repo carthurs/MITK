@@ -78,6 +78,12 @@ QmitkAbstractRenderEditor::~QmitkAbstractRenderEditor()
     d->m_Prefs->OnChanged.RemoveListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
                                          (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
+
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if (s)
+  {
+      s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener);
+  }
 }
 
 void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
