@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLocalStorageHandler.h"
 
 #include <vtkActor.h>
-#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
@@ -126,7 +125,7 @@ public:
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkOpenGLPolyDataMapper::New();
+        m_VtkPolyDataMapper = vtkPainterPolyDataMapper::New();
         m_VtkPolyDataNormals = vtkPolyDataNormals::New();
         m_Actor = vtkActor::New();
         m_ClippingPlaneCollection = vtkPlaneCollection::New();
