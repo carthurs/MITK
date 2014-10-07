@@ -275,7 +275,7 @@ bool mitk::PlanarFigureInteractor::EndHovering( StateMachineAction*, Interaction
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
-  return ( planarFigure->GetNumberOfControlPoints() > planarFigure->GetMinimumNumberOfControlPoints()  );
+  return ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMinimumNumberOfControlPoints()  );
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigureFinished( const InteractionEvent* /*interactionEvent*/ )
@@ -636,6 +636,10 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   mitk::Geometry2D *planarFigureGeometry = dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
   const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
+  if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
+      return false;
+  }
+
   mitk::Point2D pointProjectedOntoLine;
   int previousControlPoint = this->IsPositionOverFigure( positionEvent,
                                                          planarFigure,
@@ -670,6 +674,10 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::Geometry2D *planarFigureGeometry = dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
   const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
+
+  if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
+      return false;
+  }
 
 
   int pointIndex = -1;
@@ -867,6 +875,15 @@ bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const Interac
     // don't react, when interaction is too far away
     return false;
   }
+
+  BaseRenderer* renderer = posEvent->GetSender();
+  assert(renderer);
+  if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
+      // Don't react in 3D
+      return false;
+  }
+
+
   return true;
 }
 
@@ -1068,6 +1085,10 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
 
   BaseRenderer* renderer = positionEvent->GetSender();
   assert(renderer);
+
+  if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
+      return false;
+  }
 
   // Get the timestep to support 3D+t
   int timeStep( renderer->GetTimeStep( planarFigure ) );
