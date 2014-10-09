@@ -83,7 +83,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
 
 void mitk::PlanarFigureInteractor::RemoveObservers()
 {
-    for (int i = 0; i < m_ObserverTagInfo.observerTags.size(); ++i) {
+    for (size_t i = 0; i < m_ObserverTagInfo.observerTags.size(); ++i) {
         m_ObserverTagInfo.object->RemoveObserver(m_ObserverTagInfo.observerTags[i]);
     }
     m_ObserverTagInfo.object = nullptr;
