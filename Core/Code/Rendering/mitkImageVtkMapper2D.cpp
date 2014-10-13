@@ -294,6 +294,33 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       vtkSmartPointer<vtkImageGradientMagnitude> magFilter = vtkSmartPointer<vtkImageGradientMagnitude>::New();
       magFilter->SetInputData(localStorage->m_ReslicedImage);
       magFilter->Update();
+
+      // Find "background" pixels and account for the fact that they produce wrong gradients at border
+      for (int y = 0; y < magFilter->GetOutput()->GetDimensions()[1]; ++y) {
+          for (int x = 0; x < magFilter->GetOutput()->GetDimensions()[0]; ++x) {
+              if (fabsf(localStorage->m_ReslicedImage->GetScalarComponentAsDouble(x, y, 0, 0) - (-32768.0)) < 1e-3) { // see mitk::ExtractSliceFilter
+                  magFilter->GetOutput()->SetScalarComponentFromDouble(x, y, 0, 0, 0);
+              }
+
+              int offsets[][2] = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
+
+              for (int i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i) {
+                  int xoff = x + offsets[i][0];
+                  int yoff = y + offsets[i][1];
+
+                  if (xoff < 0 || xoff >= magFilter->GetOutput()->GetDimensions()[0] || yoff < 0 || yoff >= magFilter->GetOutput()->GetDimensions()[1]) {
+                      continue;
+                  }
+
+                  if (fabsf(localStorage->m_ReslicedImage->GetScalarComponentAsDouble(xoff, yoff, 0, 0) - (-32768.0)) < 1e-3) { // see mitk::ExtractSliceFilter
+                      magFilter->GetOutput()->SetScalarComponentFromDouble(x, y, 0, 0, 0);
+                      break;
+                  }
+              }
+          }
+      }
+      
+
       localStorage->m_ReslicedImage = magFilter->GetOutput();
       
       vtkSmartPointer<vtkImageHistogramStatistics> stats = vtkSmartPointer<vtkImageHistogramStatistics>::New();
