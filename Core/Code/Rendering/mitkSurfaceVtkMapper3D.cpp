@@ -224,7 +224,7 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
     property->SetSpecular( coeff_specular );
     property->SetSpecularPower( power_specular );
 
-    property->SetAmbientColor( ambient );
+    property->SetAmbientColor(ambient);
     property->SetDiffuseColor( diffuse );
     property->SetSpecularColor( specular );
   }
@@ -288,7 +288,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   // Applying shading properties
-  Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
+  //Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
   this->ApplyShaderProperties(renderer);
   // VTK Properties
   ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
