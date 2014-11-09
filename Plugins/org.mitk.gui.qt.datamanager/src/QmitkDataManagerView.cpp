@@ -257,7 +257,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
         MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
         continue;
       }
-      contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      contextMenuAction = new QAction( QIcon( QString::fromStdString(cmIcon)), QString::fromStdString(cmLabel), parent);
       tmpDescriptor->AddAction(contextMenuAction);
       m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(tmpDescriptor,contextMenuAction));
       m_ConfElements[contextMenuAction] = *cmActionsIt;
