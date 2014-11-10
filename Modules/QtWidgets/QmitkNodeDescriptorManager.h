@@ -75,6 +75,22 @@ public:
   QmitkNodeDescriptor* GetDescriptor(const QString& _ClassName) const;
 
   ///
+  /// Get all descriptors in the descriptors list that match the given node.
+  ///
+  /// \return a list of QmitkNodeDescriptor for the given node or empty list if there is no QmitkNodeDescriptor for _Node
+  /// \sa AddDescriptor()
+  ///
+  QList<QmitkNodeDescriptor*> GetAllDescriptors(const mitk::DataNode* _Node) const;
+
+  ///
+  /// Get all QmitkNodeDescriptors for the given class name
+  ///
+  /// \return a list of QmitkNodeDescriptor for the given class name or empty list if there is no QmitkNodeDescriptor for _ClassName
+  ///
+  QList<QmitkNodeDescriptor*> GetAllDescriptors(const QString& _ClassName) const;
+
+
+  ///
   /// \return The UnknownDataNodeDescriptor, which is the default Descriptor for all Nodes.
   ///
   QmitkNodeDescriptor* GetUnknownDataNodeDescriptor() const;
