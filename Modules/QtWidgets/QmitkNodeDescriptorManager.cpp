@@ -118,46 +118,85 @@ QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const QString& _
 
   return _Descriptor;
 }
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _Node ) const
-{
-  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
-  actions.append(m_UnknownDataNodeDescriptor->GetActions());
-  QmitkNodeDescriptor* lastDescriptor = m_UnknownDataNodeDescriptor;
 
-  for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+QList<QmitkNodeDescriptor*> QmitkNodeDescriptorManager::GetAllDescriptors(const mitk::DataNode* _Node) const
+{
+  QList<QmitkNodeDescriptor*> _Descriptors;
+
+  for (QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
   {
-    if((*it)->CheckNode(_Node))
-    {
-      actions.append(lastDescriptor->GetSeparator());
-      lastDescriptor = *it;
-      actions.append(lastDescriptor->GetBatchActions());
-      actions.append(lastDescriptor->GetActions());
+    if ((*it)->CheckNode(_Node)) {
+      _Descriptors << *it;
     }
   }
+
+  return _Descriptors;
+}
+
+QList<QmitkNodeDescriptor*> QmitkNodeDescriptorManager::GetAllDescriptors(const QString& _ClassName) const
+{
+  QList<QmitkNodeDescriptor*> _Descriptors;
+
+  if (_ClassName == "Unknown")
+  {
+    _Descriptors << m_UnknownDataNodeDescriptor;
+  }
+  else
+  {
+    for (QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+    {
+      if ((*it)->GetClassName() == _ClassName)
+        _Descriptors << *it;
+    }
+  }
+
+  return _Descriptors;
+}
+
+
+QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _Node ) const
+{
+  QList<QmitkNodeDescriptor*> descriptors;
+  descriptors << m_UnknownDataNodeDescriptor;
+  descriptors << GetAllDescriptors(_Node);
+  QList<QAction*> actions;
+
+  for (QList<QmitkNodeDescriptor*>::const_iterator it = descriptors.begin(); it != descriptors.end(); ++it)
+  {
+    actions.append((*it)->GetBatchActions());
+    actions.append((*it)->GetActions());
+    actions.append((*it)->GetSeparator());
+  }
+  actions.removeLast();
 
   return actions;
 }
 
 QList<QAction*> QmitkNodeDescriptorManager::GetActions( const QList<mitk::DataNode::Pointer> &_Nodes ) const
 {
-  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
-  QSet<QmitkNodeDescriptor*> nodeDescriptors;
-  QmitkNodeDescriptor* lastDescriptor;
+  QList<QAction*> actions;
+  QSet<QmitkNodeDescriptor*> nodeDescriptorsSet;
 
   // find all descriptors for the nodes (unique)
   foreach (mitk::DataNode::Pointer node, _Nodes)
   {
-    lastDescriptor = this->GetDescriptor(node);
-    nodeDescriptors.insert(lastDescriptor);
+    QList<QmitkNodeDescriptor*> currentNodeDescriptors = GetAllDescriptors(node);
+    foreach(QmitkNodeDescriptor* descriptor, currentNodeDescriptors) {
+      nodeDescriptorsSet.insert(descriptor);
+    }
   }
+
+  QList<QmitkNodeDescriptor*> nodeDescriptorsList;
+  nodeDescriptorsList << m_UnknownDataNodeDescriptor;
+  nodeDescriptorsList << nodeDescriptorsSet.toList();
+
   // add all actions for the found descriptors
-  lastDescriptor = m_UnknownDataNodeDescriptor;
-  foreach (QmitkNodeDescriptor* descr, nodeDescriptors)
+  foreach(QmitkNodeDescriptor* descr, nodeDescriptorsList)
   {
-    actions.append(lastDescriptor->GetSeparator());
-    lastDescriptor = descr;
-    actions.append(lastDescriptor->GetBatchActions());
+    actions.append(descr->GetBatchActions());
+    actions.append(descr->GetSeparator());
   }
+  actions.removeLast();
 
   return actions;
 }
