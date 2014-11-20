@@ -520,12 +520,7 @@ void mitk::ToolManager::UnregisterClient()
   --m_RegisteredClients;
   if ( m_RegisteredClients < 1 )
   {
-    if ( m_ActiveTool )
-    {
-      m_ActiveTool->Deactivated();
-      //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
-      m_ActiveToolRegistration.Unregister();
-    }
+      ActivateTool(-1);
   }
 }
 

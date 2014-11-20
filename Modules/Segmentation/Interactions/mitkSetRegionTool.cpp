@@ -41,6 +41,7 @@ mitk::SetRegionTool::~SetRegionTool()
 
 void mitk::SetRegionTool::ConnectActionsAndFunctions()
 {
+  CONNECT_FUNCTION( "Move", OnMouseMoved);
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
   CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);

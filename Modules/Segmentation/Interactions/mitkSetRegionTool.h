@@ -60,6 +60,7 @@ class MitkSegmentation_EXPORT SetRegionTool : public FeedbackContourTool
     virtual void Activated();
     virtual void Deactivated();
 
+    virtual bool OnMouseMoved ( StateMachineAction*, InteractionEvent* ) { return false; }
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
     virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );

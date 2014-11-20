@@ -110,7 +110,7 @@ void mitk::Tool::Activated()
 void mitk::Tool::Deactivated()
 {
   // ToDo: reactivate this feature!
-  //StateMachine::ResetStatemachineToStartState(); // forget about the past
+  EventStateMachine::ResetToStartState(); // forget about the past
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
