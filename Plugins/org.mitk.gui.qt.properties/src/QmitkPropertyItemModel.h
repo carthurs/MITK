@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
 
+#include <org_mitk_gui_qt_properties_Export.h>
+
+
 class QmitkPropertyItem;
 
 namespace berry
@@ -39,7 +42,7 @@ namespace mitk
   };
 }
 
-class QmitkPropertyItemModel : public QAbstractItemModel
+class PROPERTIES_EXPORT QmitkPropertyItemModel : public QAbstractItemModel
 {
   Q_OBJECT
 

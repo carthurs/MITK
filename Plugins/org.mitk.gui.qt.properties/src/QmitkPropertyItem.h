@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QList>
 #include <QVariant>
 
-class QmitkPropertyItem
+#include <org_mitk_gui_qt_properties_Export.h>
+
+class PROPERTIES_EXPORT QmitkPropertyItem
 {
 public:
   explicit QmitkPropertyItem(const QList<QVariant>& data);

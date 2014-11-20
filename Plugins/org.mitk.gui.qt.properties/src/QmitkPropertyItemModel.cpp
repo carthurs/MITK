@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetPropertyService.h"
-#include "QmitkPropertiesPreferencePage.h"
+#include "internal/mitkGetPropertyService.h"
+#include "internal/QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyItem.h"
 #include "QmitkPropertyItemModel.h"
 #include <berryIBerryPreferences.h>

@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetPropertyService.h"
+#include "internal/mitkGetPropertyService.h"
 #include "QmitkPropertyItemDelegate.h"
 #include "QmitkPropertyItemModel.h"
 #include <mitkBaseProperty.h>

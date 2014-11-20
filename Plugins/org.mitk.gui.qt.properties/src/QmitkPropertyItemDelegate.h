@@ -22,10 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
 
+#include <org_mitk_gui_qt_properties_Export.h>
+
+
 class QComboBox;
 class QResizeEvent;
 
-class QmitkComboBoxListView : public QListView
+class PROPERTIES_EXPORT QmitkComboBoxListView : public QListView
 {
   Q_OBJECT
 
@@ -42,7 +45,7 @@ private:
   QComboBox* m_ComboBox;
 };
 
-class QmitkPropertyItemDelegate : public QStyledItemDelegate
+class PROPERTIES_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
