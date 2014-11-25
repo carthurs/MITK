@@ -133,7 +133,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
   }
 
-  surfaceFilter->UpdateLargestPossibleRegion();
+surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
   m_Surface = surfaceFilter->GetOutput();
@@ -145,16 +145,17 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   polyData->SetVerts(0);
   polyData->SetLines(0);
 
-  if ( smooth || applyMedian || decimateMesh)
+  if (smooth || applyMedian || decimateMesh)
   {
-    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
-
-    normalsGen->SetInputData( polyData );
-    normalsGen->Update();
-
-    m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
-
-    normalsGen->Delete();
+//    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
+// 
+//     normalsGen->SetInputData( polyData );
+//     normalsGen->Update();
+// 
+//     m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
+// 
+//     normalsGen->Delete();
+      m_Surface->SetVtkPolyData(polyData);
   }
   else
   {

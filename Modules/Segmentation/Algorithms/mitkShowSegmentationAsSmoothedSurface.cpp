@@ -438,13 +438,13 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Compute Normals
 
-  vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
-  computeNormals->SetInputData(m_Surface->GetVtkPolyData());
-  computeNormals->SetFeatureAngle(360.0f);
-  computeNormals->FlipNormalsOff();
-  computeNormals->Update();
-
-  m_Surface->SetVtkPolyData(computeNormals->GetOutput());
+//   vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
+//   computeNormals->SetInputData(m_Surface->GetVtkPolyData());
+//   computeNormals->SetFeatureAngle(360.0f);
+//   computeNormals->FlipNormalsOff();
+//   computeNormals->Update();
+// 
+//   m_Surface->SetVtkPolyData(computeNormals->GetOutput());
 
   return true;
 }
