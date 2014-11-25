@@ -1041,7 +1041,6 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
 
 void QmitkDataManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
 {
-    MITK_INFO << "QmitkDataManagerView::OnSelectionChanged " << nodes.size() << " nodes";
     m_NodeTreeView->clearSelection();
 
     for (int i = 0; i < nodes.size(); ++i) {
