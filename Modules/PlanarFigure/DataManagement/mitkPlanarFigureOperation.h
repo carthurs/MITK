@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkPlanarFigureExports.h>
 #include "mitkOperation.h"
-#include "mitkVector.h"
+#include "mitkPoint.h"
 
 
 

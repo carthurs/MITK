@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure modeling a cross with two orthogonal lines
@@ -99,6 +99,7 @@ public:
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const;
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarCross();

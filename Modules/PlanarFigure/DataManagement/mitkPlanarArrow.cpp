@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarArrow.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarArrow::PlanarArrow()
@@ -28,13 +28,7 @@ mitk::PlanarArrow::PlanarArrow()
   this->SetNumberOfPolyLines( 1 );
   this->SetNumberOfHelperPolyLines( 2 );
 
-  //m_PolyLines->InsertElement( 0, VertexContainerType::New());
-
   // Create helper polyline object (for drawing the orthogonal orientation line)
-  //m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
-  //m_HelperPolyLines->InsertElement( 1, VertexContainerType::New());
-  //m_HelperPolyLines->ElementAt( 0 )->Reserve( 2 );
-  //m_HelperPolyLines->ElementAt( 1 )->Reserve( 2 );
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
   m_HelperPolyLinesToBePainted->InsertElement( 1, false );
 }
@@ -48,14 +42,8 @@ void mitk::PlanarArrow::GeneratePolyLine()
 {
   this->ClearPolyLines();
 
-  this->AppendPointToPolyLine( 0, PolyLineElement( this->GetControlPoint( 0 ), 0 ));
-  this->AppendPointToPolyLine( 0, PolyLineElement( this->GetControlPoint( 1 ), 0 ));
-
-  // TODO: start line at specified start point...
-  // Generate poly-line
-  //m_PolyLines->ElementAt( 0 )->Reserve( 2 );
-  //m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
-  //m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
+  this->AppendPointToPolyLine(0, this->GetControlPoint(0));
+  this->AppendPointToPolyLine(0, this->GetControlPoint(1));
 }
 
 void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
@@ -88,8 +76,6 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   const Point2D p1 = this->GetControlPoint( 0 );
   const Point2D p2 = this->GetControlPoint( 1 );
 
-  //const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-  //const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
   Vector2D n1 = p1 - p2;
   n1.Normalize();
 
@@ -101,16 +87,10 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   temp2[0] = n1[0] * cos(-degrees) - n1[1] * sin(-degrees);
   temp2[1] = n1[0] * sin(-degrees) + n1[1] * cos(-degrees);
 
-  this->AppendPointToHelperPolyLine( 0, PolyLineElement( p1, 0 ));
-  this->AppendPointToHelperPolyLine( 0, PolyLineElement( p1 - temp * nonScalingLength, 0 ));
-  this->AppendPointToHelperPolyLine( 1, PolyLineElement( p1, 0 ));
-  this->AppendPointToHelperPolyLine( 1, PolyLineElement( p1 - temp2 * nonScalingLength, 0 ));
-
-  //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p1;
-  //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p1 - temp * nonScalingLength;
-  //m_HelperPolyLines->ElementAt( 1 )->ElementAt( 0 ) = p1;
-  //m_HelperPolyLines->ElementAt( 1 )->ElementAt( 1 ) = p1 - temp2 * nonScalingLength;
-
+  this->AppendPointToHelperPolyLine(0, p1);
+  this->AppendPointToHelperPolyLine(0, Point2D(p1 - temp * nonScalingLength));
+  this->AppendPointToHelperPolyLine(1, p1);
+  this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
 }
 
 
@@ -124,7 +104,6 @@ void mitk::PlanarArrow::EvaluateFeaturesInternal()
   this->SetQuantity( FEATURE_ID_LENGTH, length );
 }
 
-
 void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
@@ -133,4 +112,20 @@ void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
 {
   m_ArrowTipScaleFactor = scale;
+}
+
+bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure& other) const
+{
+  const mitk::PlanarArrow* otherArrow = dynamic_cast<const mitk::PlanarArrow*>(&other);
+  if ( otherArrow )
+  {
+    if ( std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)
+      return false;
+
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
 }

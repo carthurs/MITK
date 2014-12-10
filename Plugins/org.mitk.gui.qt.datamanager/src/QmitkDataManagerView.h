@@ -46,6 +46,8 @@ class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
 class QmitkDataStorageFilterProxyModel;
 class QmitkDataManagerItemDelegate;
+class QmitkNumberPropertySlider;
+class QmitkDataStorageFilterProxyModel;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -81,6 +83,10 @@ public slots:
   /// In this function the the opacity slider is set to the selected nodes opacity value
   ///
   void OpacityActionChanged();
+  /// Invoked when the component action changed
+  /// In this function the the opacity slider is set to the selected nodes opacity value
+  ///
+  void ComponentActionChanged();
   ///
   /// Invoked when the color button is pressed
   ///
@@ -118,10 +124,6 @@ public slots:
   ///
   void NodeTableViewContextMenuRequested( const QPoint & index );
   ///
-  /// \brief Invoked when an element should be saved.
-  ///
-  void SaveSelectedNodes( bool checked = false );
-  ///
   /// \brief Invoked when an element should be removed.
   ///
   void RemoveSelectedNodes( bool checked = false );
@@ -145,10 +147,6 @@ public slots:
   /// \brief Invoked when infos of the selected nodes should be shown in a dialog.
   ///
   void ShowInfoDialogForSelectedNodes ( bool checked = false );
-  ///
-  /// \brief Shows a load dialog.
-  ///
-  void Load ( bool checked = false );
   ///
   /// \brief Reinits everything.
   ///
@@ -199,9 +197,7 @@ protected:
   ///
   /// React to node changes. Overridden from QmitkAbstractView.
   ///
-  virtual void NodeChanged(const mitk::DataNode* node);
-
-
+  virtual void NodeChanged(const mitk::DataNode* /*node*/);
 protected:
 
   QWidget* m_Parent;
@@ -214,7 +210,6 @@ protected:
   QmitkDataStorageFilterProxyModel* m_FilterModel;
   mitk::NodePredicateBase::Pointer m_HelperObjectFilterPredicate;
   mitk::NodePredicateBase::Pointer m_NodeWithNoDataFilterPredicate;
-
   ///
   /// Holds the preferences for the datamanager.
   ///
@@ -242,6 +237,8 @@ protected:
 
   /// A Slider widget to change the opacity of a node
   QSlider* m_OpacitySlider;
+  /// A Slider widget to change the rendered vector component of an image
+  QmitkNumberPropertySlider* m_ComponentSlider;
   /// button to change the color of a node
   QPushButton* m_ColorButton;
   /// TextureInterpolation action

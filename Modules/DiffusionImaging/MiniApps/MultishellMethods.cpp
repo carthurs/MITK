@@ -13,9 +13,6 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
-#include "MiniAppManager.h"
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -35,26 +32,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
 #include <mitkFiberBundleX.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 
 #include <itkRadialMultishellToSingleshellImageFilter.h>
 #include <itkADCAverageFunctor.h>
 #include <itkBiExpFitFunctor.h>
 #include <itkKurtosisFitFunctor.h>
-#include <mitkNrrdDiffusionImageWriter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
+#include <mitkIOUtil.h>
 
-int MultishellMethods(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
+
+  parser.setTitle("Multishell Methods");
+  parser.setCategory("Fiber Tracking and Processing Methods");
+  parser.setDescription("");
+  parser.setContributor("MBI");
+
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("in", "i", ctkCommandLineParser::String, "input file", us::Any(), false);
-  parser.addArgument("out", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-  parser.addArgument("adc", "D", ctkCommandLineParser::Bool, "ADC Average", us::Any(), false);
-  parser.addArgument("akc", "K", ctkCommandLineParser::Bool, "Kurtosis Fit", us::Any(), false);
-  parser.addArgument("biexp", "B", ctkCommandLineParser::Bool, "BiExp fit", us::Any(), false);
-  parser.addArgument("targetbvalue", "b", ctkCommandLineParser::String, "target bValue (mean, min, max)", us::Any(), false);
+  parser.addArgument("in", "i", mitkCommandLineParser::InputFile, "Input:", "input file", us::Any(), false);
+  parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output:", "output file", us::Any(), false);
+  parser.addArgument("adc", "D", mitkCommandLineParser::Bool, "ADC:", "ADC Average", us::Any(), false);
+  parser.addArgument("akc", "K", mitkCommandLineParser::Bool, "Kurtosis fit:", "Kurtosis Fit", us::Any(), false);
+  parser.addArgument("biexp", "B", mitkCommandLineParser::Bool, "BiExp fit:", "BiExp fit", us::Any(), false);
+  parser.addArgument("targetbvalue", "b", mitkCommandLineParser::String, "b Value:", "target bValue (mean, min, max)", us::Any(), false);
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -70,14 +73,13 @@ int MultishellMethods(int argc, char* argv[])
 
   try
   {
-    MITK_INFO << "Loading " << inName;
+    std::cout << "Loading " << inName;
     const std::string s1="", s2="";
     std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inName, s1, s2, false );
     mitk::BaseData::Pointer baseData = infile.at(0);
 
     if ( dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer()) )
     {
-      MITK_INFO << "Writing " << outName;
       mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(baseData.GetPointer());
       typedef itk::RadialMultishellToSingleshellImageFilter<short, short> FilterType;
 
@@ -144,10 +146,7 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_ADC.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (outName + "_ADC.dwi").c_str());
       }
       if(applyAKC)
       {
@@ -170,10 +169,7 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_AKC.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (string(outName) + "_AKC.dwi").c_str());
       }
       if(applyBiExp)
       {
@@ -196,29 +192,24 @@ int MultishellMethods(int argc, char* argv[])
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::NrrdDiffusionImageWriter<short>::Pointer writer = mitk::NrrdDiffusionImageWriter<short>::New();
-        writer->SetFileName((string(outName) + "_BiExp.dwi"));
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::IOUtil::Save(outImage, (string(outName) + "_BiExp.dwi").c_str());
       }
     }
   }
   catch (itk::ExceptionObject e)
   {
-    MITK_INFO << e;
+    std::cout << e;
     return EXIT_FAILURE;
   }
   catch (std::exception e)
   {
-    MITK_INFO << e.what();
+    std::cout << e.what();
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    MITK_INFO << "ERROR!?!";
+    std::cout << "ERROR!?!";
     return EXIT_FAILURE;
   }
-  MITK_INFO << "DONE";
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(MultishellMethods);

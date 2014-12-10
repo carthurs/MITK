@@ -49,15 +49,12 @@ void PickingEventObserver::HandlePickingEvent(InteractionEvent* interactionEvent
 
     if (releaseEvent->GetModifiers() == 0) {
         // Simple click
-        MITK_INFO << "PickingEventObserver::HandlePickingEvent SingleNodePickEvent.Send()";
         HandlePickOneEvent(interactionEvent);
     }
     else if (releaseEvent->GetModifiers() & InteractionEvent::ShiftKey) {
-        MITK_INFO << "PickingEventObserver::HandlePickingEvent AddNodePickEvent.Send()";
         HandlePickAddEvent(interactionEvent);
     }
     else if (releaseEvent->GetModifiers() & InteractionEvent::ControlKey) {
-        MITK_INFO << "PickingEventObserver::HandlePickingEvent ToggleNodePickEvent.Send()";
         HandlePickToggleEvent(interactionEvent);
     }
 }

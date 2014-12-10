@@ -28,10 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNodeDescriptorManager.h"
 #include <QmitkEnums.h>
 #include <QmitkCustomVariants.h>
+#include <QmitkMimeTypes.h>
 
 #include <QIcon>
 #include <QMimeData>
 #include <QTextStream>
+#include <QFile>
 
 #include <map>
 
@@ -157,19 +159,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     returnValue = true;
 
     // First we extract a Qlist of TreeItem* pointers.
-    QString arg = QString(data->data("application/x-qabstractitemmodeldatalist").data());
-    QStringList listOfTreeItemAddressPointers = arg.split(",");
-
-    QStringList::iterator slIter;
-    QList<TreeItem*> listOfItemsToDrop;
-
-    for(slIter  = listOfTreeItemAddressPointers.begin();
-        slIter != listOfTreeItemAddressPointers.end();
-        slIter++)
-    {
-      size_t val = (*slIter).toULongLong();
-      listOfItemsToDrop << reinterpret_cast<TreeItem *>(val);
-    }
+    QList<TreeItem*> listOfItemsToDrop = ToTreeItemPtrList(data);
 
     // Retrieve the TreeItem* where we are dropping stuff, and its parent.
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
@@ -230,18 +220,12 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
   {
     returnValue = true;
 
-    QString arg = QString(data->data("application/x-mitk-datanodes").data());
-    QStringList listOfDataNodeAddressPointers = arg.split(",");
     int numberOfNodesDropped = 0;
 
-    QStringList::iterator slIter;
-    for (slIter = listOfDataNodeAddressPointers.begin();
-         slIter != listOfDataNodeAddressPointers.end();
-         slIter++)
+    QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
+    mitk::DataNode* node = NULL;
+    foreach(node, dataNodeList)
     {
-      size_t val = (*slIter).toULongLong();
-      mitk::DataNode* node = reinterpret_cast<mitk::DataNode *>(val);
-
       if(node && m_DataStorage.IsNotNull() && !m_DataStorage->Exists(node))
       {
           m_DataStorage->Add( node );
@@ -274,18 +258,34 @@ QStringList QmitkDataStorageTreeModel::mimeTypes() const
     return types;
 }
 
-QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
+QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const
+{
+  return mimeDataFromModelIndexList(indexes);
+}
 
+QMimeData *QmitkDataStorageTreeModel::mimeDataFromModelIndexList(const QModelIndexList &indexes)
+{
   QMimeData * ret = new QMimeData;
 
   QString treeItemAddresses("");
   QString dataNodeAddresses("");
 
+  QByteArray baTreeItemPtrs;
+  QByteArray baDataNodePtrs;
+
+  QDataStream dsTreeItemPtrs(&baTreeItemPtrs, QIODevice::WriteOnly);
+  QDataStream dsDataNodePtrs(&baDataNodePtrs, QIODevice::WriteOnly);
+
   for (int i = 0; i < indexes.size(); i++)
   {
     TreeItem* treeItem = static_cast<TreeItem*>(indexes.at(i).internalPointer());
-    size_t treeItemAddress = reinterpret_cast<size_t>(treeItem);
-    size_t dataNodeAddress = reinterpret_cast<size_t>(treeItem->GetDataNode().GetPointer());
+
+    dsTreeItemPtrs << reinterpret_cast<quintptr>(treeItem);
+    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode().GetPointer());
+
+    // --------------- deprecated -----------------
+    unsigned long long treeItemAddress = reinterpret_cast<unsigned long long>(treeItem);
+    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode().GetPointer());
     QTextStream(&treeItemAddresses) << treeItemAddress;
     QTextStream(&dataNodeAddresses) << dataNodeAddress;
 
@@ -294,10 +294,16 @@ QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes)
       QTextStream(&treeItemAddresses) << ",";
       QTextStream(&dataNodeAddresses) << ",";
     }
+    // -------------- end deprecated -------------
   }
 
-  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(treeItemAddresses.toAscii()));
-  ret->setData("application/x-mitk-datanodes", QByteArray(dataNodeAddresses.toAscii()));
+  // ------------------ deprecated -----------------
+  ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(treeItemAddresses.toLatin1()));
+  ret->setData("application/x-mitk-datanodes", QByteArray(dataNodeAddresses.toLatin1()));
+  // --------------- end deprecated -----------------
+
+  ret->setData(QmitkMimeTypes::DataStorageTreeItemPtrs, baTreeItemPtrs);
+  ret->setData(QmitkMimeTypes::DataNodePtrs, baDataNodePtrs);
 
   return ret;
 }
@@ -314,11 +320,13 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
     mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
     mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
 
-    nodeName.append(patientsName->GetValueAsString().c_str()).append("\n");
-    nodeName.append(studyDescription->GetValueAsString().c_str()).append("\n");
-    nodeName.append(seriesDescription->GetValueAsString().c_str());
-  }else{
-      nodeName = QString::fromStdString(dataNode->GetName());
+    nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
+    nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) +  "\n";
+    nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+  }
+  else
+  {
+    nodeName = QFile::encodeName(dataNode->GetName().c_str());
   }
   if(nodeName.isEmpty())
   {
@@ -412,7 +420,8 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
     mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
     rootDataNode->SetName("Data Manager");
     m_Root = new TreeItem(rootDataNode, 0);
-    this->reset();
+    this->beginResetModel();
+    this->endResetModel();
 
     if(m_DataStorage.IsNotNull())
     {
@@ -688,6 +697,28 @@ QModelIndex QmitkDataStorageTreeModel::GetIndex( const mitk::DataNode* node ) co
   return QModelIndex();
 }
 
+QList<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::ToTreeItemPtrList(const QMimeData* mimeData)
+{
+  if (mimeData == NULL || !mimeData->hasFormat(QmitkMimeTypes::DataStorageTreeItemPtrs))
+  {
+    return QList<TreeItem*>();
+  }
+  return ToTreeItemPtrList(mimeData->data(QmitkMimeTypes::DataStorageTreeItemPtrs));
+}
+
+QList<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::ToTreeItemPtrList(const QByteArray& ba)
+{
+  QList<TreeItem*> result;
+  QDataStream ds(ba);
+  while(!ds.atEnd())
+  {
+    quintptr treeItemPtr;
+    ds >> treeItemPtr;
+    result.push_back(reinterpret_cast<TreeItem*>(treeItemPtr));
+  }
+  return result;
+}
+
 QmitkDataStorageTreeModel::TreeItem::TreeItem( mitk::DataNode* _DataNode, TreeItem* _Parent )
 : m_Parent(_Parent)
 , m_DataNode(_DataNode)
@@ -815,7 +846,8 @@ void QmitkDataStorageTreeModel::Update()
 {
     if (m_DataStorage.IsNotNull())
     {
-        this->reset();
+        this->beginResetModel();
+        this->endResetModel();
 
         mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetAll();
 

@@ -34,6 +34,7 @@
 #include "mitkInternalEvent.h"
 
 #include "QmitkRenderWindowMenu.h"
+#include "QmitkMimeTypes.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
     QString name,
@@ -334,22 +335,12 @@ void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void QmitkRenderWindow::dropEvent(QDropEvent * event)
 {
-  if (event->mimeData()->hasFormat("application/x-mitk-datanodes"))
+  QList<mitk::DataNode*> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(event->mimeData());
+  if (!dataNodeList.empty())
   {
-    QString arg = QString(event->mimeData()->data("application/x-mitk-datanodes").data());
-    QStringList listOfDataNodes = arg.split(",");
-    std::vector<mitk::DataNode*> vectorOfDataNodePointers;
-
-    for (int i = 0; i < listOfDataNodes.size(); i++)
-    {
-      size_t val = listOfDataNodes[i].toULongLong();
-      mitk::DataNode* node = reinterpret_cast<mitk::DataNode *>(val);
-      vectorOfDataNodePointers.push_back(node);
+    emit NodesDropped(this, dataNodeList.toVector().toStdVector());
     }
-
-    emit NodesDropped(this, vectorOfDataNodePointers);
   }
-}
 
 mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
 {

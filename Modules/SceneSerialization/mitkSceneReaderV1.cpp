@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneReaderV1.h"
 #include "mitkSerializerMacros.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPropertyListDeserializer.h"
 #include "mitkProgressBar.h"
+#include "mitkIOUtil.h"
 #include "Poco/Path.h"
 #include <mitkRenderingModeProperty.h>
 
@@ -248,16 +248,18 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
 
   if (dataElement)
   {
-    const char* filename( dataElement->Attribute("file") );
+    const char* filename = dataElement->Attribute("file");
     if ( filename )
     {
-      DataNodeFactory::Pointer factory = DataNodeFactory::New();
-      factory->SetFileName( workingDirectory + Poco::Path::separator() + filename );
-
       try
       {
-        factory->Update();
-        node = factory->GetOutput();
+        std::vector<BaseData::Pointer> baseData = IOUtil::Load( workingDirectory + Poco::Path::separator() + filename );
+        if (baseData.size() > 1)
+        {
+          MITK_WARN << "Discarding multiple base data results from " << filename << " except the first one.";
+        }
+        node = DataNode::New();
+        node->SetData(baseData.front());
       }
       catch (std::exception& e)
       {
@@ -310,27 +312,6 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
 
     if (readProperties.IsNotNull())
     {
-      //'use color' is deprecated since 2013.03 release. It was replaced by
-      //'Image Rendering.Mode' in bug #12056. This code is for legacy support
-      //of old scene files containing the property 'use color'. The code should
-      //be removed in one of the upcomng releases.
-      if(readProperties->GetProperty("Image Rendering.Mode") == NULL )
-      {
-        mitk::BaseProperty* useColorProperty = readProperties->GetProperty("use color");
-        if(mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(useColorProperty))
-        {
-          bool useColor = boolProp->GetValue();
-          readProperties->DeleteProperty("use color");
-          mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-          if(useColor)
-            renderingMode->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
-          else
-            renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-          readProperties->SetProperty("Image Rendering.Mode", renderingMode);
-          MITK_WARN << "The property 'use color' has been found in a scene file and was replaced by 'Image Rendering.Mode'. 'use color' is deprecated since 2013.03 release.";
-        }
-
-      }
       propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
     }
     else

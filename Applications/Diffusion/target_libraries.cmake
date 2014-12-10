@@ -20,4 +20,6 @@ set(target_libraries
   org_mitk_gui_qt_measurementtoolbox
   org_mitk_gui_qt_basicimageprocessing
   org_mitk_gui_qt_registration
+  org_mitk_gui_qt_viewnavigator
+  org_mitk_gui_qt_cmdlinemodules
 )

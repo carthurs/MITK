@@ -14,30 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 // std includes
 #include <string>
 
 // CTK includes
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 // MITK includes
 #include <mitkBaseDataIOFactory.h>
 #include "mitkConnectomicsNetworkCreator.h"
 #include <mitkCoreObjectFactory.h>
+#include <mitkIOUtil.h>
 
-int NetworkCreation(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-  ctkCommandLineParser parser;
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("fiberImage", "f", ctkCommandLineParser::String, "input fiber image (.fib)", us::Any(), false);
-  parser.addArgument("parcellation", "p", ctkCommandLineParser::String, "parcellation image", us::Any(), false);
-  parser.addArgument("outputNetwork", "o", ctkCommandLineParser::String, "where to save the ouput (.cnf)", us::Any(), false);
+  parser.addArgument("fiberImage", "f", mitkCommandLineParser::InputFile, "Input image", "input fiber image (.fib)", us::Any(), false);
+  parser.addArgument("parcellation", "p", mitkCommandLineParser::InputFile, "Parcellation image", "parcellation image", us::Any(), false);
+  parser.addArgument("outputNetwork", "o", mitkCommandLineParser::String, "Output network", "where to save the output (.cnf)", us::Any(), false);
 
-  parser.addArgument("radius", "r", ctkCommandLineParser::Int, "Search radius in mm", 15, true);
-  parser.addArgument("noCenterOfMass", "com", ctkCommandLineParser::Bool, "Do not use center of mass for node positions");
+  parser.addArgument("radius", "r", mitkCommandLineParser::Int, "Radius", "Search radius in mm", 15, true);
+  parser.addArgument("noCenterOfMass", "com", mitkCommandLineParser::Bool, "No center of mass", "Do not use center of mass for node positions");
 
+  parser.setCategory("Connectomics");
+  parser.setTitle("Network Creation");
+  parser.setDescription("");
+  parser.setContributor("MBI");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
@@ -104,36 +107,27 @@ int NetworkCreation(int argc, char* argv[])
 
     mitk::ConnectomicsNetwork::Pointer network = connectomicsNetworkCreator->GetNetwork();
 
-    MITK_INFO << "searching writer";
-    mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
-    for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
-    {
-      if ( (*it)->CanWriteBaseDataType(network.GetPointer()) )
-      {
-        MITK_INFO << "writing";
-        (*it)->SetFileName( outputFilename.c_str() );
-        (*it)->DoWrite( network.GetPointer() );
-      }
-    }
+    std::cout << "searching writer";
+
+    mitk::IOUtil::SaveBaseData(network.GetPointer(), outputFilename );
 
     return EXIT_SUCCESS;
   }
   catch (itk::ExceptionObject e)
   {
-    MITK_INFO << e;
+    std::cout << e;
     return EXIT_FAILURE;
   }
   catch (std::exception e)
   {
-    MITK_INFO << e.what();
+    std::cout << e.what();
     return EXIT_FAILURE;
   }
   catch (...)
   {
-    MITK_INFO << "ERROR!?!";
+    std::cout << "ERROR!?!";
     return EXIT_FAILURE;
   }
-  MITK_INFO << "DONE";
+  std::cout << "DONE";
   return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(NetworkCreation);

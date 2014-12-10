@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarSubdivisionPolygon.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 // stl related includes
@@ -119,14 +119,29 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       nextIndex = (((i - 1) >> this->GetSubdivisionRounds()) + 1) % m_ControlPoints.size();
       if(!isInitiallyPlaced && nextIndex > m_ControlPoints.size()-2)
       {
-
-        PolyLineElement elem( m_ControlPoints[m_ControlPoints.size()-1], nextIndex );
-        this->AppendPointToPolyLine( 0, elem );
+        this->AppendPointToPolyLine( 0, m_ControlPoints[m_ControlPoints.size()-1] );
         break;
       }
     }
-    PolyLineElement elem( *it, nextIndex );
-    this->AppendPointToPolyLine( 0, elem );
+
+    this->AppendPointToPolyLine( 0, *it );
   }
   subdivisionPoints.clear();
 }
+
+ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) const
+ {
+   const mitk::PlanarSubdivisionPolygon* otherSubDivPoly = dynamic_cast<const mitk::PlanarSubdivisionPolygon*>(&other);
+   if ( otherSubDivPoly )
+   {
+     if ( this->m_SubdivisionRounds != otherSubDivPoly->m_SubdivisionRounds)
+       return false;
+     if ( std::abs(this->m_TensionParameter - otherSubDivPoly->m_TensionParameter) > mitk::eps)
+       return false;
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }
