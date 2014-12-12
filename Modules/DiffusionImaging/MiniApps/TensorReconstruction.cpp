@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
 #include "mitkBaseDataIOFactory.h"
 #include "mitkDiffusionImage.h"
 #include "mitkBaseData.h"
@@ -23,20 +22,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <itksys/SystemTools.hxx>
 
 using namespace mitk;
 /**
  * Convert files from one ending to the other
  */
-int TensorReconstruction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    ctkCommandLineParser parser;
+    std::cout << "TensorReconstruction";
+    mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
-    parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "baseline image intensity threshold", 0, true);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
+    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
+    parser.addArgument("b0Threshold", "t", mitkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
+
+    parser.setCategory("Preprocessing Tools");
+    parser.setTitle("Tensor Reconstruction");
+    parser.setDescription("");
+    parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -53,12 +58,10 @@ int TensorReconstruction(int argc, char* argv[])
 
     try
     {
-        MITK_INFO << "Loading image ...";
         const std::string s1="", s2="";
         std::vector<BaseData::Pointer> infile = BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
         DiffusionImage<short>::Pointer dwi = dynamic_cast<DiffusionImage<short>*>(infile.at(0).GetPointer());
 
-        MITK_INFO << "B0 threshold: " << threshold;
         typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, float > TensorReconstructionImageFilterType;
         TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
         filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage() );
@@ -67,7 +70,6 @@ int TensorReconstruction(int argc, char* argv[])
         filter->Update();
 
         // Save tensor image
-        MITK_INFO << "writing image " << outfilename;
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
         io->SetFileType( itk::ImageIOBase::Binary );
         io->UseCompressionOn();
@@ -81,17 +83,16 @@ int TensorReconstruction(int argc, char* argv[])
     }
     catch ( itk::ExceptionObject &err)
     {
-        MITK_INFO << "Exception: " << err;
+        std::cout << "Exception: " << err;
     }
     catch ( std::exception err)
     {
-        MITK_INFO << "Exception: " << err.what();
+        std::cout << "Exception: " << err.what();
     }
     catch ( ... )
     {
-        MITK_INFO << "Exception!";
+        std::cout << "Exception!";
     }
     return EXIT_SUCCESS;
 
 }
-RegisterDiffusionMiniApp(TensorReconstruction);

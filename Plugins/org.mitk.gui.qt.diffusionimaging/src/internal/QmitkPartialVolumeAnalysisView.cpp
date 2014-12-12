@@ -330,7 +330,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
     if (m_ClusteringResult.IsNull() || m_SelectedImage.IsNull())
         return;
 
-    mitk::Geometry3D* geometry = m_SelectedImage->GetGeometry();
+    mitk::BaseGeometry* geometry = m_SelectedImage->GetGeometry();
 
     itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
 
@@ -468,7 +468,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
     point2[1] = factor*len2;
 
     mitk::PlanarCircle::Pointer circle = mitk::PlanarCircle::New();
-    circle->SetGeometry2D(planegeometry);
+    circle->SetPlaneGeometry(planegeometry);
     circle->PlaceFigure( point1 );
     circle->SetControlPoint(0,point1);
     circle->SetControlPoint(1,point2);
@@ -599,9 +599,7 @@ void QmitkPartialVolumeAnalysisView::PlanarFigureFocus(mitk::DataNode* node)
 
         FindRenderWindow(node);
 
-        const mitk::PlaneGeometry
-                * _PlaneGeometry =
-                dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+        const mitk::PlaneGeometry* _PlaneGeometry = _PlanarFigure->GetPlaneGeometry();
 
         // make node visible
         if (m_SelectedRenderWindow)

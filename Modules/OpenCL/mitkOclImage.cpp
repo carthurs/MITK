@@ -168,8 +168,7 @@ cl_int mitk::OclImage::AllocateGPUImage()
   // create an transfer kernel object in case the proposed format is not supported
   if( !(this->m_formatSupported) )
   {
-    MITK_ERROR << "Original format not supported on the installed graphics card.";
-    return -1;
+    mitkThrowException(mitk::ImageTypeIsNotSupportedByGPU) << "Original format not supported on the installed graphics card.";
   }
 
   // create new buffer
@@ -321,7 +320,7 @@ float mitk::OclImage::GetSpacing(int idx)
 {
   if (this->m_dim > idx)
   {
-    const float* imSpacing = m_Image->GetSlicedGeometry()->GetFloatSpacing();
+    const mitk::Vector3D imSpacing = m_Image->GetSlicedGeometry()->GetSpacing();
 
     return imSpacing[idx];
   }

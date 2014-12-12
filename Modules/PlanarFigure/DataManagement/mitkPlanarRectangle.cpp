@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 
 #include "mitkPlanarRectangle.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 
 
 mitk::PlanarRectangle::PlanarRectangle()
@@ -80,14 +80,10 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
 
 void mitk::PlanarRectangle::GeneratePolyLine()
 {
-  // TODO: start polygon at specified initalize point...
+  this->ClearPolyLines();
 
-  ClearPolyLines();
-
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    AppendPointToPolyLine( 0, PolyLineElement( GetControlPoint(i), i ) );
-  }
+  for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
+    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
 }
 
 void mitk::PlanarRectangle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
@@ -111,7 +107,7 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 
   // Calculate rectangle area (well, done a bit clumsy...)
   double area = 0.0;
-  if ( this->GetGeometry2D() != NULL )
+  if ( this->GetPlaneGeometry() != NULL )
   {
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {
@@ -141,3 +137,16 @@ void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) con
     os << indent << indent << i << ": " <<GetControlPoint( i ) << std::endl;
   }
 }
+
+ bool mitk::PlanarRectangle::Equals(const mitk::PlanarFigure& other) const
+ {
+   const mitk::PlanarRectangle* otherRectangle = dynamic_cast<const mitk::PlanarRectangle*>(&other);
+   if ( otherRectangle )
+   {
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

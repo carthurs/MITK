@@ -103,7 +103,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( image );
-  surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
+  surfaceFilter->SetThreshold( 0.5 ); //expects binary image with zeros and ones
 
   surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
   surfaceFilter->SetSmooth(smooth);
@@ -133,7 +133,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
   }
 
-  surfaceFilter->UpdateLargestPossibleRegion();
+surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
   m_Surface = surfaceFilter->GetOutput();
@@ -145,16 +145,17 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   polyData->SetVerts(0);
   polyData->SetLines(0);
 
-  if ( smooth || applyMedian || decimateMesh)
+  if (smooth || applyMedian || decimateMesh)
   {
-    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
-
-    normalsGen->SetInputData( polyData );
-    normalsGen->Update();
-
-    m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
-
-    normalsGen->Delete();
+//    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
+// 
+//     normalsGen->SetInputData( polyData );
+//     normalsGen->Update();
+// 
+//     m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
+// 
+//     normalsGen->Delete();
+      m_Surface->SetVtkPolyData(polyData);
   }
   else
   {
@@ -187,6 +188,10 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
   if (groupNode)
   {
     groupNode->GetName( groupNodesName );
+    //if parameter smooth is set add extension to node name
+    bool smooth(true);
+    GetParameter("Smooth", smooth);
+    if(smooth) groupNodesName.append("_smoothed");
   }
   m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
 

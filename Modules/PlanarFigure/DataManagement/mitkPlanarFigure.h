@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Base-class for geometric planar (2D) figures, such as
@@ -60,21 +60,12 @@ public:
   mitkClassMacro( PlanarFigure, BaseData )
   itkCloneMacro( Self )
 
-  struct PolyLineElement
-  {
-    PolyLineElement( Point2D point, int index )
-      : Point( point ), Index( index )
-    {
-    };
-
-    Point2D Point;
-    int Index;
-  };
+  typedef Point2D PolyLineElement;
 
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
   typedef std::deque< Point2D > ControlPointListType;
-  typedef std::list< PolyLineElement > PolyLineType;
+  typedef std::vector< PolyLineElement > PolyLineType;
 
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
@@ -83,12 +74,10 @@ public:
    * describing the slice of the image on which measurements will be
    * performed.
    */
-  virtual void SetGeometry2D( mitk::Geometry2D *geometry );
-
+  virtual void SetPlaneGeometry( mitk::PlaneGeometry *geometry );
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
-  virtual const Geometry2D *GetGeometry2D() const;
-
+  virtual const PlaneGeometry *GetPlaneGeometry() const;
 
   /** \brief True if the planar figure is closed.
    *
@@ -282,14 +271,6 @@ public:
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
 
-  /** \brief Copies contents and state of a figre provided as parameter to the current object.
-    *
-    * Requires a matching type of both figures.
-    *
-    * \note Deprecated, use Clone() instead.
-    */
-  DEPRECATED(void DeepCopy(Self::Pointer oldFigure));
-
   /** \brief Allow sub-classes to apply constraints on control points.
   *
   * Sub-classes can define spatial constraints to certain control points by
@@ -299,6 +280,11 @@ public:
 
   /** \brief executes the given Operation */
   virtual void ExecuteOperation(Operation* operation);
+  /**
+  * \brief Compare two PlanarFigure objects
+  * Note: all subclasses have to implement the method on their own.
+  */
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
 
 protected:
   PlanarFigure();
@@ -339,7 +325,7 @@ protected:
   virtual void EvaluateFeaturesInternal() = 0;
 
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
-   * geometry of this figure. Note that each time step holds one Geometry2D.
+   * geometry of this figure. Note that each time step holds one PlaneGeometry.
    */
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
@@ -404,7 +390,7 @@ private:
 
   virtual itk::LightObject::Pointer InternalClone() const = 0;
 
-  Geometry2D *m_Geometry2D;
+  PlaneGeometry *m_PlaneGeometry;
 
 
   bool m_PolyLineUpToDate;
@@ -441,6 +427,8 @@ itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
 
 #pragma GCC visibility pop
 
+
+MITK_CORE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 
 } // namespace mitk
 

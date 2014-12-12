@@ -14,7 +14,6 @@
 
  ===================================================================*/
 
-#include "MiniAppManager.h"
 
 #include <mitkIOUtil.h>
 
@@ -28,7 +27,7 @@
 
 #include "itkTensorDerivedMeasurementsFilter.h"
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 
 #include <itkImageFileWriter.h>
 #include <itkNrrdImageIO.h>
@@ -46,7 +45,7 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
   typedef itk::Image< TensorPixelType, 3 > TensorImageType;
 
   TensorImageType::Pointer itkvol = TensorImageType::New();
-  mitk::CastToItkImage<TensorImageType>(image, itkvol);
+  mitk::CastToItkImage(image, itkvol);
 
   typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
 
@@ -100,14 +99,20 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
 }
 
 
-int TensorDerivedMapsExtraction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 
-  ctkCommandLineParser parser;
+    std::cout << "TensorDerivedMapsExtraction";
+  mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("help", "h", ctkCommandLineParser::String, "Show this help text");
-  parser.addArgument("input", "i", ctkCommandLineParser::String, "input dwi file", us::Any(),false);
-  parser.addArgument("out", "o", ctkCommandLineParser::String, "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
+  parser.addArgument("help", "h", mitkCommandLineParser::String, "Help", "Show this help text");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input file", "input dwi file", us::Any(),false);
+  parser.addArgument("out", "o", mitkCommandLineParser::String, "Output folder", "output folder and base name, e.g. /tmp/outPatient1 ", us::Any(),false);
+
+  parser.setCategory("Diffusion Related Measures");
+  parser.setTitle("Tensor Derived Maps Extraction");
+  parser.setDescription("");
+  parser.setContributor("MBI");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0 || parsedArgs.count("help") || parsedArgs.count("h"))
@@ -128,7 +133,7 @@ int TensorDerivedMapsExtraction(int argc, char* argv[])
 
   std::string dtiFileName = "_dti.dti";
 
-  MITK_INFO << "BaseFileName: " << baseFileName;
+  std::cout << "BaseFileName: " << baseFileName;
 
 
   mitk::Image::Pointer inputImage =  mitk::IOUtil::LoadImage(inputFile);
@@ -184,7 +189,3 @@ int TensorDerivedMapsExtraction(int argc, char* argv[])
   return EXIT_SUCCESS;
 
 }
-
-
-
-RegisterDiffusionMiniApp(TensorDerivedMapsExtraction);

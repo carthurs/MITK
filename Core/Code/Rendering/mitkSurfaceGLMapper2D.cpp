@@ -121,17 +121,28 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
       vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
       if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 )) continue;
       vtkDataArray *vpointscalars = vtkpolydata->GetPointData()->GetScalars();
-      if (vpointscalars) {
+      if (vpointscalars)
+      {
+        if(vpointscalars->GetLookupTable())
+        {
+          // load vtk lookup table if there is one for the scalar data
+          m_LUT->DeepCopy(vpointscalars->GetLookupTable());
+        }
+        else
+        {
         vpointscalars->GetRange( range, 0 );
-        if (dataRange[0]==0 && dataRange[1]==0) {
+          if (dataRange[0]==0 && dataRange[1]==0)
+          {
           dataRange[0] = range[0];
           dataRange[1] = range[1];
         }
-        else {
+          else
+          {
           if (range[0] < dataRange[0]) dataRange[0] = range[0];
           if (range[1] > dataRange[1]) dataRange[1] = range[1];
         }
       }
+    }
     }
     if (dataRange[1] - dataRange[0] > 0) {
       m_LUT->SetTableRange( dataRange );
@@ -153,16 +164,32 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   //
-  // get the world time
+  // get the TimeGeometry of the input object
   //
-  Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry.IsNotNull() );
-
-  vtkPolyData * vtkpolydata = input->GetVtkPolyData(this->GetTimestep());
-  if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
+  const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
+  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
     return;
 
-  PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
+  m_LineWidth = 1;
+  GetDataNode()->GetIntProperty("line width", m_LineWidth, renderer);
+
+  //
+  // get the world time
+  //
+  ScalarType time =renderer->GetTime();
+  int timestep=0;
+
+  if( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
+    timestep = inputTimeGeometry->TimePointToTimeStep( time );
+
+ // int timestep = this->GetTimestep();
+
+  if( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
+    return;
+
+  vtkPolyData * vtkpolydata = input->GetVtkPolyData( timestep );
+  if((vtkpolydata==NULL) || (vtkpolydata->GetNumberOfPoints() < 1 ))
+    return;
 
   if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
       m_LineWidth = 1;
@@ -195,10 +222,8 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     {
       lut = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
 
-      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
-        scalarsMin = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
-      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
-        scalarsMax = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
+      GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
+      GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
       // check if the scalar range has been changed, e.g. manually, for the data tree node, and rebuild the LUT if necessary.
       double* oldRange = lut->GetTableRange();
@@ -214,21 +239,23 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
-    if(worldPlaneGeometry.IsNotNull())
+    PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
+    assert( worldGeometry.IsNotNull() );
+    if (worldGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
-      points[0] = worldPlaneGeometry->GetOrigin();
-      points[0][0] += 1e-5;
-      points[0][1] += 1e-5;
-      points[0][2] += 1e-5;
-      points[1] = points[0] + worldPlaneGeometry->GetAxisVector(0);
-      points[2] = points[0] + worldPlaneGeometry->GetAxisVector(1);
-      points[3] = points[1] + worldPlaneGeometry->GetAxisVector(1);
+      points[0] = worldGeometry->GetOrigin();
+      points[0][0] += 1e-4;
+      points[0][1] += 1e-4;
+      points[0][2] += 1e-4;
+      points[1] = points[0] + worldGeometry->GetAxisVector(0);
+      points[2] = points[0] + worldGeometry->GetAxisVector(1);
+      points[3] = points[1] + worldGeometry->GetAxisVector(1);
       m_Plane->SetTransform((vtkAbstractTransform*)NULL);
     }
     else
     {
-      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldGeometry2D());
+      AbstractTransformGeometry::ConstPointer worldAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
       if(worldAbstractGeometry.IsNotNull())
       {
         AbstractTransformGeometry::ConstPointer surfaceAbstractGeometry = dynamic_cast<const AbstractTransformGeometry*>(input->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
@@ -282,7 +309,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 }
 
 void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour,
-                                       const Geometry2D* worldGeometry,
+                                       const PlaneGeometry* worldGeometry,
                                        const DisplayGeometry* displayGeometry,
                                        vtkLinearTransform * vtktransform,
                                        vtkLookupTable *lut,
@@ -292,10 +319,10 @@ void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyDa
   bool usePointData = false;
 
   bool useCellData = false;
-  this->GetDataNode()->GetBoolProperty("deprecated useCellDataForColouring", useCellData);
+  this->GetDataNode()->GetBoolProperty("deprecated useCellDataForColouring", useCellData, renderer);
 
   bool scalarVisibility = false;
-  this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+  this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility, renderer);
 
   if(scalarVisibility)
   {
@@ -512,7 +539,6 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
   else
   {
@@ -524,7 +550,5 @@ void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 
     node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
     node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-
   }
 }
-

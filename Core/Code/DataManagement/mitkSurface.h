@@ -50,7 +50,7 @@ namespace mitk
     const RegionType& GetLargestPossibleRegion() const;
     virtual const RegionType& GetRequestedRegion() const;
     unsigned int GetSizeOfPolyDataSeries() const;
-    virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
+    virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0) const;
     virtual vtkSmartPointer<vtkPolyData> CutWithPlane(mitk::Point3D planePoints[4], unsigned int t = 0);
     virtual void Graft(const DataObject* data);
     virtual bool IsEmptyTimeStep(unsigned int t) const;
@@ -83,7 +83,7 @@ namespace mitk
     std::vector<std::unique_ptr<ISurfaceCutter>> m_Cutters;
 
     mutable RegionType m_LargestPossibleRegion;
-    RegionType m_RequestedRegion;
+    mutable RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;
   };
 

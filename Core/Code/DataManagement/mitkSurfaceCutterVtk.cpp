@@ -44,13 +44,13 @@ public:
         }
 
         double vtkOrigin[3];
-        itk2vtk(planePoints[0], vtkOrigin);
+        planePoints[0].ToArray(vtkOrigin);
         _plane->SetOrigin(vtkOrigin);
 
         mitk::Vector3D normal = itk::CrossProduct(planePoints[1] - planePoints[0], planePoints[2] - planePoints[0]);
         normal.Normalize();
         double vtkNormal[3];
-        itk2vtk(normal, vtkNormal);
+        normal.ToArray(normal);
         _plane->SetNormal(vtkNormal);
 
         _cutter->Update();

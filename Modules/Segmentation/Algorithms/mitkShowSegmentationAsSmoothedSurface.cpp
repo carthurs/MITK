@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkShowSegmentationAsSmoothedSurface.h"
 #include "mitkImageToItk.h"
+#include "mitkImageCast.h"
 #include "itkIntelligentBinaryClosingFilter.h"
 #include <mitkUIDGenerator.h>
 #include <mitkGeometry3D.h>
@@ -60,7 +61,7 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
   SetParameter("Sync visibility", syncVisibility);
   SetParameter("Wireframe", false);
 
-  // The Smoothing value is used as variance for a Gauß filter.
+  // The Smoothing value is used as variance for a Gauss filter.
   // A reasonable default value equals the image spacing in mm.
   SetParameter("Smoothing", 1.0f);
 
@@ -438,13 +439,13 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Compute Normals
 
-  vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
-  computeNormals->SetInputData(m_Surface->GetVtkPolyData());
-  computeNormals->SetFeatureAngle(360.0f);
-  computeNormals->FlipNormalsOff();
-  computeNormals->Update();
-
-  m_Surface->SetVtkPolyData(computeNormals->GetOutput());
+//   vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
+//   computeNormals->SetInputData(m_Surface->GetVtkPolyData());
+//   computeNormals->SetFeatureAngle(360.0f);
+//   computeNormals->FlipNormalsOff();
+//   computeNormals->Update();
+// 
+//   m_Surface->SetVtkPolyData(computeNormals->GetOutput());
 
   return true;
 }

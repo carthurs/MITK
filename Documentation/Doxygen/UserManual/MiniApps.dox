@@ -1,0 +1,47 @@
+/**
+\page MiniAppExplainPage MITK MiniApps
+
+\section MiniAppExplainPageDescription What are MiniApps
+
+MiniApps are small compilations of command line tools. Each of these tools is designed to fulfill one simple task,
+e.g. resample an image or extract image statistics of a given region of interest (ROI).
+
+They are intended to provide command line access to a variety of features of MITK, thus facilitating batched processing of data.
+
+\section MiniAppExplainPageUsage Usage
+
+The MiniApps are built in a self-describing way, that is they follow the usual print out about parameters when called without any argumments, e.g.
+
+\code
+$./MitkGibbsTracking
+
+ -i, --input, input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)
+ -p, --parameters, parameter file (.gtp)
+ -m, --mask, binary mask image (optional)
+ -s, --shConvention, sh coefficient convention (FSL, MRtrix) (optional), (default: FSL)
+ -o, --outFile, output fiber bundle (.fib)
+ -f, --noFlip, do not flip input image to match MITK coordinate convention (optional)
+\endcode
+
+They also follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml:
+
+\code
+$./GibbsTracking --xml
+<executable>
+<category>Fiber Tracking and Processing Methods</category>
+<title>Gibbs Tracking</title>
+<description></description>
+<contributor>MBI</contributor>
+<parameters>
+...
+</parameters>
+</executable>
+\endcode
+
+\note Full conformity is still a work in progress.
+
+\section MiniAppExplainPageAvailableList Available MiniApps
+
+\li \subpage DiffusionMiniApps
+
+*/

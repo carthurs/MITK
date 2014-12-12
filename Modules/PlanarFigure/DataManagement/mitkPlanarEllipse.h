@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class Geometry2D;
+class PlaneGeometry;
 
 /**
  * \brief Implementation of PlanarFigure representing a circle
@@ -100,6 +100,14 @@ public:
       m_TreatAsCircle = active;
   }
 
+  virtual bool Equals(const mitk::PlanarFigure& other) const;
+
+  // Feature identifiers
+  const unsigned int FEATURE_ID_RADIUS1;
+  const unsigned int FEATURE_ID_RADIUS2;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
+  const unsigned int FEATURE_ID_AREA;
+
 protected:
   PlanarEllipse();
   virtual ~PlanarEllipse();
@@ -120,11 +128,6 @@ protected:
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-  // Feature identifiers
-  const unsigned int FEATURE_ID_RADIUS1;
-  const unsigned int FEATURE_ID_RADIUS2;
-  const unsigned int FEATURE_ID_CIRCUMFERENCE;
-  const unsigned int FEATURE_ID_AREA;
 
   //Member variables:
   double m_MinRadius;

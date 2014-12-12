@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkPlanarEllipse.h"
-#include "mitkGeometry2D.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>
@@ -25,7 +25,8 @@ mitk::PlanarEllipse::PlanarEllipse()
     : FEATURE_ID_RADIUS1(this->AddFeature("Radius 1", "mm")),
       FEATURE_ID_RADIUS2(this->AddFeature("Radius 2", "mm")),
       FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
-      FEATURE_ID_AREA(this->AddFeature("Area", "mm2")), m_MinRadius(0),
+      FEATURE_ID_AREA(this->AddFeature("Area", "mm2")), 
+      m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
       m_TreatAsCircle(true)
@@ -117,16 +118,16 @@ mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int ind
     return point;
 
     Point2D indexPoint;
-    this->GetGeometry2D()->WorldToIndex( point, indexPoint );
+    this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-    BoundingBox::BoundsArrayType bounds = this->GetGeometry2D()->GetBounds();
+    BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
     if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
     if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
     if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
     if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
 
     Point2D constrainedPoint;
-    this->GetGeometry2D()->IndexToWorld( indexPoint, constrainedPoint );
+    this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
 
     if(m_MinMaxRadiusContraintsActive)
     {
@@ -204,7 +205,7 @@ void mitk::PlanarEllipse::GeneratePolyLine()
 
         // ... and append it to the PolyLine.
         // No extending supported here, so we can set the index of the PolyLineElement to '0'
-        AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
+        this->AppendPointToPolyLine(0, polyLinePoint);
     }
 
 //     AppendPointToPolyLine( 1, PolyLineElement( centerPoint, 0 ) );
@@ -240,3 +241,19 @@ void mitk::PlanarEllipse::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
     Superclass::PrintSelf( os, indent );
 }
+
+ bool mitk::PlanarEllipse::Equals(const mitk::PlanarFigure& other) const
+ {
+   const mitk::PlanarEllipse* otherEllipse = dynamic_cast<const mitk::PlanarEllipse*>(&other);
+   if ( otherEllipse )
+   {
+     if(this->m_TreatAsCircle != otherEllipse->m_TreatAsCircle)
+       return false;
+
+     return Superclass::Equals(other);
+   }
+   else
+   {
+     return false;
+   }
+ }

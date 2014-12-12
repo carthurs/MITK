@@ -64,8 +64,6 @@ namespace mitk {
         mitk::InteractionEventObserver* obsService = m_InteractionEventObserverServiceTracker.GetService();
         m_DataNodePickingEventObserver = dynamic_cast<mitk::DataNodePickingEventObserver*>(obsService);
 
-        MITK_INFO << "PickedDataNodeSelectionProvider::ConnectPickedDataNodeSelectionProviderEvents() " << obsService << " " << m_DataNodePickingEventObserver;
-
         if (m_DataNodePickingEventObserver == NULL)
         {
             return;
@@ -107,7 +105,6 @@ namespace mitk {
             m_CurrentSelection.push_back(node);
         }
 
-        MITK_INFO << "PickedDataNodeSelectionProvider::SetSelectionToSingleNode, selection size: " << m_CurrentSelection.size();
         FireSelectionChanged();
     }
 
@@ -117,7 +114,6 @@ namespace mitk {
             m_CurrentSelection.push_back(node);
             FireSelectionChanged();
         }
-        MITK_INFO << "PickedDataNodeSelectionProvider::AddNodeToSelection, selection size: " << m_CurrentSelection.size();
     }
 
     void PickedDataNodeSelectionProvider::ToggleNodeSelection(mitk::DataNode* node)
@@ -130,6 +126,5 @@ namespace mitk {
             m_CurrentSelection.erase(iter);
         }
         FireSelectionChanged();
-        MITK_INFO << "PickedDataNodeSelectionProvider::ToggleNodeSelection, selection size: " << m_CurrentSelection.size();
     }
 } // namespace mitk

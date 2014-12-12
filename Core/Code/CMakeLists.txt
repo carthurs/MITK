@@ -23,7 +23,7 @@ MITK_CREATE_MODULE(Core
   DEPENDS mbilog CppMicroServices 
   PACKAGE_DEPENDS tinyxml GDCM
                   ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKTestKernel+ITKIORAW
-                  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkImagingStatistics+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
+                  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML+vtkImagingStatistics
                   OpenGL
                   CGAL
   EXPORT_DEFINE MITK_CORE_EXPORT

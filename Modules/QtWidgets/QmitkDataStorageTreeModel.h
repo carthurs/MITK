@@ -102,6 +102,8 @@ public:
   QStringList mimeTypes() const;
   QMimeData * mimeData(const QModelIndexList & indexes) const;
 
+  static QMimeData* mimeDataFromModelIndexList(const QModelIndexList& indexes);
+
   //# End of QAbstractItemModel
 
 //# SETTER
@@ -207,6 +209,10 @@ protected:
     std::vector<TreeItem*> m_Children;
     mitk::DataNode::Pointer m_DataNode;
   };
+
+  QList<TreeItem*> ToTreeItemPtrList(const QMimeData* mimeData);
+  QList<TreeItem*> ToTreeItemPtrList(const QByteArray& ba);
+
   ///
   /// Adjusts the LayerProperty according to the nodes position
   ///
@@ -232,7 +238,7 @@ protected:
   ///
   void TreeToNodeSet(TreeItem* parent, QList<mitk::DataNode::Pointer> &vec) const;
   ///
-  /// Update Tree Model 
+  /// Update Tree Model
   ///
   void Update();
 
