@@ -304,7 +304,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
               int offsets[][2] = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
 
-              for (int i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i) {
+              for (size_t i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i) {
                   int xoff = x + offsets[i][0];
                   int yoff = y + offsets[i][1];
 

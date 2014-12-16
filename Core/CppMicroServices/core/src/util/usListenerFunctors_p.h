@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <functional>
 
 #ifdef US_HAVE_TR1_FUNCTIONAL_H
   #include <tr1/functional>
