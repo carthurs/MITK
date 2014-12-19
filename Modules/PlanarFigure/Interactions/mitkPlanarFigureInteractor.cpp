@@ -1047,7 +1047,9 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
       else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint, pointProjectedOntoLine ) )
       {
         // Point is close enough to line segment --> Return index of the segment
-        return std::distance(polyLine.begin(), it);
+        //return std::distance(polyLine.begin(), it);
+          mitk::PlanarFigure::PolyLineSegmentInfoType segmentInfo = planarFigure->GetPolyLineSegmentInfo(loop);
+          return std::distance(segmentInfo.begin(), std::upper_bound(segmentInfo.begin(), segmentInfo.end(), std::distance(polyLine.begin(), it)));
       }
       previousPolyLinePoint = polyLinePoint;
     }

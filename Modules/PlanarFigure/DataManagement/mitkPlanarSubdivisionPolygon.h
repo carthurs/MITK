@@ -74,6 +74,8 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const;
 
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const;
+
 protected:
   PlanarSubdivisionPolygon();
   virtual ~PlanarSubdivisionPolygon();
@@ -86,6 +88,7 @@ protected:
   float m_TensionParameter;
   int m_SubdivisionRounds;
 
+  PolyLineSegmentInfoType m_PolyLineSegmentInfo;
 
 private:
 

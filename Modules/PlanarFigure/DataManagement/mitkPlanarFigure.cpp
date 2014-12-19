@@ -840,6 +840,12 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   return true;
 }
 
+const mitk::PlanarFigure::PolyLineSegmentInfoType mitk::PlanarFigure::GetPolyLineSegmentInfo(unsigned int) const
+{
+    MITK_ERROR << "GetPolyLineSegmentInfo not implemented for " << GetNameOfClass();
+    return PolyLineSegmentInfoType();
+}
+
 bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose )
 {
   return leftHandSide.Equals(rightHandSide);

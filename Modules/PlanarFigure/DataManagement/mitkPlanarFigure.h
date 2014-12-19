@@ -67,6 +67,7 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
+  typedef std::vector<unsigned long> PolyLineSegmentInfoType;
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
@@ -184,6 +185,10 @@ public:
    * (for text, angles, etc.). */
   const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
 
+  /** \brief Returns the polyline segment information. The polyline where each value represents the index of point in the polyline
+  * For control point i, the polyline points [SegmentInfo[i], SegmentInfo[i + 1]) belong to segment [i, (i + 1) % nControlPoints]
+  * */
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const;
 
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
