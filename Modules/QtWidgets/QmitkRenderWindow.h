@@ -96,6 +96,8 @@ public:
 
   void FullScreenMode(bool state);
 
+  virtual void setVisible(bool visible);
+
 protected:
   // overloaded move handler
   virtual void moveEvent(QMoveEvent* event);

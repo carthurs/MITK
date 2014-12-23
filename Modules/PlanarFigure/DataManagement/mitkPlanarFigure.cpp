@@ -842,7 +842,6 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
 
 const mitk::PlanarFigure::PolyLineSegmentInfoType mitk::PlanarFigure::GetPolyLineSegmentInfo(unsigned int) const
 {
-    MITK_ERROR << "GetPolyLineSegmentInfo not implemented for " << GetNameOfClass();
     return PolyLineSegmentInfoType();
 }
 
