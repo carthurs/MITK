@@ -1092,6 +1092,14 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
     }
   }
 
+
+  if (dynamic_cast<const mitk::PlanarCircle*>(planarFigure)) {
+      mitk::Point2D dummy;
+      if (IsPositionOverFigure(positionEvent, const_cast<mitk::PlanarFigure*>(planarFigure), planarFigureGeometry, rendererGeometry, displayGeometry, dummy)) {
+          return 1;
+      }
+  }
+
   return -1;
 }
 
