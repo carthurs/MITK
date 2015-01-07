@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIOFactory.h>
 
 mitk::ImageWriter::ImageWriter()
-: m_UseCompression( false )
+: m_UseCompression( true )
 {
    this->SetNumberOfRequiredInputs( 1 );
    m_MimeType = "";
