@@ -61,7 +61,6 @@ m_LayoutDesign(0),
 m_OldLayoutDesign(0),
 m_FullScreenMode(false),
 m_Entered(false),
-m_Hidden(true),
 m_Renderer(b),
 m_MultiWidget(mw),
 m_Parent(parent)
@@ -104,7 +103,9 @@ m_Parent(parent)
   // for autorotating
   m_AutoRotationTimer.setInterval( 75 );
   connect( &m_AutoRotationTimer, SIGNAL(timeout()), this, SLOT(AutoRotateNextStep()) );
-  connect( m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
+  m_HideTimer.setSingleShot(true);
+  connect( &m_HideTimer, SIGNAL(timeout()), this, SLOT(DeferredHideMenu()));
+  connect(m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
@@ -242,54 +243,27 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
 void QmitkRenderWindowMenu::HideMenu( )
 {
   MITK_DEBUG << "menu hideEvent";
-
-  m_Hidden = true;
-
-  if( ! m_Entered )
-  {
-     //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-     //for Mac OS see bug 3192
-     //for Windows see bug 12130
-     //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) 
-    this->setWindowOpacity(0.0f);
-#else
-    this->setVisible(false);
-#endif
-  }
+  DeferredHideMenu();
 }
 
 void QmitkRenderWindowMenu::ShowMenu( )
 {
   MITK_DEBUG << "menu showMenu";
-
-  m_Hidden = false;
-  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-  //for Mac OS see bug 3192
-  //for Windows see bug 12130
-  //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) 
-  this->setWindowOpacity(1.0f);
-#else
-  this->setVisible(true);
-#endif
+  DeferredShowMenu();
 }
 
 
 void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
 {
   MITK_DEBUG << "menu enterEvent";
+  DeferredShowMenu();
 
   m_Entered=true;
-
-  m_Hidden=false;
 }
 
 void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
   MITK_DEBUG << "menu deferredhidemenu";
-  if(m_Hidden)
-  {
   //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
   //for Mac OS see bug 3192
   //for Windows see bug 12130
@@ -299,7 +273,6 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
 #else
   this->setVisible(false);
 #endif
-  }
 
 //    setVisible(false);
 //    setWindowOpacity(0.0f);
@@ -310,8 +283,8 @@ void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
 {
   MITK_DEBUG << "menu leaveEvent";
 
+  m_Entered = false;
   smoothHide();
-
 }
 
 /* This method is responsible for non fluttering of
@@ -320,14 +293,7 @@ void QmitkRenderWindowMenu::smoothHide()
 {
 
   MITK_DEBUG<< "menu leaveEvent";
-
-  m_Entered=false;
-
-  m_Hidden = true;
-
-  QTimer::singleShot(10,this,SLOT( DeferredHideMenu( ) ) );
-
-
+  m_HideTimer.start(10);
 }
 
 
@@ -443,6 +409,7 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
 {
 
   MITK_DEBUG << "deferred show menu";
+  m_HideTimer.stop();
 
   //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
   //for Mac OS see bug 3192
@@ -452,6 +419,7 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);
+  this->raise();
 #endif
 }
 

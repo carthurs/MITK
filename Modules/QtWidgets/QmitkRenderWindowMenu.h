@@ -314,8 +314,6 @@ protected:
 
   bool                m_Entered;
 
-  bool                m_Hidden;
-
   private:
 
   mitk::BaseRenderer::Pointer m_Renderer;
@@ -326,6 +324,7 @@ protected:
   /// a timer for the auto rotate action
   ///
   QTimer m_AutoRotationTimer;
+  QTimer m_HideTimer;
 
   QWidget* m_Parent;
 };
