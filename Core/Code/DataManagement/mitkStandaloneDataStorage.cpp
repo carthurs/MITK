@@ -101,7 +101,7 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode* node)
 {
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
-  if (node == NULL)
+  if (node == NULL || !Exists(node))
     return;
 
   // remove ITK modified event listener
