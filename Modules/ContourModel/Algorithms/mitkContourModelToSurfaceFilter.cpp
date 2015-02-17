@@ -150,7 +150,7 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
     // Add the points to the dataset
     polyData->SetPoints(points);
-    polyData->SetPolys(polygons);
+    //polyData->SetPolys(polygons);
     polyData->SetLines(lines);
     polyData->BuildLinks();
 

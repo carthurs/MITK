@@ -81,8 +81,8 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
     vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(mapper);
 
-    mapper->SetInputConnection(tubeFilter->GetOutputPort());
-    //mapper->SetInput(polyData);
+    //mapper->SetInputConnection(tubeFilter->GetOutputPort());
+    mapper->SetInputData(polyData);
 
     localStorage->m_Assembly->AddPart(actor);
 
