@@ -123,6 +123,7 @@ void mitk::Surface::InitializeEmpty()
   Superclass::InitializeTimeGeometry();
 
   m_PolyDatas.push_back(NULL);
+  m_Cutters.push_back(NULL);
   m_Initialized = true;
 }
 
