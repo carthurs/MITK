@@ -18,11 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSceneIO_h_included
 
 #include <MitkSceneSerializationExports.h>
+#include <mitkSceneReader.h>
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
+#include <Poco/Timestamp.h>
+#include <Poco/Thread.h>
 
 class TiXmlElement;
 
@@ -111,6 +114,18 @@ class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
 
     std::string  m_WorkingDirectory;
     unsigned int m_UnzipErrors;
+
+    friend class CompressorTask;
+
+    static std::map<const mitk::DataNode*, unsigned long> m_NodeLoadTimeStamps;
+    static std::string m_LoadedProjectFileName;
+    static SceneReader::LoadedNodeFileNamesMap m_LoadedNodeFileNames;
+    static Poco::Timestamp m_FileTimeStamp;
+    static Poco::Thread m_CompressionThread;
+    static std::unique_ptr<CompressorTask> m_CompressorTask;
+
+    void RecordLoadTimeStamp(const mitk::DataNode*);
+
 };
 
 }
