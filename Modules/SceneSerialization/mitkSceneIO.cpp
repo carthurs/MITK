@@ -131,7 +131,7 @@ public:
         sceneIO->m_FileTimeStamp = Poco::File(filename).getLastModified();
     }
 
-    mitk::SceneIO::Pointer sceneIO;
+    mitk::SceneIO* sceneIO;
     std::string filename;
     bool incrementalSave;
     const std::set<std::string> filesToMaintain;
