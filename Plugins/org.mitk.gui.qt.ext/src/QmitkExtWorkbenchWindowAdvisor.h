@@ -91,6 +91,11 @@ protected slots:
     virtual void onHelpOpenHelpPerspective();
     virtual void onAbout();
 
+    void onProjectNameChanged(QString);
+    void onProjectClosed();
+
+    void OpenRecentProject();
+    void RemoveFileFromRecentFileList(QString fileName);
 private:
 
   /**
@@ -115,6 +120,11 @@ private:
 
   void PropertyChange(berry::Object::Pointer /*source*/, int propId);
 
+  QStringList GetRecentFileList();
+  void SetRecentFileList(const QStringList& fileNames);
+  void UpdateRecentFileList(const QString& newFile = QString(""));
+  
+
   static QString QT_SETTINGS_FILENAME;
 
   berry::IPartListener::Pointer titlePartListener;
@@ -135,6 +145,7 @@ private:
   berry::IWorkbenchPage::WeakPtr lastActivePage;
   std::string lastEditorTitle;
   berry::IAdaptable* lastInput;
+  std::string currentlyOpenProject;
 
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
@@ -163,7 +174,10 @@ private:
 
   // actions which will be enabled/disabled depending on the application state
   QList<QAction*> viewActions;
+  QAction* fileOpenProjectAction;
   QAction* fileSaveProjectAction;
+  QAction* fileSaveProjectAsAction;
+  QAction* fileImportAction;
   QAction* closeProjectAction;
   QAction* undoAction;
   QAction* redoAction;
@@ -173,6 +187,7 @@ private:
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
   QAction* openXnatEditorAction;
+  QMenu* openRecentProjectMenu;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

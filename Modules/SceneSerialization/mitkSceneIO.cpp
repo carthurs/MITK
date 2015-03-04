@@ -44,13 +44,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
-std::map<const mitk::DataNode*, unsigned long> mitk::SceneIO::m_NodeLoadTimeStamps;
-std::string mitk::SceneIO::m_LoadedProjectFileName;
-mitk::SceneReader::LoadedNodeFileNamesMap mitk::SceneIO::m_LoadedNodeFileNames;
-Poco::Timestamp mitk::SceneIO::m_FileTimeStamp;
-Poco::Thread mitk::SceneIO::m_CompressionThread;
-std::unique_ptr<mitk::CompressorTask> mitk::SceneIO::m_CompressorTask;
-
 namespace mitk {
 
 class CompressorTask : public Poco::Runnable {
@@ -199,9 +192,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
                                                     bool clearStorageFirst )
 {
     if (!m_LoadedProjectFileName.empty()) {
-        m_LoadedProjectFileName.clear();
-        m_NodeLoadTimeStamps.clear();
-        m_LoadedNodeFileNames.clear();
+        Clear();
     }
 
   // prepare data storage
@@ -716,4 +707,11 @@ void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco:
 void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
+}
+
+void mitk::SceneIO::Clear()
+{
+    m_LoadedProjectFileName.clear();
+    m_NodeLoadTimeStamps.clear();
+    m_LoadedNodeFileNames.clear();
 }

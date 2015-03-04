@@ -32,8 +32,8 @@ public:
   {
     m_Window = window;
     action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
-    action->setText("&Open...");
-    action->setToolTip("Open data files (images, surfaces,...)");
+    action->setText("&Import...");
+    action->setToolTip("Import data files (images, surfaces,...)");
 
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
   }
@@ -101,7 +101,7 @@ QmitkFileOpenAction::~QmitkFileOpenAction()
 void QmitkFileOpenAction::Run()
 {
   // Ask the user for a list of files to open
-  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Open",
+  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Import",
                                                          d->getLastFileOpenPath(),
                                                          QmitkIOUtil::GetFileOpenFilterString());
 

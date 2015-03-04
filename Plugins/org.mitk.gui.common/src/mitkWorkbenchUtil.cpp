@@ -152,46 +152,7 @@ void WorkbenchUtil::LoadFiles(const QStringList &fileNames, berry::IWorkbenchWin
       _CrtSetReportMode( _CRT_ASSERT, lastCrtReportType );
   #endif
 
-  // Check if there is an open perspective. If not, open the default perspective.
-  if (window->GetActivePage().IsNull())
-  {
-    std::string defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
-    window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
-  }
-
-  bool globalReinitOnNodeAdded = true;
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  if (prefService.IsNotNull())
-  {
-      berry::IBerryPreferences::Pointer prefs
-              = (prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager")).Cast<berry::IBerryPreferences>();
-      if(prefs.IsNotNull())
-        globalReinitOnNodeAdded = prefs->GetBool("Call global reinit if node is added", true);
-  }
-
-  if (openEditor && globalReinitOnNodeAdded)
-  {
-    try
-    {
-      // Activate the editor using the same data storage or open the default editor
-      mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageRef));
-      berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
-      mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
-      mitk::IRenderingManager* renderingManager = renderEditor == 0 ? 0 : renderEditor->GetRenderingManager();
-
-      if(dsmodified && renderingManager)
-      {
-        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-      }
-    }
-    catch (const berry::PartInitException& e)
-    {
-      QString msg = "An error occurred when displaying the file(s): %1";
-      QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
-                           msg.arg(QString::fromStdString(e.message())));
-    }
-  }
+    ReinitAfterLoadFiles(window, openEditor, dataStorageRef, dsmodified);
 }
 
 berry::IEditorPart::Pointer WorkbenchUtil::OpenEditor(berry::IWorkbenchPage::Pointer page,
@@ -345,6 +306,50 @@ bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctk
     return false;
   }
   return true;
+}
+
+void WorkbenchUtil::ReinitAfterLoadFiles(berry::IWorkbenchWindow::Pointer window, bool openEditor, mitk::IDataStorageReference::Pointer dataStorageRef, const bool dsmodified)
+{
+    // Check if there is an open perspective. If not, open the default perspective.
+    if (window->GetActivePage().IsNull())
+    {
+        std::string defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+        window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
+    }
+
+    bool globalReinitOnNodeAdded = true;
+    berry::IPreferencesService::Pointer prefService
+        = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    if (prefService.IsNotNull())
+    {
+        berry::IBerryPreferences::Pointer prefs
+            = (prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager")).Cast<berry::IBerryPreferences>();
+        if (prefs.IsNotNull())
+            globalReinitOnNodeAdded = prefs->GetBool("Call global reinit if node is added", true);
+    }
+
+    if (openEditor && globalReinitOnNodeAdded)
+    {
+        try
+        {
+            // Activate the editor using the same data storage or open the default editor
+            mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(dataStorageRef));
+            berry::IEditorPart::Pointer editor = mitk::WorkbenchUtil::OpenEditor(window->GetActivePage(), input, true);
+            mitk::IRenderWindowPart* renderEditor = dynamic_cast<mitk::IRenderWindowPart*>(editor.GetPointer());
+            mitk::IRenderingManager* renderingManager = renderEditor == 0 ? 0 : renderEditor->GetRenderingManager();
+
+            if (dsmodified && renderingManager)
+            {
+                mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorageRef->GetDataStorage());
+            }
+        }
+        catch (const berry::PartInitException& e)
+        {
+            QString msg = "An error occurred when displaying the file(s): %1";
+            QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
+                msg.arg(QString::fromStdString(e.message())));
+        }
+    }
 }
 
 } // namespace mitk

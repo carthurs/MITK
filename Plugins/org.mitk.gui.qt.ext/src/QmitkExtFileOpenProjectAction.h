@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkExtFileSaveProjectAction_H_
-#define QmitkExtFileSaveProjectAction_H_
+#ifndef QmitkExtFileOpenProjectAction_H_
+#define QmitkExtFileOpenProjectAction_H_
 
 #ifdef __MINGW32__
 // We need to inlclude winbase.h here in order to declare
@@ -31,27 +31,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include <mitkSceneIO.h>
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkExtFileSaveProjectAction : public QAction
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtFileOpenProjectAction : public QAction
 {
   Q_OBJECT
 
 public:
 
-  QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO, bool saveAs);
+  QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
 
-protected slots:
+  mitk::SceneIO::Pointer GetSceneIO() { return m_SceneIO; }
 
-  void Run();
+public slots:
+
+  void Run(QString fileName = QString(""));
 
 signals:
-  void projectSaved(QString fileName);
+  void projectOpened(QString fileName);
+  void projectOpenFailed(QString fileName);
 
 private:
 
   berry::IWorkbenchWindow::Pointer m_Window;
   mitk::SceneIO::Pointer m_SceneIO;
-  bool m_SaveAs;
 };
 
 
-#endif /*QmitkExtFileSaveProjectAction_H_*/
+#endif /*QmitkExtFileOpenProjectAction_H_*/

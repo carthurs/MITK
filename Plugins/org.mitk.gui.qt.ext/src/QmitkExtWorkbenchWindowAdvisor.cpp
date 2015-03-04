@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileSaveAction.h>
+#include <QmitkExtFileOpenProjectAction.h>
 #include <QmitkExtFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
@@ -64,6 +65,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorageEditorInput.h>
 #include <mitkWorkbenchUtil.h>
 #include <vtkVersionMacros.h>
+#include <mitkSceneIO.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -300,6 +302,8 @@ public:
                 windowAdvisor->openXnatEditorAction->setEnabled(true);
             }
             windowAdvisor->fileSaveProjectAction->setEnabled(true);
+            windowAdvisor->fileSaveProjectAsAction->setEnabled(true);
+            windowAdvisor->fileImportAction->setEnabled(true);
             windowAdvisor->closeProjectAction->setEnabled(true);
             windowAdvisor->undoAction->setEnabled(true);
             windowAdvisor->redoAction->setEnabled(true);
@@ -345,6 +349,8 @@ public:
                 windowAdvisor->openXnatEditorAction->setEnabled(false);
             }
             windowAdvisor->fileSaveProjectAction->setEnabled(false);
+            windowAdvisor->fileSaveProjectAsAction->setEnabled(false);
+            windowAdvisor->fileImportAction->setEnabled(false);
             windowAdvisor->closeProjectAction->setEnabled(false);
             windowAdvisor->undoAction->setEnabled(false);
             windowAdvisor->redoAction->setEnabled(false);
@@ -417,7 +423,9 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchA
     showClosePerspectiveMenuItem(true),
     viewNavigatorFound(false),
     showMemoryIndicator(true),
-    dropTargetListener(new QmitkDefaultDropTargetListener)
+    dropTargetListener(new QmitkDefaultDropTargetListener),
+    fileOpenProjectAction(nullptr)
+
 {
     productName = QCoreApplication::applicationName().toStdString();
     viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
@@ -552,19 +560,47 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");
 
-    QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
-    fileOpenAction->setShortcut(QKeySequence::Open);
-    fileMenu->addAction(fileOpenAction);
-    QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
-    fileSaveAction->setShortcut(QKeySequence::Save);
-    fileMenu->addAction(fileSaveAction);
-    fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-    fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+    mitk::SceneIO::Pointer sharedSceneIO = mitk::SceneIO::New();
+
+    fileOpenProjectAction = new QmitkExtFileOpenProjectAction(window, sharedSceneIO);
+    fileOpenProjectAction->setIcon(QIcon::fromTheme("document-open", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")));
+    fileOpenProjectAction->setShortcut(QKeySequence::Open);
+    fileMenu->addAction(fileOpenProjectAction);
+    connect(fileOpenProjectAction, SIGNAL(projectOpened(QString)), this, SLOT(onProjectNameChanged(QString)));
+
+    fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, false);
+    fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+    fileSaveProjectAction->setShortcut(QKeySequence::Save);
     fileMenu->addAction(fileSaveProjectAction);
+    connect(fileSaveProjectAction, SIGNAL(projectSaved(QString)), this, SLOT(onProjectNameChanged(QString)));
+
+    fileSaveProjectAsAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, true);
+    fileSaveProjectAsAction->setIcon(QIcon::fromTheme("document-save-as",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+    fileSaveProjectAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
+    fileMenu->addAction(fileSaveProjectAsAction);
+    connect(fileSaveProjectAsAction, SIGNAL(projectSaved(QString)), this, SLOT(onProjectNameChanged(QString)));
+
     closeProjectAction = new QmitkCloseProjectAction(window);
     closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
     fileMenu->addAction(closeProjectAction);
+    connect(closeProjectAction, SIGNAL(projectClosed()), this, SLOT(onProjectClosed()));
+
+    openRecentProjectMenu = new QMenu("Recent pro&jects");
+    UpdateRecentFileList();
+    fileMenu->addMenu(openRecentProjectMenu);
+
     fileMenu->addSeparator();
+
+    fileImportAction = new QmitkFileOpenAction(QIcon::fromTheme("go-down", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/go-down.svg")), window);
+    fileImportAction->setShortcut(QKeySequence("Ctrl+I"));
+    fileMenu->addAction(fileImportAction);
+
+    QAction* fileExportAction = new QmitkFileSaveAction(QIcon::fromTheme("go-up", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/go-up.svg")), window);
+    fileExportAction->setShortcut(QKeySequence("Ctrl+E"));
+    fileMenu->addAction(fileExportAction);
+
+    fileMenu->addSeparator();
+
     QAction* fileExitAction = new QmitkFileExitAction(window);
     fileExitAction->setIcon(QIcon::fromTheme("system-log-out",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
     fileExitAction->setShortcut(QKeySequence::Quit);
@@ -653,8 +689,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
 #endif
 
-    mainActionsToolBar->addAction(fileOpenAction);
+    mainActionsToolBar->addAction(fileOpenProjectAction);
     mainActionsToolBar->addAction(fileSaveProjectAction);
+    mainActionsToolBar->addAction(fileImportAction);
     mainActionsToolBar->addAction(closeProjectAction);
     mainActionsToolBar->addAction(undoAction);
     mainActionsToolBar->addAction(redoAction);
@@ -854,6 +891,113 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
         qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onProjectNameChanged(QString fileName)
+{
+    currentlyOpenProject = QFileInfo(fileName).fileName().toStdString();
+
+    UpdateRecentFileList(fileName);
+    RecomputeTitle();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::onProjectClosed()
+{
+    if (mitk::UndoController::GetCurrentUndoModel()) {
+        mitk::UndoController::GetCurrentUndoModel()->Clear();
+    }
+    static_cast<QmitkExtFileOpenProjectAction*>(fileOpenProjectAction)->GetSceneIO()->Clear();
+    onProjectNameChanged("");
+}
+
+QStringList QmitkExtWorkbenchWindowAdvisor::GetRecentFileList()
+{
+    berry::IPreferencesService::Pointer prefService
+        = berry::Platform::GetServiceRegistry()
+        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    if (prefService.IsNull())
+    {
+        return QStringList();
+    }
+
+    berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
+    if (prefs.IsNull()) {
+        return QStringList();
+    }
+
+    return QString::fromStdString(prefs->Get("RecentProjectFileList", "")).split("###", QString::SkipEmptyParts);
+}
+
+void QmitkExtWorkbenchWindowAdvisor::SetRecentFileList(const QStringList& fileNames)
+{
+    berry::IPreferencesService::Pointer prefService
+        = berry::Platform::GetServiceRegistry()
+        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+    if (prefService.IsNull())
+    {
+        return;
+    }
+
+    berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
+    if (prefs.IsNull()) {
+        return;
+    }
+
+    prefs->Put("RecentProjectFileList", fileNames.join("###").toStdString());
+    prefs->Flush();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::UpdateRecentFileList(const QString& newFile)
+{
+    QStringList fileNames = GetRecentFileList();
+
+    if (!newFile.isEmpty()) {
+        fileNames.removeAll(newFile);
+        fileNames.push_front(newFile);
+        while (fileNames.size() > 10) {
+            fileNames.removeLast();
+        }
+    }
+
+    openRecentProjectMenu->clear();
+
+    Q_FOREACH(const QString& fileName, fileNames) {
+        QAction* openRecentAction = new QAction(fileName, NULL);
+        openRecentProjectMenu->addAction(openRecentAction);
+        connect(openRecentAction, SIGNAL(triggered()), this, SLOT(OpenRecentProject()));
+    }
+    openRecentProjectMenu->setEnabled(fileNames.size() > 0);
+
+    SetRecentFileList(fileNames);
+}
+
+void QmitkExtWorkbenchWindowAdvisor::RemoveFileFromRecentFileList(QString fileName)
+{
+    if (QMessageBox::question(NULL,
+        "File not found",
+        fileName + " could not be opened.\n Would you like to remove it from the list of recent files?",
+        QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+        return;
+    }
+
+    QStringList fileNames = GetRecentFileList();
+    fileNames.removeAll(fileName);
+    SetRecentFileList(fileNames);
+
+    UpdateRecentFileList();
+}
+
+void QmitkExtWorkbenchWindowAdvisor::OpenRecentProject()
+{
+    QAction* action = qobject_cast<QAction*>(sender());
+
+    if (!action) {
+        return;
+    }
+
+    connect(fileOpenProjectAction, SIGNAL(projectOpenFailed(QString)), this, SLOT(RemoveFileFromRecentFileList(QString)));
+    static_cast<QmitkExtFileOpenProjectAction*>(fileOpenProjectAction)->Run(action->text());
+    disconnect(fileOpenProjectAction, SIGNAL(projectOpenFailed(QString)), this, SLOT(RemoveFileFromRecentFileList(QString)));
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
@@ -1181,13 +1325,14 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
     }
 
     std::string title;
+
     //TODO Product
     //    IProduct product = Platform.getProduct();
     //    if (product != null) {
     //      title = product.getName();
     //    }
     // instead of the product name, we use a custom variable for now
-    title = productName;
+    title += productName;
 
     if(showMitkVersionInfo)
     {
@@ -1231,6 +1376,12 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
             title = label + " - " + title;
         }
     }
+
+    if (!currentlyOpenProject.empty()) {
+        title = currentlyOpenProject + " - " + title;
+    }
+
+
 
     title += " (Not for use in diagnosis or treatment of patients)";
 

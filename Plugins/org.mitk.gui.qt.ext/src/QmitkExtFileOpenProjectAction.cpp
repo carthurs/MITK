@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkExtFileSaveProjectAction.h"
+#include "QmitkExtFileOpenProjectAction.h"
 
 #include "internal/QmitkCommonExtPlugin.h"
 
@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
+#include <mitkWorkbenchUtil.h>
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
@@ -36,8 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include "berryPlatform.h"
 
-// DUPLICATED FROM QmitkFileOpenAction & QmitkExtFileOpenProjectAction
-static berry::IPreferences::Pointer GetPreferences()
+
+// DUPLICATED FROM QmitkFileOpenAction
+static berry::IPreferences::Pointer GetPreferences() 
 {
     berry::IPreferencesService::Pointer prefService
         = berry::Platform::GetServiceRegistry()
@@ -49,7 +51,7 @@ static berry::IPreferences::Pointer GetPreferences()
     return berry::IPreferences::Pointer(0);
 }
 
-static QString getLastFileOpenPath()
+static QString getLastFileOpenPath() 
 {
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
@@ -59,7 +61,7 @@ static QString getLastFileOpenPath()
     return QString();
 }
 
-static void setLastFileOpenPath(const QString& path)
+static void setLastFileOpenPath(const QString& path) 
 {
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
@@ -71,21 +73,20 @@ static void setLastFileOpenPath(const QString& path)
 // end DUPLICATED
 
 
-QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
+QmitkExtFileOpenProjectAction::QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO)
 : QAction(0)
 , m_SceneIO(sceneIO)
-, m_SaveAs(saveAs)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  this->setText(m_SaveAs ? "Save Project &As..." : "Save Project");
-  this->setToolTip("Save content of Data Manager as a .mitk project file");
+  this->setText("&Open Project");
+  this->setToolTip("Open an .mitk project file");
   m_Window = window;
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 
-void QmitkExtFileSaveProjectAction::Run()
+void QmitkExtFileOpenProjectAction::Run(QString fName)
 {
   try
   {
@@ -118,88 +119,57 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::DataStorage::Pointer storage = dsRef->GetDataStorage();
 
-    QString fileName;
-    if (m_SaveAs || m_SceneIO->GetLoadedProjectFileName().empty()) {
-        QString dialogTitle = "Save MITK Scene (%1)";
-        fileName = QFileDialog::getSaveFileName(NULL,
+    QString fileName = fName;
+
+    if (fileName.isEmpty()) {
+        QString dialogTitle = "Open MITK Scene (%1)";
+        fileName = QFileDialog::getOpenFileName(NULL,
             dialogTitle.arg(dsRef->GetLabel()),
             getLastFileOpenPath(),
             "MITK scene files (*.mitk)",
             NULL);
     }
-    else {
-        fileName = QString::fromStdString(m_SceneIO->GetLoadedProjectFileName());
-    }
 
     if (fileName.isEmpty())
         return;
 
-    if ( fileName.right(5) != ".mitk" )
-      fileName += ".mitk";
+    // Close project
+    //check if we got the default datastorage and if there is anything else then helper object in the storage
+    if (dsRef->IsDefault() ||
+        !storage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
+    {
+        /* Ask, if the user is sure about that */
+        QString msg = "Are you sure that you want to close the current project (%1)?\nThis will remove all data objects.";
+        if (QMessageBox::question(NULL, "Remove all data?", msg.arg(m_SceneIO->GetLoadedProjectFileName().empty() ? dsRef->GetLabel() : QString::fromStdString(m_SceneIO->GetLoadedProjectFileName())),
+            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+        {
+            return;
+        }
+    }
 
+    // remember the location
     setLastFileOpenPath(fileName);
 
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
     /* Build list of nodes that should be saved */
-    mitk::NodePredicateNot::Pointer isNotHelperObject =
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
-    mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
-
-    if ( !m_SceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
+    if ( !m_SceneIO->LoadScene(fileName.toStdString(), storage, true) || m_SceneIO->GetLoadedProjectFileName().empty())
     {
       QMessageBox::information(NULL,
-                               "Scene saving",
-                               "Scene could not be written completely. Please check the log.",
+                               "Scene opening",
+                               "Scene could not be loaded. Please check the log.",
                                QMessageBox::Ok);
-
+      emit projectOpenFailed(fileName);
     }
+    else {
+        emit projectOpened(fileName);
+    }
+
+    mitk::WorkbenchUtil::ReinitAfterLoadFiles(m_Window, true, dsRef, true);
     mitk::ProgressBar::GetInstance()->Progress(2);
-
-    mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = m_SceneIO->GetFailedNodes();
-    if (!failedNodes->empty())
-    {
-      std::stringstream ss;
-      ss << "The following nodes could not be serialized:" << std::endl;
-      for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
-        iter != failedNodes->end();
-        ++iter )
-      {
-        ss << " - ";
-        if ( mitk::BaseData* data =(*iter)->GetData() )
-        {
-          ss << data->GetNameOfClass();
-        }
-        else
-        {
-          ss << "(NULL)";
-        }
-
-        ss << " contained in node '" << (*iter)->GetName() << "'" << std::endl;
-      }
-
-      MITK_WARN << ss.str();
-    }
-
-    mitk::PropertyList::ConstPointer failedProperties = m_SceneIO->GetFailedProperties();
-    if (!failedProperties->GetMap()->empty())
-    {
-      std::stringstream ss;
-      ss << "The following properties could not be serialized:" << std::endl;
-      const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
-      for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
-        iter != propmap->end();
-        ++iter )
-      {
-        ss << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
-      }
-
-      MITK_WARN << ss.str();
-    }
-    emit projectSaved(fileName);
   }
   catch (std::exception& e)
   {
-    MITK_ERROR << "Exception caught during scene saving: " << e.what();
+    MITK_ERROR << "Exception caught during scene loading: " << e.what();
   }
 }

@@ -210,7 +210,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(globalReinitAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, globalReinitAction));
 
-  QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"),
+  QAction* saveAction = new QmitkFileSaveAction(QIcon::fromTheme("go-up", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/go-up.svg")),
                                                 this->GetSite()->GetWorkbenchWindow());
   unknownDataNodeDescriptor->AddAction(saveAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,saveAction));

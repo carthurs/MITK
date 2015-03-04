@@ -42,6 +42,8 @@ public:
   QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
 protected slots:
   void Run();
+signals:
+  void projectClosed();
 
 private:
   void init(berry::IWorkbenchWindow::Pointer window);

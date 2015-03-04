@@ -96,6 +96,10 @@ class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
      */
     const PropertyList* GetFailedProperties();
 
+    const std::string& GetLoadedProjectFileName() { return m_LoadedProjectFileName; }
+
+    void Clear();
+
   protected:
 
     SceneIO();
@@ -117,12 +121,12 @@ class MitkSceneSerialization_EXPORT SceneIO : public itk::Object
 
     friend class CompressorTask;
 
-    static std::map<const mitk::DataNode*, unsigned long> m_NodeLoadTimeStamps;
-    static std::string m_LoadedProjectFileName;
-    static SceneReader::LoadedNodeFileNamesMap m_LoadedNodeFileNames;
-    static Poco::Timestamp m_FileTimeStamp;
-    static Poco::Thread m_CompressionThread;
-    static std::unique_ptr<CompressorTask> m_CompressorTask;
+    std::map<const mitk::DataNode*, unsigned long> m_NodeLoadTimeStamps;
+    std::string m_LoadedProjectFileName;
+    SceneReader::LoadedNodeFileNamesMap m_LoadedNodeFileNames;
+    Poco::Timestamp m_FileTimeStamp;
+    Poco::Thread m_CompressionThread;
+    std::unique_ptr<CompressorTask> m_CompressorTask;
 
     void RecordLoadTimeStamp(const mitk::DataNode*);
 

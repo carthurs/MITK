@@ -62,8 +62,8 @@ public:
     m_Action = action;
 
     action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
-    action->setText("&Save...");
-    action->setToolTip("Save data objects (images, surfaces,...)");
+    action->setText("&Export...");
+    action->setToolTip("Export data objects (images, surfaces,...)");
 
     berry::ISelectionService* selectionService = m_Window.Lock()->GetSelectionService();
     setEnabled(selectionService->GetSelection());

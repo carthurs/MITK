@@ -119,6 +119,8 @@ void QmitkCloseProjectAction::Run()
       editorsToClose.assign(dsEditors.begin(), dsEditors.end());
       m_Window->GetActivePage()->CloseEditors(editorsToClose, false);
     }
+
+    emit projectClosed();
   }
   catch (std::exception& e)
   {
