@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>
 
+#include <Poco/TemporaryFile.h>
+#include <Poco/Path.h>
+
 mitk::BaseDataSerializer::BaseDataSerializer()
 : m_FilenameHint("unnamed")
 , m_WorkingDirectory("")
@@ -40,17 +43,6 @@ std::string mitk::BaseDataSerializer::Serialize()
 
 std::string mitk::BaseDataSerializer::GetUniqueFilenameInWorkingDirectory()
 {
-  // tmpname
-  static unsigned long count = 0;
-  unsigned long n = count++;
-  std::ostringstream name;
-  for (int i = 0; i < 6; ++i)
-  {
-    name << char('a' + (n % 26));
-    n /= 26;
-  }
-  std::string myname;
-  myname.append(name.str());
-  return myname;
+    return Poco::Path(Poco::TemporaryFile::tempName(m_WorkingDirectory)).getFileName();
 }
 

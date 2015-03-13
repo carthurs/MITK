@@ -345,7 +345,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
     bool incrementalSave = Poco::File(filename).path() == Poco::File(m_LoadedProjectFileName).path() && m_FileTimeStamp == Poco::File(filename).getLastModified();
-    std::unordered_set<std::string> stubFileNames;
 
     std::set<std::string> filesToMaintain;
     if (sceneNodes.IsNull())
@@ -412,27 +411,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         {
           nodeUIDs[ node ] = nodeUIDGen.GetUID();
         }
-      }
-
-      // First, put empty files into working directory for base datas that dont need to be saved to avoid name clashes
-      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-          iter != sceneNodes->end();
-          ++iter)
-      {
-          if (iter->IsNull() || (*iter)->GetData() == nullptr) {
-              continue;
-          }
-          DataNode* node = iter->GetPointer();
-          BaseData* data = node->GetData();
-          bool dataNeedsToBeWritten = (!incrementalSave || m_NodeLoadTimeStamps.find(node) == m_NodeLoadTimeStamps.end() || node->GetData()->GetMTime() > m_NodeLoadTimeStamps[node]);
-
-          if (!dataNeedsToBeWritten) {
-              for (size_t i = 0; i < m_LoadedNodeFileNames[node].baseDataFiles.size(); ++i)
-              {
-                  Poco::File(m_WorkingDirectory + "/" + m_LoadedNodeFileNames[node].baseDataFiles[i]).createFile(); // To avoid name clash
-                  stubFileNames.insert(m_LoadedNodeFileNames[node].baseDataFiles[i]);
-              }
-          }
       }
 
       // write out objects, dependencies and properties
@@ -581,14 +559,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     }
     else
     {
-        // Remove empty files created to avoid name clashes
-        Poco::DirectoryIterator end;
-        for (Poco::DirectoryIterator iter(m_WorkingDirectory); iter != end; ++iter) {
-            if (!iter->isDirectory() && stubFileNames.find(Poco::Path(iter->path()).getFileName()) != stubFileNames.end()) {
-                iter->remove(); 
-            }
-        }
-
         m_CompressorTask = std::make_unique<CompressorTask>(this, filename, incrementalSave, filesToMaintain);
         m_CompressionThread.start(*m_CompressorTask);
         return true;
