@@ -14,6 +14,7 @@
      </transition>
     
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Start" >
+      <condition name="point_is_valid" />      
       <condition name="figure_is_finished"/>
       <action name="finalize_figure" />
     </transition>
