@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkDataTypesExtExports.h"
 #include "itkImageRegion.h"
 
-class vtkUnstructuredGrid;
+class vtkUnstructuredGridBase;
 
 namespace mitk {
 
@@ -41,9 +41,9 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid* grid, unsigned int t = 0);
+  virtual void SetVtkUnstructuredGrid(vtkUnstructuredGridBase* grid, unsigned int t = 0);
 
-  virtual vtkUnstructuredGrid* GetVtkUnstructuredGrid(unsigned int t = 0);
+  virtual vtkUnstructuredGridBase* GetVtkUnstructuredGrid(unsigned int t = 0);
 
   virtual void UpdateOutputInformation();
 
@@ -86,7 +86,7 @@ public:
 protected:
   mitkCloneMacro(Self);
 
-  typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
+  typedef std::vector< vtkUnstructuredGridBase* > VTKUnstructuredGridSeries;
 
   UnstructuredGrid();
 

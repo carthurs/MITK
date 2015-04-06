@@ -147,7 +147,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
         mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
         if (input.IsNull()) return;
 
-        vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
+        vtkUnstructuredGridBase * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
         if (grid == 0) return;
 
         double* scalarRange = grid->GetScalarRange();
@@ -177,7 +177,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   //
   // set the input-object at time t for the mapper
   //
-  vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid( this->GetTimestep() );
+  vtkUnstructuredGridBase * grid = input->GetVtkUnstructuredGrid( this->GetTimestep() );
   if(grid == 0)
   {
     m_Assembly->VisibilityOff();

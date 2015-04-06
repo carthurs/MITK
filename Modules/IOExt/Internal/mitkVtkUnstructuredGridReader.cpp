@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDataReader.h>
 #include <vtkUnstructuredGridReader.h>
 #include <vtkXMLUnstructuredGridReader.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <itksys/SystemTools.hxx>
 

@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUnstructuredGrid.h"
 
-#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGridBase.h>
 
-void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )
+void mitk::UnstructuredGrid::SetVtkUnstructuredGrid(vtkUnstructuredGridBase* grid, unsigned int t)
 {
   this->Expand(t);
 
@@ -46,7 +46,7 @@ void mitk::UnstructuredGrid::Expand(unsigned int timeSteps)
   if(timeSteps > m_GridSeries.size())
   {
     Superclass::Expand(timeSteps);
-    vtkUnstructuredGrid* pdnull = 0;
+    vtkUnstructuredGridBase* pdnull = 0;
     m_GridSeries.resize( timeSteps, pdnull );
     m_CalculateBoundingBox = true;
   }
@@ -66,18 +66,18 @@ void mitk::UnstructuredGrid::ClearData()
 
 void mitk::UnstructuredGrid::InitializeEmpty()
 {
-  vtkUnstructuredGrid* pdnull = 0;
+  vtkUnstructuredGridBase* pdnull = 0;
   m_GridSeries.resize( 1, pdnull );
   Superclass::InitializeTimeGeometry(1);
 
   m_Initialized = true;
 }
 
-vtkUnstructuredGrid* mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int t)
+vtkUnstructuredGridBase* mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int t)
 {
   if ( t < m_GridSeries.size() )
   {
-    vtkUnstructuredGrid* grid = m_GridSeries[ t ];
+    vtkUnstructuredGridBase* grid = m_GridSeries[t];
     if((grid == 0) && (GetSource().GetPointer() != 0))
     {
       RegionType requestedregion;
@@ -150,7 +150,7 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   //
   for ( unsigned int i = 0 ; i < m_GridSeries.size() ; ++i )
   {
-    vtkUnstructuredGrid* grid = m_GridSeries[ i ];
+    vtkUnstructuredGridBase* grid = m_GridSeries[i];
     double bounds[ ] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     if ( ( grid != 0 ) && ( grid->GetNumberOfCells() > 0 ) )
     {

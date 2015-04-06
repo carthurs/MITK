@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkUnstructuredGridBase.h"
 
 vtkStandardNewMacro(vtkUnstructuredGridMapper);
 
@@ -54,16 +54,16 @@ void vtkUnstructuredGridMapper::SetBoundingObject(mitk::BoundingObject* bo)
 }
 
 //----------------------------------------------------------------------------
-void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGrid *input)
+void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGridBase *input)
 {
   this->SetInputDataObject(input);
 }
 
 //----------------------------------------------------------------------------
-vtkUnstructuredGrid *vtkUnstructuredGridMapper::GetInput()
+vtkUnstructuredGridBase *vtkUnstructuredGridMapper::GetInput()
 {
   //return this->Superclass::GetInputAsDataSet();
-  return vtkUnstructuredGrid::SafeDownCast(
+  return vtkUnstructuredGridBase::SafeDownCast(
       this->GetExecutive()->GetInputData(0, 0));
 }
 
@@ -213,7 +213,7 @@ unsigned long vtkUnstructuredGridMapper::GetMTime()
 int vtkUnstructuredGridMapper::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGridBase");
   return 1;
 }
 
