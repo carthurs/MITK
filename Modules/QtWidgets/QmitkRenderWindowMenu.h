@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QEvent>
 #include <QPushButton>
+#include <QToolButton>
 #include <QMenuBar>
 #include <QAction>
 #include <QLabel>
@@ -244,15 +245,15 @@ public:
 
 protected:
 
-  QPushButton*        m_CrosshairModeButton;
+  QToolButton*        m_CrosshairModeButton;
 
   //QAction*            m_ShowHideCrosshairVisibilityAction;
 
   /*! QPushButton for activating/deactivating full-screen mode*/
-  QPushButton*        m_FullScreenButton;
+  QToolButton*        m_FullScreenButton;
 
   /*! QPushButton for open the settings menu*/
-  QPushButton*        m_SettingsButton;
+  QToolButton*        m_SettingsButton;
 
   /*! QAction for Default layout design */
   QAction*            m_DefaultLayoutAction;

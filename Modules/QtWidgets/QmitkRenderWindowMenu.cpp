@@ -128,28 +128,30 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   connect( m_CrosshairMenu, SIGNAL( aboutToShow() ), this, SLOT(OnCrossHairMenuAboutToShow()) );
 
   // button for changing rotation mode
-  m_CrosshairModeButton = new QPushButton(this);
+  m_CrosshairModeButton = new QToolButton(this);
   m_CrosshairModeButton->setMaximumSize(15, 15);
   m_CrosshairModeButton->setIconSize(size);
-  m_CrosshairModeButton->setFlat( true );
   m_CrosshairModeButton->setMenu( m_CrosshairMenu );
   m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
+  m_CrosshairModeButton->setPopupMode(QToolButton::InstantPopup);
+  m_CrosshairModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+  m_CrosshairModeButton->setAutoRaise(true);
   layout->addWidget( m_CrosshairModeButton );
 
   //fullScreenButton
-  m_FullScreenButton = new QPushButton(this);
+  m_FullScreenButton = new QToolButton(this);
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
-  m_FullScreenButton->setFlat( true );
   m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
+  m_FullScreenButton->setAutoRaise(true);
   layout->addWidget( m_FullScreenButton );
 
   //settingsButton
-  m_SettingsButton = new QPushButton(this);
+  m_SettingsButton = new QToolButton(this);
   m_SettingsButton->setMaximumSize(15, 15);
   m_SettingsButton->setIconSize(size);
-  m_SettingsButton->setFlat( true );
   m_SettingsButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
+  m_SettingsButton->setAutoRaise(true);
   layout->addWidget( m_SettingsButton );
 
   //Create Connections -- coming soon?
