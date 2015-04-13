@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIWorkbenchWindow.h>
 
+#include <mitkSceneIO.h>
+
 /**
  * \ingroup org_mitk_gui_qt_application
  */
@@ -38,15 +40,16 @@ class MITK_QT_APP QmitkCloseProjectAction : public QAction
   Q_OBJECT
 
 public:
-  QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window);
-  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
-protected slots:
-  void Run();
+  QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
+  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
+public slots:
+  bool Run();
 signals:
   void projectClosed();
 
 private:
-  void init(berry::IWorkbenchWindow::Pointer window);
+  void init(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
   berry::IWorkbenchWindow::Pointer m_Window;
+  mitk::SceneIO::Pointer m_SceneIO;
 };
 #endif /*QmitkCloseProjectAction_H_*/

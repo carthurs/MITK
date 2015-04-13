@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include "berryPlatform.h"
+#include <QmitkCloseProjectAction.h>
 
 
 // DUPLICATED FROM QmitkFileOpenAction
@@ -138,11 +139,7 @@ void QmitkExtFileOpenProjectAction::Run(QString fName)
     if (dsRef->IsDefault() ||
         !storage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
     {
-        /* Ask, if the user is sure about that */
-        QString msg = "Are you sure that you want to close the current project (%1)?\nThis will remove all data objects.";
-        if (QMessageBox::question(NULL, "Remove all data?", msg.arg(m_SceneIO->GetLoadedProjectFileName().empty() ? dsRef->GetLabel() : QString::fromStdString(m_SceneIO->GetLoadedProjectFileName())),
-            QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-        {
+        if (!QmitkCloseProjectAction(m_Window, m_SceneIO).Run()) {
             return;
         }
     }
@@ -153,7 +150,7 @@ void QmitkExtFileOpenProjectAction::Run(QString fName)
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
     /* Build list of nodes that should be saved */
-    if ( !m_SceneIO->LoadScene(fileName.toStdString(), storage, true) || m_SceneIO->GetLoadedProjectFileName().empty())
+    if ( !m_SceneIO->LoadScene(fileName.toStdString(), storage, false) || m_SceneIO->GetLoadedProjectFileName().empty())
     {
       QMessageBox::information(NULL,
                                "Scene opening",

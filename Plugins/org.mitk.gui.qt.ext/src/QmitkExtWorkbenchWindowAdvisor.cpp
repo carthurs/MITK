@@ -580,7 +580,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileMenu->addAction(fileSaveProjectAsAction);
     connect(fileSaveProjectAsAction, SIGNAL(projectSaved(QString)), this, SLOT(onProjectNameChanged(QString)));
 
-    closeProjectAction = new QmitkCloseProjectAction(window);
+    closeProjectAction = new QmitkCloseProjectAction(window, sharedSceneIO);
     closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
     fileMenu->addAction(closeProjectAction);
     connect(closeProjectAction, SIGNAL(projectClosed()), this, SLOT(onProjectClosed()));
