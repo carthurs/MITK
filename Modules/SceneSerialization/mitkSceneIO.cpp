@@ -425,6 +425,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           TiXmlElement* nodeElement = new TiXmlElement("node");
           std::string filenameHint( node->GetName() );
           filenameHint = itksys::SystemTools::MakeCindentifier(filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
+          filenameHint.resize(std::min(filenameHint.size(), static_cast<size_t>(100))); // Limit file name to support windows file systems with limit of 255 symbols
 
           // store dependencies
           UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
