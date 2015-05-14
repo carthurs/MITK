@@ -174,6 +174,7 @@ void berry::PreferencesService::ShutDown()
     if(it->second != 0)
       it->second->GetRoot()->Flush();
   }
+  m_PreferencesStorages.clear();
 }
 
 void berry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
