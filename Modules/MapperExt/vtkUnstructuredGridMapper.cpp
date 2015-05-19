@@ -23,12 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkUnstructuredGridBase.h"
+#include "vtkDataSetSurfaceFilter.h"
 
 vtkStandardNewMacro(vtkUnstructuredGridMapper);
 
 //----------------------------------------------------------------------------
 vtkUnstructuredGridMapper::vtkUnstructuredGridMapper()
 {
+    this->SurfaceExtractor = 0;
   this->GeometryExtractor = 0;
   this->PolyDataMapper = 0;
 }
@@ -37,6 +39,9 @@ vtkUnstructuredGridMapper::vtkUnstructuredGridMapper()
 vtkUnstructuredGridMapper::~vtkUnstructuredGridMapper()
 {
   // delete internally created objects.
+    if (this->SurfaceExtractor) {
+        this->SurfaceExtractor->Delete();
+    }
   if ( this->GeometryExtractor )
     {
     this->GeometryExtractor->Delete();
@@ -110,10 +115,13 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   //
   if ( this->PolyDataMapper == 0 )
     {
+    vtkDataSetSurfaceFilter* sf = vtkDataSetSurfaceFilter::New();
     vtkGeometryFilter *gf = vtkGeometryFilter::New();
     vtkPolyDataMapper *pm = vtkPolyDataMapper::New();
+    gf->SetInputConnection(sf->GetOutputPort());
     pm->SetInputConnection(gf->GetOutputPort());
 
+    this->SurfaceExtractor = sf;
     this->GeometryExtractor = gf;
     this->PolyDataMapper = pm;
     }
@@ -137,7 +145,7 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
     this->GeometryExtractor->ExtentClippingOff();
   }
 
-  this->GeometryExtractor->SetInputData(this->GetInput());
+  this->SurfaceExtractor->SetInputData(this->GetInput());
   this->PolyDataMapper->SetInputConnection(this->GeometryExtractor->GetOutputPort());
 
   // update ourselves in case something has changed
@@ -223,6 +231,8 @@ void vtkUnstructuredGridMapper::ReportReferences(vtkGarbageCollector* collector)
   this->Superclass::ReportReferences(collector);
   // These filters share our input and are therefore involved in a
   // reference loop.
+  vtkGarbageCollectorReport(collector, this->SurfaceExtractor,
+      "SurfaceExtractor");
   vtkGarbageCollectorReport(collector, this->GeometryExtractor,
                             "GeometryExtractor");
   vtkGarbageCollectorReport(collector, this->PolyDataMapper,

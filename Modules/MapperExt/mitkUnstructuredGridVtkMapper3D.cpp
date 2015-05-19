@@ -36,8 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkProperty.h>
 
 #include <vtkPlanes.h>
-
-
+#include <mitkClippingProperty.h>
+#include <vtkNew.h>
+#include <vtkDoubleArray.h>
 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkMapper3D::GetInput()
 {
@@ -49,6 +50,7 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
 {
 
   m_VtkTriangleFilter = vtkDataSetTriangleFilter::New();
+  m_ExtractGeometryFilter = vtkExtractGeometry::New();
 
   m_Assembly = vtkAssembly::New();
 
@@ -122,7 +124,6 @@ vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-
   mitk::DataNode::ConstPointer node = this->GetDataNode();
 
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -134,9 +135,10 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
     m_Assembly->VisibilityOn();
 
-    m_ActorWireframe->GetProperty()->SetAmbient(1.0);
-    m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
-    m_ActorWireframe->GetProperty()->SetSpecular(0.0);
+    vtkProperty* wireframeProperty = m_ActorWireframe->GetProperty();
+    wireframeProperty->SetAmbient(1.0);
+    wireframeProperty->SetDiffuse(0.0);
+    wireframeProperty->SetSpecular(0.0);
 
     mitk::TransferFunctionProperty::Pointer transferFuncProp;
     if (node->GetProperty(transferFuncProp, "TransferFunction"))
@@ -178,17 +180,63 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   // set the input-object at time t for the mapper
   //
   vtkUnstructuredGridBase * grid = input->GetVtkUnstructuredGrid( this->GetTimestep() );
-  if(grid == 0)
+  if (grid == nullptr)
   {
     m_Assembly->VisibilityOff();
     return;
   }
 
+  if (needGenerateData) {
+      // Check whether one or more ClippingProperty objects have been defined for
+      // this node. Check both renderer specific and global property lists, since
+      // properties in both should be considered.
+      const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList(renderer)->GetMap();
+      const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList(nullptr)->GetMap();
+
+      auto addClippingPlane = [](mitk::BaseProperty* property, vtkPlanes* planes)
+      {
+          ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >(property);
+
+          if (!clippingProperty) {
+              return;
+          }
+
+          planes->GetPoints()->InsertNextPoint(clippingProperty->GetOrigin()[0], clippingProperty->GetOrigin()[1], clippingProperty->GetOrigin()[2]);
+          planes->GetNormals()->InsertNextTuple3(clippingProperty->GetNormal()[0], clippingProperty->GetNormal()[1], clippingProperty->GetNormal()[2]);
+      };
+
+      vtkNew<vtkPlanes> planes;
+      planes->SetPoints(vtkPoints::New());
+      vtkNew<vtkDoubleArray> normals;
+      normals->SetNumberOfComponents(3);
+      planes->SetNormals(normals.Get());
+
+      for (const PropertyList::PropertyMapElementType& propertyMapElement : *rendererProperties) {
+          addClippingPlane(propertyMapElement.second, planes.Get());
+      }
+
+      for (const PropertyList::PropertyMapElementType& propertyMapElement : *globalProperties) {
+          addClippingPlane(propertyMapElement.second, planes.Get());
+      }
+
+      if (planes->GetPoints()->GetNumberOfPoints() > 0) {
+          m_ExtractGeometryFilter->SetInputData(grid);
+          m_ExtractGeometryFilter->SetImplicitFunction(planes.Get());
+          m_ExtractGeometryFilter->ExtractBoundaryCellsOn();
+          m_ExtractGeometryFilter->Update();
+          m_VtkTriangleFilter->SetInputData(m_ExtractGeometryFilter->GetOutput());
+          m_VtkDataSetMapper->SetInput(m_ExtractGeometryFilter->GetOutput());
+          m_VtkDataSetMapper2->SetInput(m_ExtractGeometryFilter->GetOutput());
+      }
+      else {
+          m_VtkTriangleFilter->SetInputData(grid);
+          m_VtkDataSetMapper->SetInput(grid);
+          m_VtkDataSetMapper2->SetInput(grid);
+      }
+  }
+
   m_Assembly->VisibilityOn();
 
-  m_VtkTriangleFilter->SetInputData(grid);
-  m_VtkDataSetMapper->SetInput(grid);
-  m_VtkDataSetMapper2->SetInput(grid);
 
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
@@ -408,6 +456,7 @@ void mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(mitk::DataNode* nod
   //node->AddProperty("scalar range max", DoubleProperty::New(std::numeric_limits<double>::max()), renderer, overwrite);
   node->AddProperty("outline polygons", BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("color", ColorProperty::New(1.0f, 1.0f, 1.0f), renderer, overwrite);
+  node->AddProperty("color.selected", ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);
   node->AddProperty("line width", IntProperty::New(1), renderer, overwrite);
 
   if(overwrite || node->GetProperty("TransferFunction", renderer) == 0)

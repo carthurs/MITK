@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkPolyDataMapper;
 class vtkGeometryFilter;
+class vtkDataSetSurfaceFilter;
 class vtkUnstructuredGridBase;
 
 class MitkMapperExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper
@@ -70,6 +71,7 @@ protected:
   vtkUnstructuredGridMapper();
   ~vtkUnstructuredGridMapper();
 
+  vtkDataSetSurfaceFilter* SurfaceExtractor;
   vtkGeometryFilter *GeometryExtractor;
   vtkPolyDataMapper *PolyDataMapper;
 
