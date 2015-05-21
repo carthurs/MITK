@@ -571,6 +571,9 @@ mitk::DataNode *
       if ( !pickable )
         continue;
 
+      if (!node->IsVisible(this))
+        continue;
+
       VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
