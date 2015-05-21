@@ -160,33 +160,8 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
         colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
       }
     }
-  }
 
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(!visible)
-  {
-    m_Assembly->VisibilityOff();
-    return;
-  }
-
-  //
-  // get the TimeGeometry of the input object
-  //
-  mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >( this->GetInput() );
-
-  //
-  // set the input-object at time t for the mapper
-  //
-  vtkUnstructuredGridBase * grid = input->GetVtkUnstructuredGrid( this->GetTimestep() );
-  if (grid == nullptr)
-  {
-    m_Assembly->VisibilityOff();
-    return;
-  }
-
-  if (needGenerateData) {
       // Check whether one or more ClippingProperty objects have been defined for
       // this node. Check both renderer specific and global property lists, since
       // properties in both should be considered.
@@ -219,24 +194,51 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
           addClippingPlane(propertyMapElement.second, planes.Get());
       }
 
+      m_ExtractGeometryFilter->ExtractBoundaryCellsOn();
       if (planes->GetPoints()->GetNumberOfPoints() > 0) {
-          m_ExtractGeometryFilter->SetInputData(grid);
           m_ExtractGeometryFilter->SetImplicitFunction(planes.Get());
-          m_ExtractGeometryFilter->ExtractBoundaryCellsOn();
-          m_ExtractGeometryFilter->Update();
-          m_VtkTriangleFilter->SetInputData(m_ExtractGeometryFilter->GetOutput());
-          m_VtkDataSetMapper->SetInput(m_ExtractGeometryFilter->GetOutput());
-          m_VtkDataSetMapper2->SetInput(m_ExtractGeometryFilter->GetOutput());
-      }
-      else {
-          m_VtkTriangleFilter->SetInputData(grid);
-          m_VtkDataSetMapper->SetInput(grid);
-          m_VtkDataSetMapper2->SetInput(grid);
+      } else {
+          m_ExtractGeometryFilter->SetImplicitFunction(nullptr);
       }
   }
 
-  m_Assembly->VisibilityOn();
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
+  if(!visible)
+  {
+    m_Assembly->VisibilityOff();
+    return;
+  }
+
+  //
+  // get the TimeGeometry of the input object
+  //
+  mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >( this->GetInput() );
+
+  //
+  // set the input-object at time t for the mapper
+  //
+  vtkUnstructuredGridBase * grid = input->GetVtkUnstructuredGrid( this->GetTimestep() );
+  if (grid == nullptr)
+  {
+    m_Assembly->VisibilityOff();
+    return;
+  }
+
+  if (m_ExtractGeometryFilter->GetImplicitFunction() != nullptr) {
+      m_ExtractGeometryFilter->SetInputData(grid);
+      m_ExtractGeometryFilter->Update();
+      m_VtkTriangleFilter->SetInputData(m_ExtractGeometryFilter->GetOutput());
+      m_VtkDataSetMapper->SetInput(m_ExtractGeometryFilter->GetOutput());
+      m_VtkDataSetMapper2->SetInput(m_ExtractGeometryFilter->GetOutput());
+  } else {
+      m_VtkTriangleFilter->SetInputData(grid);
+      m_VtkDataSetMapper->SetInput(grid);
+      m_VtkDataSetMapper2->SetInput(grid);
+  }
+
+  m_Assembly->VisibilityOn();
 
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
