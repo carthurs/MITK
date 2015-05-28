@@ -117,24 +117,24 @@ mitk::IDataStorageReference::Pointer QmitkAbstractRenderEditor::GetDataStorageRe
   {
     return input->GetDataStorageReference();
   }
-  return mitk::IDataStorageReference::Pointer(0);
+  return mitk::IDataStorageReference::Pointer(nullptr);
 }
 
 mitk::DataStorage::Pointer QmitkAbstractRenderEditor::GetDataStorage() const
 {
   mitk::IDataStorageReference::Pointer ref = this->GetDataStorageReference();
   if (ref.IsNotNull()) return ref->GetDataStorage();
-  return mitk::DataStorage::Pointer(0);
+  return mitk::DataStorage::Pointer(nullptr);
 }
 
 berry::IPreferences::Pointer QmitkAbstractRenderEditor::GetPreferences() const
 {
   berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
-  if (prefService != 0)
+  if (prefService != nullptr)
   {
     return prefService->GetSystemPreferences()->Node(this->GetSite()->GetId());
   }
-  return berry::IPreferences::Pointer(0);
+  return berry::IPreferences::Pointer(nullptr);
 }
 
 void QmitkAbstractRenderEditor::SetSelectionProvider()
@@ -166,7 +166,7 @@ mitk::SliceNavigationController* QmitkAbstractRenderEditor::GetTimeNavigationCon
 {
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();
-  return 0;
+  return nullptr;
 }
 
 void QmitkAbstractRenderEditor::OnPreferencesChanged(const berry::IBerryPreferences *)

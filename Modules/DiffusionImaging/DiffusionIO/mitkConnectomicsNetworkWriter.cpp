@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::ConnectomicsNetworkWriter::ConnectomicsNetworkWriter()
-  : AbstractFileWriter(mitk::ConnectomicsNetwork::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
+  : AbstractFileWriter(mitk::ConnectomicsNetwork::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
 {
   RegisterService();
 }
@@ -130,6 +130,7 @@ void mitk::ConnectomicsNetworkWriter::Write()
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID , edgeVector[ index ].second.sourceId );
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID , edgeVector[ index ].second.targetId );
           edgeXML->SetAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID , edgeVector[ index ].second.weight );
+          edgeXML->SetDoubleAttribute( mitk::ConnectomicsNetworkDefinitions::XML_EDGE_DOUBLE_WEIGHT_ID , edgeVector[ index ].second.edge_weight );
           edgesXML->LinkEndChild(edgeXML);
         }
       } // end edges section

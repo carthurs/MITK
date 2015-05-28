@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSource.h"
 #include "mitkUIDGenerator.h"
 
+
 //Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -29,7 +30,7 @@ const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME 
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource()
-  : itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)")
+: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)"), m_IsFrozen(false)
 {
 }
 
@@ -142,4 +143,14 @@ mitk::PropertyList::ConstPointer mitk::NavigationDataSource::GetParameters() con
   // add properties to p like this:
   //p->SetProperty("MyFilter_MyParameter", mitk::PropertyDataType::New(m_MyParameter));
   return mitk::PropertyList::ConstPointer(p);
+}
+
+void mitk::NavigationDataSource::Freeze()
+{
+  m_IsFrozen = true;
+}
+
+void mitk::NavigationDataSource::UnFreeze()
+{
+  m_IsFrozen = false;
 }

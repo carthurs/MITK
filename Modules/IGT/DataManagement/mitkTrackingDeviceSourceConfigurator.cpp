@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNDITrackingDevice.h"
 #include "mitkClaronTrackingDevice.h"
 #include "mitkOptitrackTrackingDevice.h"
+#include "mitkOpenIGTLinkTrackingDevice.h"
+#include "mitkVirtualTrackingDevice.h"
 
 #include <mitkIGTException.h>
 #include <mitkIGTHardwareException.h>
@@ -95,6 +97,8 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   else if (m_TrackingDevice->GetType()==mitk::NDIPolaris) {returnValue = CreateNDIPolarisTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
   else if (m_TrackingDevice->GetType()==mitk::ClaronMicron) {returnValue = CreateMicronTrackerTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
   else if (m_TrackingDevice->GetType()==mitk::NPOptitrack) {returnValue = CreateNPOptitrackTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
+  else if (m_TrackingDevice->GetType()==mitk::VirtualTracker) {returnValue = CreateVirtualTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
+  else if (m_TrackingDevice->GetType()==mitk::OpenIGTLinkTrackingDeviceConnection) {returnValue = CreateOpenIGTLinkTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
   //TODO: insert other tracking systems?
   if (returnValue.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
 
@@ -211,6 +215,20 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   return returnValue;
   }
 
+mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateOpenIGTLinkTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
+{
+  mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
+  mitk::OpenIGTLinkTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::OpenIGTLinkTrackingDevice*>(trackingDevice.GetPointer());
+  thisDevice->DiscoverTools();
+  if (thisDevice->GetToolCount() != navigationTools->GetToolCount())
+    {
+    this->m_ErrorMessage = "The number of tools in the connected device differs from the tool storage, cannot add tools.";
+    return NULL;
+    }
+  returnValue->SetTrackingDevice(thisDevice);
+  return returnValue;
+}
+
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateMicronTrackerTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
   {
   mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
@@ -263,15 +281,41 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   returnValue->SetTrackingDevice(thisDevice);
   return returnValue;
   }
+
+mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateVirtualTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
+  {
+  mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
+  mitk::VirtualTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::VirtualTrackingDevice*>(trackingDevice.GetPointer());
+  m_ToolCorrespondencesInToolStorage = std::vector<int>();
+
+  //add the tools to the tracking device
+  for (int i=0; i<navigationTools->GetToolCount(); i++)
+      {
+        mitk::NavigationTool::Pointer thisNavigationTool = m_NavigationTools->GetTool(i);
+        m_ToolCorrespondencesInToolStorage.push_back(i);
+        bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str());
+        if (!toolAddSuccess)
+          {
+          //todo error handling
+          this->m_ErrorMessage = "Can't add tool, is the toolfile valid?";
+          return NULL;
+          }
+      }
+  returnValue->SetTrackingDevice(thisDevice);
+  return returnValue;
+  }
+
 mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools)
   {
   mitk::NavigationDataObjectVisualizationFilter::Pointer returnValue = mitk::NavigationDataObjectVisualizationFilter::New();
   for (unsigned int i=0; i<trackingDeviceSource->GetNumberOfIndexedOutputs(); i++)
     {
+    // Note: If all tools have the same name only the first tool will always be returned and
+    //       the others won't be updated during rendering.This could potentially lead to inconstencies
     mitk::NavigationTool::Pointer currentTool = navigationTools->GetToolByName(trackingDeviceSource->GetOutput(i)->GetName());
     if (currentTool.IsNull())
       {
-      this->m_ErrorMessage = "Error: did not find correspondig tool in tracking device after initialization.";
+      this->m_ErrorMessage = "Error: did not find corresponding tool in tracking device after initialization.";
       return NULL;
       }
     returnValue->SetInput(i,trackingDeviceSource->GetOutput(i));

@@ -24,11 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <windows.h>
 #endif
 
+#include <berrySmartPointer.h>
+
 #include <QAction>
 
 #include <org_mitk_gui_qt_application_Export.h>
 
-#include <berryIWorkbenchWindow.h>
+namespace berry {
+struct IWorkbenchWindow;
+}
 
 #include <mitkSceneIO.h>
 
@@ -40,16 +44,16 @@ class MITK_QT_APP QmitkCloseProjectAction : public QAction
   Q_OBJECT
 
 public:
-  QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
-  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
-public slots:
-  bool Run();
-signals:
-  void projectClosed();
+  QmitkCloseProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO);
+  QmitkCloseProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
+  QmitkCloseProjectAction(const QIcon & icon, berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO);
+  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
+protected slots:
+  void Run();
 
 private:
-  void init(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
-  berry::IWorkbenchWindow::Pointer m_Window;
+  void init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
+  berry::IWorkbenchWindow* m_Window;
   mitk::SceneIO::Pointer m_SceneIO;
 };
 #endif /*QmitkCloseProjectAction_H_*/

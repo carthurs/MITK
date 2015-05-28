@@ -29,7 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkImageToItk.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
+#include <mitkImageCast.h>
 
 // VTK
 #include <vtkPolyData.h>
@@ -114,10 +115,11 @@ void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::Dat
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
-            if( dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()) )
+          bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+          if ( isDiffusionImage )
             {
                 m_DiffusionImageNode = node;
-                m_DiffusionImage = dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData());
+                m_DiffusionImage = dynamic_cast<mitk::Image*>(node->GetData());
                 m_Controls->m_DiffusionImageLabel->setText(node->GetName().c_str());
             }
             else
@@ -158,7 +160,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     typedef itk::SceneSpatialObject<3>          SceneSpatialObjectType;
 
     /* get Gradients/Direction of dwi */
-    itk::VectorContainer< unsigned int, vnl_vector_fixed<double,3> >::Pointer Pdir = m_DiffusionImage->GetDirections();
+    GradientDirectionContainerType::Pointer Pdir = static_cast<mitk::GradientDirectionsProperty*>( m_DiffusionImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer();
 
     /* bValueContainer, Container includes b-values according to corresponding gradient-direction*/
     TrackingFilterType::bValueContainerType::Pointer vecCont = TrackingFilterType::bValueContainerType::New();
@@ -171,33 +173,30 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
         {  //set 0-Gradient to bValue 0
             vecCont->InsertElement(i,0);
         }else{
-            vecCont->InsertElement(i,m_DiffusionImage->GetReferenceBValue());
+            vecCont->InsertElement(i, static_cast<mitk::FloatProperty*>(m_DiffusionImage->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue());
         }
     }
 
     /* define measurement frame (identity-matrix 3x3) */
-    TrackingFilterType::MeasurementFrameType measurement_frame = m_DiffusionImage->GetMeasurementFrame();
+    TrackingFilterType::MeasurementFrameType measurement_frame =  static_cast<mitk::MeasurementFrameProperty*>(m_DiffusionImage->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame();
 
     /* generate white matterImage (dummy?)*/
+    ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(m_DiffusionImage, itkVectorImagePointer);
+
     FloatImageType::Pointer wmImage = FloatImageType::New();
-    wmImage->SetSpacing( m_DiffusionImage->GetVectorImage()->GetSpacing() );
-    wmImage->SetOrigin( m_DiffusionImage->GetVectorImage()->GetOrigin() );
-    wmImage->SetDirection( m_DiffusionImage->GetVectorImage()->GetDirection() );
-    wmImage->SetLargestPossibleRegion( m_DiffusionImage->GetVectorImage()->GetLargestPossibleRegion() );
+    wmImage->SetSpacing( itkVectorImagePointer->GetSpacing() );
+    wmImage->SetOrigin( itkVectorImagePointer->GetOrigin() );
+    wmImage->SetDirection( itkVectorImagePointer->GetDirection() );
+    wmImage->SetLargestPossibleRegion( itkVectorImagePointer->GetLargestPossibleRegion() );
     wmImage->SetBufferedRegion( wmImage->GetLargestPossibleRegion() );
     wmImage->SetRequestedRegion( wmImage->GetLargestPossibleRegion() );
     wmImage->Allocate();
-
-    itk::ImageRegionIterator<FloatImageType> ot(wmImage, wmImage->GetLargestPossibleRegion() );
-    while (!ot.IsAtEnd())
-    {
-        ot.Set(1);
-        ++ot;
-    }
+    wmImage->FillBuffer(1);
 
     /* init TractographyFilter */
     TrackingFilterType::Pointer trackingFilter = TrackingFilterType::New();
-    trackingFilter->SetPrimaryInput(m_DiffusionImage->GetVectorImage().GetPointer());
+    trackingFilter->SetPrimaryInput(itkVectorImagePointer.GetPointer());
     trackingFilter->SetbValues(vecCont);
     trackingFilter->SetGradients(Pdir);
     trackingFilter->SetMeasurementFrame(measurement_frame);
@@ -206,15 +205,14 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     trackingFilter->SetMaxLikelihoodCacheSize(m_Controls->m_MaxCacheSizeSlider->value()*1000);
     trackingFilter->SetMaxTractLength(m_Controls->m_MaxTractLengthSlider->value());
 
-    //itk::Image< char, 3 >
-    mitk::ImageToItk< itk::Image< unsigned char, 3 > >::Pointer binaryImageToItk1 = mitk::ImageToItk< itk::Image< unsigned char, 3 > >::New();
-    binaryImageToItk1->SetInput( m_SeedRoi );
-    binaryImageToItk1->Update();
+
+    BinaryImageType::Pointer mask = BinaryImageType::New();
+    mitk::CastToItkImage(m_SeedRoi, mask);
 
     vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
 
-    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
+    itk::ImageRegionConstIterator< BinaryImageType > it(mask, mask->GetRequestedRegion());
     it.GoToBegin();
     mitk::BaseGeometry* geom = m_DiffusionImage->GetGeometry();
 
@@ -275,7 +273,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     fiberPolyData->SetPoints(vPoints);
     fiberPolyData->SetLines(vCellArray);
 
-    mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
+    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberPolyData);
     fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData())->GetGeometry());
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);
