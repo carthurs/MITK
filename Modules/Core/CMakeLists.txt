@@ -18,7 +18,7 @@ MITK_CREATE_MODULE(
     # We privately use/link all ITK modules in order to support all IO, Transform, etc.
     # factories from ITK which are registered "automatically" via a factory manager.
     PRIVATE ITK
-    PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
+    PUBLIC  CGAL VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML+vtkImagingStatistics
   WARNINGS_AS_ERRORS
   SUBPROJECTS MITK-Core
   # Do not automatically create CppMicroServices initialization code.

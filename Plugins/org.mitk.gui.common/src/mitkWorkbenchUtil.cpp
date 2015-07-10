@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryCoreException.h>
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
+#include <berryIBerryPreferences.h>
 
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
@@ -355,14 +356,13 @@ void WorkbenchUtil::ReinitAfterLoadFiles(berry::IWorkbenchWindow::Pointer window
     // Check if there is an open perspective. If not, open the default perspective.
     if (window->GetActivePage().IsNull())
     {
-        std::string defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+        QString defaultPerspId = window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
         window->GetWorkbench()->ShowPerspective(defaultPerspId, window);
     }
 
     bool globalReinitOnNodeAdded = true;
-    berry::IPreferencesService::Pointer prefService
-        = berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (prefService)
     {
         berry::IBerryPreferences::Pointer prefs
             = (prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager")).Cast<berry::IBerryPreferences>();
@@ -389,7 +389,7 @@ void WorkbenchUtil::ReinitAfterLoadFiles(berry::IWorkbenchWindow::Pointer window
         {
             QString msg = "An error occurred when displaying the file(s): %1";
             QMessageBox::warning(QApplication::activeWindow(), "Error displaying file",
-                msg.arg(QString::fromStdString(e.message())));
+                msg.arg(e.message()));
         }
     }
 }

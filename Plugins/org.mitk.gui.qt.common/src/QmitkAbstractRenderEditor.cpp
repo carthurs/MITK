@@ -50,7 +50,7 @@ public:
   /**
   * reactions to selection events from views
   */
-  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+  void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart, const berry::ISelection::ConstPointer& selection)
   {
       if (sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
           return;
@@ -62,7 +62,7 @@ public:
   mitk::IRenderingManager* m_RenderingManagerInterface;
   ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
   berry::IBerryPreferences::Pointer m_Prefs;
-  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
   berry::ISelectionProvider::Pointer m_SelectionProvider;
 };
 
@@ -82,7 +82,7 @@ QmitkAbstractRenderEditor::~QmitkAbstractRenderEditor()
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if (s)
   {
-      s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener);
+      s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener.data());
   }
 }
 
@@ -103,10 +103,9 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
 
   this->SetSelectionProvider();
 
-  d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
-      new berry::NullSelectionChangedAdapter<QmitkAbstractRenderEditorPrivate>(d.data(),
-      &QmitkAbstractRenderEditorPrivate::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
+  d->m_BlueBerrySelectionListener.reset( 
+      new berry::NullSelectionChangedAdapter<QmitkAbstractRenderEditorPrivate>(d.data(), &QmitkAbstractRenderEditorPrivate::BlueBerrySelectionChanged));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener.data());
 
 }
 

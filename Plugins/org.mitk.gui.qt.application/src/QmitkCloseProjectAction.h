@@ -48,8 +48,10 @@ public:
   QmitkCloseProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
   QmitkCloseProjectAction(const QIcon & icon, berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO);
   QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
-protected slots:
-  void Run();
+public slots:
+  bool Run();
+signals:
+  void projectClosed();
 
 private:
   void init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);

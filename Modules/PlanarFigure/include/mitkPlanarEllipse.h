@@ -40,26 +40,24 @@ public:
   itkCloneMacro(Self)
 
 
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
-   *
-   * Must be implemented in sub-classes.
-   */
-  virtual void PlaceFigure( const Point2D &point ) override;
-
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true ) override;
+
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 3;
+  }
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
-    return 4;
+    return 3;
   }
 
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMaximumNumberOfControlPoints() const override
   {
-    return 4;
+    return 3;
   }
 
   /** \brief Sets the minimum radius
@@ -104,8 +102,11 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
-  const unsigned int FEATURE_ID_MAJOR_AXIS;
-  const unsigned int FEATURE_ID_MINOR_AXIS;
+  // Feature identifiers
+  const unsigned int FEATURE_ID_RADIUS1;
+  const unsigned int FEATURE_ID_RADIUS2;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
+  const unsigned int FEATURE_ID_AREA;
 
 protected:
   PlanarEllipse();

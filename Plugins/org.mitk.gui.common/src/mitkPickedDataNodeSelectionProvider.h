@@ -26,13 +26,13 @@ public:
     /**
     * This method will always return a mitk::DataNodeSelection object.
     */
-    void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener) override;
+    void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
 
-    void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener) override;
+    void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
 
     berry::ISelection::ConstPointer GetSelection() const override;
 
-    void SetSelection(berry::ISelection::ConstPointer selection) override;
+    void SetSelection(const berry::ISelection::ConstPointer& selection) override;
 
 protected:
     berry::ISelectionChangedListener::Events selectionEvents;

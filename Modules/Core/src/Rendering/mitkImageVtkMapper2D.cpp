@@ -52,6 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkImageGradientMagnitude.h>
+#include <vtkImageHistogramStatistics.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -286,6 +288,52 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     localStorage->m_ReslicedImage = localStorage->m_Reslicer->GetVtkOutput();
   }
 
+  bool showGradientMagnitude = false;
+  datanode->GetBoolProperty("show gradient magnitude", showGradientMagnitude, renderer);
+  if (showGradientMagnitude) {
+      vtkSmartPointer<vtkImageGradientMagnitude> magFilter = vtkSmartPointer<vtkImageGradientMagnitude>::New();
+      magFilter->SetInputData(localStorage->m_ReslicedImage);
+      magFilter->Update();
+
+      // Find "background" pixels and account for the fact that they produce wrong gradients at border
+      for (int y = 0; y < magFilter->GetOutput()->GetDimensions()[1]; ++y) {
+          for (int x = 0; x < magFilter->GetOutput()->GetDimensions()[0]; ++x) {
+              if (fabsf(localStorage->m_ReslicedImage->GetScalarComponentAsDouble(x, y, 0, 0) - (-32768.0)) < 1e-3) { // see mitk::ExtractSliceFilter
+                  magFilter->GetOutput()->SetScalarComponentFromDouble(x, y, 0, 0, 0);
+              }
+
+              int offsets[][2] = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
+
+              for (size_t i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i) {
+                  int xoff = x + offsets[i][0];
+                  int yoff = y + offsets[i][1];
+
+                  if (xoff < 0 || xoff >= magFilter->GetOutput()->GetDimensions()[0] || yoff < 0 || yoff >= magFilter->GetOutput()->GetDimensions()[1]) {
+                      continue;
+                  }
+
+                  if (fabsf(localStorage->m_ReslicedImage->GetScalarComponentAsDouble(xoff, yoff, 0, 0) - (-32768.0)) < 1e-3) { // see mitk::ExtractSliceFilter
+                      magFilter->GetOutput()->SetScalarComponentFromDouble(x, y, 0, 0, 0);
+                      break;
+                  }
+              }
+          }
+      }
+      
+
+      localStorage->m_ReslicedImage = magFilter->GetOutput();
+      
+      vtkSmartPointer<vtkImageHistogramStatistics> stats = vtkSmartPointer<vtkImageHistogramStatistics>::New();
+      stats->SetInputData(localStorage->m_ReslicedImage);
+      stats->Update();
+      stats->GetAutoRange();
+
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetRangeMinMax(stats->GetAutoRange()[0], stats->GetAutoRange()[1]);
+      levelWindow.SetWindowBounds(stats->GetAutoRange()[0], stats->GetAutoRange()[1]);
+      datanode->SetLevelWindow(levelWindow, renderer, "levelwindow_grad");
+  }
+
   // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
@@ -437,8 +485,12 @@ void mitk::ImageVtkMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
   LocalStorage *localStorage = this->GetLocalStorage( renderer );
 
   LevelWindow levelWindow;
-  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, "levelwindow" );
+
+  bool showGradientMagnitude = false;
+  GetDataNode()->GetBoolProperty("show gradient magnitude", showGradientMagnitude, renderer);
+  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, showGradientMagnitude ? "levelwindow_grad" : "levelwindow" );
   localStorage->m_LevelWindowFilter->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+
 
   mitk::LevelWindow opacLevelWindow;
   if( this->GetDataNode()->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
@@ -586,14 +638,13 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  vtkLookupTable* usedLookupTable = localStorage->m_ColorLookupTable;
 
   // If lookup table or transferfunction use is requested...
-  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
+  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable", renderer));
 
   if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
   {
-    usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
+      localStorage->m_ColorLookupTable->DeepCopy(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
   }
   else
   {
@@ -602,7 +653,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
     //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
     //in every interation of the rendering.
   }
-  localStorage->m_LevelWindowFilter->SetLookupTable(usedLookupTable);
+  localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_ColorLookupTable);
 }
 
 void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer *renderer)

@@ -14,31 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSurfaceCutterCGAL_h
-#define mitkSurfaceCutterCGAL_h
+#ifndef mitkSurfaceCutterVtk_h
+#define mitkSurfaceCutterVtk_h
 
 #include <memory>
+
 #include "mitkISurfaceCutter.h"
 
 namespace mitk
 {
   /**
-    * \brief Class for cutting surfaces using CGAL
+    * \brief Class for cutting surfaces using VTK
     * \ingroup Data
     */
-      class SurfaceCutterCGALPrivate;
-      class MITK_CORE_EXPORT SurfaceCutterCGAL : public ISurfaceCutter
+      class SurfaceCutterVtkPrivate;
+      class MITKCORE_EXPORT SurfaceCutterVtk : public ISurfaceCutter
       {
       public:
-          SurfaceCutterCGAL();
-          virtual ~SurfaceCutterCGAL();
+          SurfaceCutterVtk();
+          virtual ~SurfaceCutterVtk();
 
           virtual vtkSmartPointer<vtkPolyData> cutWithPlane(const mitk::Point3D planePoints[4]) const;
           virtual void setPolyData(vtkPolyData* surface);
 
       private:
-          std::unique_ptr<SurfaceCutterCGALPrivate> p;
+          std::unique_ptr<SurfaceCutterVtkPrivate> p;
       };
 } // namespace mitk
 
-#endif // mitkSurfaceCutterCGAL_h
+#endif // mitkSurfaceCutterVtk_h

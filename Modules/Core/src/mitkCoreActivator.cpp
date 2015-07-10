@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreActivator.h"
 
 // File IO
+#include <mitkSurfaceCutterFactoryPerformanceSelector.h>
 #include <mitkIOUtil.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkItkImageIO.h>
@@ -297,6 +298,9 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
 
   m_PropertyFilters.reset(new mitk::PropertyFilters);
   context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
+
+  m_SurfaceCutterFactory.reset(new mitk::SurfaceCutterFactoryPerformanceSelector);
+  context->RegisterService<mitk::ISurfaceCutterFactory>(m_SurfaceCutterFactory.get());
 
   m_MimeTypeProvider.reset(new mitk::MimeTypeProvider);
   m_MimeTypeProvider->Start();

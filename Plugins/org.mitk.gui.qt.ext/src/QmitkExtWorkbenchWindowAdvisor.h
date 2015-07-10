@@ -147,7 +147,7 @@ private:
   berry::IWorkbenchPage::WeakPtr lastActivePage;
   QString lastEditorTitle;
   berry::IAdaptable* lastInput;
-  std::string currentlyOpenProject;
+  QString currentlyOpenProject;
 
   berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;

@@ -5,7 +5,7 @@ The Medical Imaging Interaction Toolkit (MITK)
 Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
-
+ 
 This software is distributed WITHOUT ANY WARRANTY; without
 even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
@@ -17,9 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkInteractionConst.h"
 #include "mitkSurfaceOperation.h"
+#include "mitkCoreServices.h"
+#include "mitkISurfaceCutterFactory.h"
 
 #include <algorithm>
 #include <vtkPolyData.h>
+#include <vtkIdList.h>
+#include <vtkTriangleFilter.h>
+#include <vtkSmartPointer.h>
+#include <vtkCell.h>
 
 static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData* other)
 {
@@ -108,6 +114,7 @@ void mitk::Surface::InitializeEmpty()
   Superclass::InitializeTimeGeometry();
 
   m_PolyDatas.push_back(nullptr);
+  m_Cutters.push_back(nullptr);
   m_Initialized = true;
 }
 
@@ -119,6 +126,8 @@ void mitk::Surface::SetVtkPolyData(vtkPolyData* polyData, unsigned int t)
   {
     if (m_PolyDatas[t].GetPointer() == polyData)
       return;
+
+    m_Cutters[t].reset();
   }
 
   m_PolyDatas[t].TakeReference(polyData);
@@ -164,6 +173,28 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
   }
 
   return nullptr;
+}
+
+vtkSmartPointer<vtkPolyData> mitk::Surface::CutWithPlane(mitk::Point3D planePoints[4], unsigned int t /* = 0 */)
+{
+    if (!GetVtkPolyData(t)) {
+        return nullptr;
+    }
+
+    if (m_Cutters.size() <= t) {
+        m_Cutters.resize(t + 1);
+    }
+
+    if (!m_Cutters[t]) {
+        ISurfaceCutterFactory* cutterFactory = CoreServices::GetSurfaceCutterFactory();
+        if (cutterFactory) {
+            m_Cutters[t].reset(cutterFactory->createSurfaceCutter());
+            if (m_Cutters[t]) {
+                m_Cutters[t]->setPolyData(m_PolyDatas[t]);
+            }
+        }
+    }
+    return m_Cutters[t] ? m_Cutters[t]->cutWithPlane(planePoints) : vtkSmartPointer<vtkPolyData>::New();
 }
 
 void mitk::Surface::UpdateOutputInformation()
@@ -284,6 +315,7 @@ void mitk::Surface::Expand(unsigned int timeSteps)
     Superclass::Expand(timeSteps);
 
     m_PolyDatas.resize(timeSteps);
+    m_Cutters.resize(timeSteps);
     m_CalculateBoundingBox = true;
   }
 }

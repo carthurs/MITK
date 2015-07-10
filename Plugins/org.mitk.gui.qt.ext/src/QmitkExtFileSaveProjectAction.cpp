@@ -35,15 +35,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include "berryPlatform.h"
 
 // DUPLICATED FROM QmitkFileOpenAction & QmitkExtFileOpenProjectAction
 static berry::IPreferences::Pointer GetPreferences()
 {
-    berry::IPreferencesService::Pointer prefService
-        = berry::Platform::GetServiceRegistry()
-        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (prefService)
     {
         return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -55,7 +54,7 @@ static QString getLastFileOpenPath()
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
     {
-        return QString::fromStdString(prefs->Get("LastProjectFileOpenPath", ""));
+        return prefs->Get("LastProjectFileOpenPath", "");
     }
     return QString();
 }
@@ -65,25 +64,27 @@ static void setLastFileOpenPath(const QString& path)
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
     {
-        prefs->Put("LastProjectFileOpenPath", path.toStdString());
+        prefs->Put("LastProjectFileOpenPath", path);
         prefs->Flush();
     }
 }
 // end DUPLICATED
 
 
-QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
+QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
   : QAction(0)
   , m_Window(nullptr)
-, m_SceneIO(sceneIO)
-, m_SaveAs(saveAs)
+  , m_SceneIO(sceneIO)
+  , m_SaveAs(saveAs)
 {
   this->Init(window.GetPointer());
 }
 
-QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window)
+QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
   : QAction(0)
   , m_Window(nullptr)
+  , m_SceneIO(sceneIO)
+  , m_SaveAs(saveAs)
 {
   this->Init(window);
 }

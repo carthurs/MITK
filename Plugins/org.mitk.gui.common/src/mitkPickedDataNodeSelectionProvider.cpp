@@ -22,12 +22,12 @@ namespace mitk {
         DisconnectPickedDataNodeSelectionProviderEvents();
     }
 
-    void PickedDataNodeSelectionProvider::AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
+    void PickedDataNodeSelectionProvider::AddSelectionChangedListener(berry::ISelectionChangedListener* listener)
     {
         selectionEvents.AddListener(listener);
     }
 
-    void PickedDataNodeSelectionProvider::RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
+    void PickedDataNodeSelectionProvider::RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener)
     {
         selectionEvents.RemoveListener(listener);
     }
@@ -37,7 +37,7 @@ namespace mitk {
         return berry::ISelection::ConstPointer(new mitk::DataNodeSelection(m_CurrentSelection));
     }
 
-    void PickedDataNodeSelectionProvider::SetSelection(berry::ISelection::ConstPointer selection)
+    void PickedDataNodeSelectionProvider::SetSelection(const berry::ISelection::ConstPointer& selection)
     {
         mitk::DataNodeSelection::ConstPointer dataNodeSelection = selection.Cast<const mitk::DataNodeSelection>();
         if (dataNodeSelection) {

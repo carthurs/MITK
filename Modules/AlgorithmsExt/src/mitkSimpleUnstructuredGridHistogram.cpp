@@ -47,7 +47,7 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   UnstructuredGrid* grid = dynamic_cast<UnstructuredGrid*>(source);
   //m_UGHistogram->Initialize(grid);
 
-  vtkUnstructuredGrid* vtkUGrid = grid->GetVtkUnstructuredGrid();
+  vtkUnstructuredGridBase* vtkUGrid = grid->GetVtkUnstructuredGrid();
 
   ListSampleType::Pointer listSample = ListSampleType::New();
   listSample->SetMeasurementVectorSize(1);

@@ -422,6 +422,9 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
     if ( !pickable )
       continue;
 
+    if ( !node->IsVisible(this) )
+      continue;
+  
     VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
     if ( mapper == NULL )
       continue;

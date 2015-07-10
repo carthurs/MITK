@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO)
+QmitkCloseProjectAction::QmitkCloseProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO)
   : QAction(0)
   , m_Window(nullptr)
 {
   this->init(window.GetPointer(), sceneIO);
 }
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO)
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO)
   : QAction(0)
   , m_Window(nullptr)
 {
@@ -60,7 +60,7 @@ QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWork
   this->init(window, sceneIO);
 }
 
-void QmitkCloseProjectAction::init(berry::IWorkbenchWindow* window)
+void QmitkCloseProjectAction::init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
 {
   m_Window = window;
   this->setText("&Close Project...");

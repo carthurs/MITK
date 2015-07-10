@@ -85,7 +85,7 @@ new QmitkExtWorkbenchWindowAdvisorHack();
 
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
-static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = true;
+static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -428,7 +428,7 @@ showNewWindowMenuItem(false),
 showClosePerspectiveMenuItem(true),
 viewNavigatorFound(false),
 showMemoryIndicator(true),
-dropTargetListener(new QmitkDefaultDropTargetListener)
+dropTargetListener(new QmitkDefaultDropTargetListener),
 fileOpenProjectAction(nullptr)
 
 {
@@ -579,7 +579,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileOpenProjectAction = new QmitkExtFileOpenProjectAction(window, sharedSceneIO);
     fileOpenProjectAction->setIcon(QIcon::fromTheme("document-open", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")));
     fileOpenProjectAction->setShortcut(QKeySequence::Open);
-    fileMenu->addAction(fileOpenProjectAction);
     connect(fileOpenProjectAction, SIGNAL(projectOpened(QString)), this, SLOT(onProjectNameChanged(QString)));
 
     fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, false);
@@ -590,7 +589,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     fileSaveProjectAsAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, true);
     fileSaveProjectAsAction->setIcon(QIcon::fromTheme("document-save-as",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
     fileSaveProjectAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
-    fileMenu->addAction(fileSaveProjectAsAction);
     connect(fileSaveProjectAsAction, SIGNAL(projectSaved(QString)), this, SLOT(onProjectNameChanged(QString)));
 
     closeProjectAction = new QmitkCloseProjectAction(window, sharedSceneIO);
@@ -656,9 +654,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");
-    fileMenu->addAction(fileOpenAction);
-    fileMenu->addAction(fileSaveAction);
+    fileMenu->addAction(fileOpenProjectAction);
     fileMenu->addAction(fileSaveProjectAction);
+    fileMenu->addAction(fileSaveProjectAsAction);
     fileMenu->addAction(closeProjectAction);
     connect(closeProjectAction, SIGNAL(projectClosed()), this, SLOT(onProjectClosed()));
 
@@ -857,9 +855,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       viewNavigatorAction->setToolTip("Toggle View Navigator");
     }
 
-    mainActionsToolBar->addAction(fileOpenAction);
+    mainActionsToolBar->addAction(fileOpenProjectAction);
     mainActionsToolBar->addAction(fileSaveProjectAction);
     mainActionsToolBar->addAction(closeProjectAction);
+    mainActionsToolBar->addAction(fileImportAction);
     mainActionsToolBar->addAction(undoAction);
     mainActionsToolBar->addAction(redoAction);
     if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
@@ -950,7 +949,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 void QmitkExtWorkbenchWindowAdvisor::onProjectNameChanged(QString fileName)
 {
-    currentlyOpenProject = QFileInfo(fileName).fileName().toStdString();
+    currentlyOpenProject = QFileInfo(fileName).fileName();
 
     UpdateRecentFileList(fileName);
     RecomputeTitle();
@@ -967,10 +966,8 @@ void QmitkExtWorkbenchWindowAdvisor::onProjectClosed()
 
 QStringList QmitkExtWorkbenchWindowAdvisor::GetRecentFileList()
 {
-    berry::IPreferencesService::Pointer prefService
-        = berry::Platform::GetServiceRegistry()
-        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-    if (prefService.IsNull())
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (!prefService)
     {
         return QStringList();
     }
@@ -980,15 +977,13 @@ QStringList QmitkExtWorkbenchWindowAdvisor::GetRecentFileList()
         return QStringList();
     }
 
-    return QString::fromStdString(prefs->Get("RecentProjectFileList", "")).split("###", QString::SkipEmptyParts);
+    return prefs->Get("RecentProjectFileList", "").split("###", QString::SkipEmptyParts);
 }
 
 void QmitkExtWorkbenchWindowAdvisor::SetRecentFileList(const QStringList& fileNames)
 {
-    berry::IPreferencesService::Pointer prefService
-        = berry::Platform::GetServiceRegistry()
-        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-    if (prefService.IsNull())
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (!prefService)
     {
         return;
     }
@@ -998,7 +993,7 @@ void QmitkExtWorkbenchWindowAdvisor::SetRecentFileList(const QStringList& fileNa
         return;
     }
 
-    prefs->Put("RecentProjectFileList", fileNames.join("###").toStdString());
+    prefs->Put("RecentProjectFileList", fileNames.join("###"));
     prefs->Flush();
 }
 
@@ -1435,7 +1430,7 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
   }
  }
 
-    if (!currentlyOpenProject.empty()) {
+    if (!currentlyOpenProject.isEmpty()) {
         title = currentlyOpenProject + " - " + title;
     }
 

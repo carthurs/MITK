@@ -257,7 +257,7 @@ void mitk::PlanarFigureReader::GenerateData()
     // If we load a planarFigure, it has definitely been placed correctly.
     // If we do not set this property here, we cannot load old planarFigures
     // without messing up the interaction (PF-Interactor needs this property.
-    planarFigure->GetPropertyList()->SetBoolProperty( "initiallyplaced", true );
+    planarFigure->SetFigureFinalized(true);
 
     // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
     // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkCoreExports.h"
 #include "mitkISurfaceCutter.h"
 
-#include <usServiceInterface.h>
+#include "mitkServiceInterface.h"
 
 namespace mitk
 {
@@ -28,7 +28,7 @@ namespace mitk
     * \brief Interface for surface cutting algorithms.
     * \ingroup Data
     */
-    class MITK_CORE_EXPORT ISurfaceCutterFactory
+    class MITKCORE_EXPORT ISurfaceCutterFactory
     {
     public:
         virtual ~ISurfaceCutterFactory() {}
@@ -39,6 +39,6 @@ namespace mitk
      };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::ISurfaceCutterFactory, "org.mitk.ISurfaceCutterFactory")
+MITK_DECLARE_SERVICE_INTERFACE(mitk::ISurfaceCutterFactory, "org.mitk.ISurfaceCutterFactory/1.0")
 
 #endif

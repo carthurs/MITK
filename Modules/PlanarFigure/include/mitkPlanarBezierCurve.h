@@ -32,13 +32,14 @@ namespace mitk
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
-    virtual unsigned int GetMaximumNumberOfControlPoints() const override;
-    virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool IsHelperToBePainted(unsigned int index) override;
+    virtual unsigned int GetPlacementNumberOfControlPoints() const { return 1; }
+    virtual unsigned int GetMaximumNumberOfControlPoints() const;
+    virtual unsigned int GetMinimumNumberOfControlPoints() const;
+    virtual bool IsHelperToBePainted(unsigned int index);
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure& other)const override;
+    virtual bool Equals(const mitk::PlanarFigure& other)const;
 
   protected:
     PlanarBezierCurve();
@@ -46,9 +47,9 @@ namespace mitk
 
     mitkCloneMacro(Self)
 
-    virtual void EvaluateFeaturesInternal() override;
-    virtual void GenerateHelperPolyLine(double, unsigned int) override;
-    virtual void GeneratePolyLine() override;
+    virtual void EvaluateFeaturesInternal();
+    virtual void GenerateHelperPolyLine(double, unsigned int);
+    virtual void GeneratePolyLine();
 
   private:
     Point2D ComputeDeCasteljauPoint(ScalarType t);

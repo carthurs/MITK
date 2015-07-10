@@ -31,7 +31,7 @@ namespace mitk {
 //##
 //## Stores everything for Adding, Moving and Deleting a Point.
 //## @ingroup Undo
-class MitkPlanarFigure_EXPORT PlanarFigureOperation : public Operation
+class MITKPLANARFIGURE_EXPORT PlanarFigureOperation : public Operation
 {
 public:
   //##Documentation

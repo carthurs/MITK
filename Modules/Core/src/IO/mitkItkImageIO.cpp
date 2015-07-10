@@ -440,7 +440,7 @@ void ItkImageIO::Write()
     }
 
     //use compression if available
-    m_ImageIO->UseCompressionOn();
+    m_ImageIO->UseCompressionOff();
 
     m_ImageIO->SetIORegion(ioRegion);
     m_ImageIO->SetFileName(path);

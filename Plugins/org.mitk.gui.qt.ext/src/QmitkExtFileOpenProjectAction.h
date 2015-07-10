@@ -28,8 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_ext_Export.h>
 
-#include <berryIWorkbenchWindow.h>
+#include <berrySmartPointer.h>
 #include <mitkSceneIO.h>
+
+namespace berry {
+struct IWorkbenchWindow;
+}
 
 class MITK_QT_COMMON_EXT_EXPORT QmitkExtFileOpenProjectAction : public QAction
 {
@@ -37,7 +41,8 @@ class MITK_QT_COMMON_EXT_EXPORT QmitkExtFileOpenProjectAction : public QAction
 
 public:
 
-  QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO);
+  QmitkExtFileOpenProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO);
+  QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
 
   mitk::SceneIO::Pointer GetSceneIO() { return m_SceneIO; }
 
@@ -50,8 +55,9 @@ signals:
   void projectOpenFailed(QString fileName);
 
 private:
+  void init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO);
 
-  berry::IWorkbenchWindow::Pointer m_Window;
+  berry::IWorkbenchWindow* m_Window;
   mitk::SceneIO::Pointer m_SceneIO;
 };
 

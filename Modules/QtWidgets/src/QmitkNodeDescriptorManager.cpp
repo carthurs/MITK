@@ -111,7 +111,7 @@ QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const QString& _
   {
       for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
       {
-        if((*it)->GetClassName() == _ClassName)
+        if((*it)->GetNameOfClass() == _ClassName)
           _Descriptor = *it;
       }
   }
@@ -145,7 +145,7 @@ QList<QmitkNodeDescriptor*> QmitkNodeDescriptorManager::GetAllDescriptors(const 
   {
     for (QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
     {
-      if ((*it)->GetClassName() == _ClassName)
+      if ((*it)->GetNameOfClass() == _ClassName)
         _Descriptors << *it;
     }
   }

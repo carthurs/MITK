@@ -26,7 +26,7 @@ namespace mitk
     * \class PickingEventObserver
     */
 
-    class MITK_CORE_EXPORT PickingEventObserver: public InteractionEventObserver
+    class MITKCORE_EXPORT PickingEventObserver: public InteractionEventObserver
     {
     public:
         PickingEventObserver();

@@ -30,7 +30,7 @@ namespace mitk
     * \brief Interface for surface cutting algorithms.
     * \ingroup Data
     */
-    class MITK_CORE_EXPORT ISurfaceCutter
+    class MITKCORE_EXPORT ISurfaceCutter
     {
     public:
         virtual ~ISurfaceCutter() {}

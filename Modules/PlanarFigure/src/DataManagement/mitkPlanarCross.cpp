@@ -24,9 +24,6 @@ mitk::PlanarCross::PlanarCross()
 : FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Axis", "mm" ) ),
   FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis", "mm" ) )
 {
-  // Cross has two control points at the beginning
-  this->ResetNumberOfControlPoints( 2 );
-
   // Create property for SingleLineMode (default: false)
   this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( false ) );
 
@@ -87,7 +84,7 @@ bool mitk::PlanarCross::ResetOnPointSelect()
   case 1:
     {
       // Control point 0 or 1 selected: reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
+      this->m_ControlPoints.resize(2);
       this->SelectControlPoint( 1 );
       return true;
     }
@@ -99,8 +96,8 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       this->SetControlPoint( 1, this->GetControlPoint( 2 ) );
 
       // Adjust selected control point, reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
-      this->SelectControlPoint( 1 );
+      this->m_ControlPoints.resize(2);
+      this->SelectControlPoint(1);
       return true;
     }
 
@@ -112,8 +109,8 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       this->SetControlPoint( 1, this->GetControlPoint( 3 ) );
 
       // Adjust selected control point, reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
-      this->SelectControlPoint( 1 );
+      this->m_ControlPoints.resize(2);
+      this->SelectControlPoint(1);
       return true;
     }
   }

@@ -10,7 +10,7 @@ namespace mitk
     * \class DataNodePickingEventObserver
     */
     
-    class MITK_CORE_EXPORT DataNodePickingEventObserver: public PickingEventObserver
+    class MITKCORE_EXPORT DataNodePickingEventObserver: public PickingEventObserver
     {
     public:
         DataNodePickingEventObserver();

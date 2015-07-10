@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include "berryPlatform.h"
 #include <QmitkCloseProjectAction.h>
 
@@ -42,10 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // DUPLICATED FROM QmitkFileOpenAction
 static berry::IPreferences::Pointer GetPreferences() 
 {
-    berry::IPreferencesService::Pointer prefService
-        = berry::Platform::GetServiceRegistry()
-        .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (prefService)
     {
         return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -57,7 +56,7 @@ static QString getLastFileOpenPath()
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
     {
-        return QString::fromStdString(prefs->Get("LastProjectFileOpenPath", ""));
+        return prefs->Get("LastProjectFileOpenPath", "");
     }
     return QString();
 }
@@ -67,25 +66,36 @@ static void setLastFileOpenPath(const QString& path)
     berry::IPreferences::Pointer prefs = GetPreferences();
     if (prefs.IsNotNull())
     {
-        prefs->Put("LastProjectFileOpenPath", path.toStdString());
+        prefs->Put("LastProjectFileOpenPath", path);
         prefs->Flush();
     }
 }
 // end DUPLICATED
 
 
-QmitkExtFileOpenProjectAction::QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO)
-: QAction(0)
-, m_SceneIO(sceneIO)
+QmitkExtFileOpenProjectAction::QmitkExtFileOpenProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO)
+: QAction(nullptr)
 {
-  m_Window = window;
-  this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  this->setText("&Open Project");
-  this->setToolTip("Open an .mitk project file");
-  m_Window = window;
-
-  this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
+    init(window.GetPointer(), sceneIO);
 }
+
+QmitkExtFileOpenProjectAction::QmitkExtFileOpenProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
+: QAction(nullptr)
+{
+    init(window, sceneIO);
+}
+
+void QmitkExtFileOpenProjectAction::init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
+{
+    m_Window = window;
+    this->setText("&Open Project");
+    this->setToolTip("Open an .mitk project file");
+
+    m_SceneIO = sceneIO;
+
+    this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
+}
+
 
 void QmitkExtFileOpenProjectAction::Run(QString fName)
 {
@@ -162,7 +172,7 @@ void QmitkExtFileOpenProjectAction::Run(QString fName)
         emit projectOpened(fileName);
     }
 
-    mitk::WorkbenchUtil::ReinitAfterLoadFiles(m_Window, true, dsRef, true);
+    mitk::WorkbenchUtil::ReinitAfterLoadFiles(berry::IWorkbenchWindow::Pointer(m_Window), true, dsRef, true);
     mitk::ProgressBar::GetInstance()->Progress(2);
   }
   catch (std::exception& e)

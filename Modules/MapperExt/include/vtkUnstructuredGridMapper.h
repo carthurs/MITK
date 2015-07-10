@@ -26,7 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkPolyDataMapper;
 class vtkGeometryFilter;
-class vtkUnstructuredGrid;
+class vtkDataSetSurfaceFilter;
+class vtkUnstructuredGridBase;
 
 class MITKMAPPEREXT_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
@@ -61,8 +62,8 @@ public:
 
   // Description:
   // Set the Input of this mapper.
-  void SetInput(vtkUnstructuredGrid *input);
-  vtkUnstructuredGrid *GetInput();
+  void SetInput(vtkUnstructuredGridBase *input);
+  vtkUnstructuredGridBase *GetInput();
 
   void SetBoundingObject(mitk::BoundingObject* bo);
 
@@ -70,6 +71,7 @@ protected:
   vtkUnstructuredGridMapper();
   ~vtkUnstructuredGridMapper();
 
+  vtkDataSetSurfaceFilter* SurfaceExtractor;
   vtkGeometryFilter *GeometryExtractor;
   vtkPolyDataMapper *PolyDataMapper;
 

@@ -41,7 +41,6 @@ class MITK_QT_COMMON_EXT_EXPORT QmitkExtFileSaveProjectAction : public QAction
 
 public:
 
-  QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window, mitk::SceneIO::Pointer sceneIO, bool saveAs);
   QmitkExtFileSaveProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO, bool saveAs);
   QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO, bool saveAs);
 

@@ -151,6 +151,9 @@ set(CPP_FILES
   DataManagement/mitkStateTransitionOperation.cpp
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
+  DataManagement/mitkSurfaceCutterCGAL.cpp
+  DataManagement/mitkSurfaceCutterVtk.cpp
+  DataManagement/mitkSurfaceCutterFactoryPerformanceSelector.cpp
   DataManagement/mitkSurfaceOperation.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
@@ -222,6 +225,8 @@ set(CPP_FILES
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkXML2EventParser.cpp
+  Interactions/mitkPickingEventObserver.cpp
+  Interactions/mitkDataNodePickingEventObserver.cpp
 
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp

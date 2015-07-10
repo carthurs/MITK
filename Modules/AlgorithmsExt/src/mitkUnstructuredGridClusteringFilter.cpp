@@ -46,7 +46,7 @@ void mitk::UnstructuredGridClusteringFilter::GenerateData()
   mitk::UnstructuredGrid::Pointer inputGrid = const_cast<mitk::UnstructuredGrid*>(this->GetInput());
   if(inputGrid.IsNull()) return;
 
-  vtkSmartPointer<vtkUnstructuredGrid> vtkInpGrid = inputGrid->GetVtkUnstructuredGrid();
+  vtkSmartPointer<vtkUnstructuredGridBase> vtkInpGrid = inputGrid->GetVtkUnstructuredGrid();
   vtkSmartPointer<vtkPoints> inpPoints = vtkInpGrid->GetPoints();
   pLocator =vtkSmartPointer<vtkPointLocator>::New();
   std::vector< vtkSmartPointer<vtkPoints> > clusterVector;

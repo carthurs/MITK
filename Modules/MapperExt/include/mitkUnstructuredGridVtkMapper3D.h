@@ -35,6 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkProjectedTetrahedraMapper.h>
 #include <vtkUnstructuredGridVolumeZSweepMapper.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkExtractGeometry.h>
+
 
 
 namespace mitk {
@@ -79,6 +82,7 @@ protected:
   vtkVolume* m_Volume;
 
   vtkDataSetTriangleFilter* m_VtkTriangleFilter;
+  vtkSmartPointer<vtkExtractGeometry> m_ExtractGeometryFilter;
 
   vtkUnstructuredGridMapper* m_VtkDataSetMapper;
   vtkUnstructuredGridMapper* m_VtkDataSetMapper2;

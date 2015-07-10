@@ -39,19 +39,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
-
-  /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 1000;
-  }
-
   /** \brief How many times should we generate a round of subdivisions? */
   unsigned int GetSubdivisionRounds() const
   {
@@ -87,6 +74,8 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const override;
+
 protected:
   PlanarSubdivisionPolygon();
   virtual ~PlanarSubdivisionPolygon();
@@ -99,6 +88,7 @@ protected:
   float m_TensionParameter;
   int m_SubdivisionRounds;
 
+  PolyLineSegmentInfoType m_PolyLineSegmentInfo;
 
 private:
 

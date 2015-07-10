@@ -67,6 +67,7 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
+  typedef std::vector<unsigned long> PolyLineSegmentInfoType;
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
@@ -89,6 +90,10 @@ public:
    * displayed/interacted with). */
   virtual bool IsPlaced() const { return m_FigurePlaced; };
 
+  /** \brief True if the planar figure has been placed (and can be
+  * displayed/interacted with). */
+  virtual bool IsFinalized() const { return m_FigureFinalized; }
+  virtual void SetFigureFinalized(bool finalized) { m_FigureFinalized = finalized; }
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.
@@ -101,6 +106,7 @@ public:
    * Can be re-implemented in sub-classes as needed.
    */
   virtual void PlaceFigure( const Point2D& point );
+  virtual void CancelPlaceFigure();
 
   /**
   * \brief Adds / inserts new control-points
@@ -121,6 +127,15 @@ public:
 
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
+
+
+  /** \brief Returns the number of control points automatically filled upon
+  * figure placement.
+  *
+  * Must be implemented in sub-classes.
+  */
+  virtual unsigned int GetPlacementNumberOfControlPoints() const = 0;
+  virtual unsigned int GetPlacementSelectedPointId() const { return 1; }
 
 
   /** \brief Returns the minimum number of control points needed to represent
@@ -170,6 +185,10 @@ public:
    * (for text, angles, etc.). */
   const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
 
+  /** \brief Returns the polyline segment information. The polyline where each value represents the index of point in the polyline
+  * For control point i, the polyline points [SegmentInfo[i], SegmentInfo[i + 1]) belong to segment [i, (i + 1) % nControlPoints]
+  * */
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const;
 
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
@@ -264,6 +283,8 @@ public:
   * the points are constrained by the image bounds. */
   virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
+  /** \brief executes the given Operation */
+  virtual void ExecuteOperation(Operation* operation);
   /**
   * \brief Compare two PlanarFigure objects
   * Note: all subclasses have to implement the method on their own.
@@ -276,9 +297,6 @@ protected:
   virtual ~PlanarFigure();
 
   PlanarFigure(const Self& other);
-
-  /** \brief Set the initial number of control points of the planar figure */
-  void ResetNumberOfControlPoints( int numberOfControlPoints );
 
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.
@@ -339,7 +357,6 @@ protected:
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
 
   ControlPointListType m_ControlPoints;
-  unsigned int m_NumberOfControlPoints;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
@@ -356,6 +373,7 @@ protected:
   bool m_PreviewControlPointVisible;
 
   bool m_FigurePlaced;
+  bool m_FigureFinalized;
 
 private:
 
@@ -398,6 +416,23 @@ private:
   std::pair<double, unsigned int> m_DisplaySize;
 
 };
+
+#pragma GCC visibility push(default)
+
+// Define events for PlanarFigure interaction notifications
+itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
+itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+
+#pragma GCC visibility pop
+
 
 MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 

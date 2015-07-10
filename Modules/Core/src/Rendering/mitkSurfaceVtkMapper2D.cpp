@@ -48,10 +48,6 @@ mitk::SurfaceVtkMapper2D::LocalStorage::LocalStorage()
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_PropAssembly = vtkSmartPointer <vtkAssembly>::New();
   m_PropAssembly->AddPart( m_Actor );
-  m_CuttingPlane = vtkSmartPointer<vtkPlane>::New();
-  m_Cutter = vtkSmartPointer<vtkCutter>::New();
-  m_Cutter->SetCutFunction(m_CuttingPlane);
-  m_Mapper->SetInputConnection( m_Cutter->GetOutputPort() );
 
   m_NormalGlyph = vtkSmartPointer<vtkGlyph3D>::New();
 
@@ -133,7 +129,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   if ( !visible )
     return;
 
-  mitk::Surface* surface  = static_cast<mitk::Surface *>( node->GetData() );
+  mitk::Surface* surface  = const_cast<Surface*>(GetInput());
   if ( surface == NULL )
     return;
 
@@ -171,7 +167,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   const DataNode* node = GetDataNode();
-  Surface* surface  = static_cast<Surface *>( node->GetData() );
+  Surface* surface = const_cast<Surface*>(GetInput());
   const TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -207,22 +203,54 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   normal[1] = planeGeometry->GetNormal()[1];
   normal[2] = planeGeometry->GetNormal()[2];
 
-  localStorage->m_CuttingPlane->SetOrigin(origin);
-  localStorage->m_CuttingPlane->SetNormal(normal);
-  //Transform the data according to its geometry.
-  //See UpdateVtkTransform documentation for details.
   vtkSmartPointer<vtkLinearTransform> vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
+  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
+
+  // set up vtkPlane according to worldGeometry
+  Point3D points[4];
+  points[0] = worldGeometry->GetOrigin();
+  points[0][0] += 1e-4;
+  points[0][1] += 1e-4;
+  points[0][2] += 1e-4;
+  points[1] = points[0] + worldGeometry->GetAxisVector(0);
+  points[2] = points[0] + worldGeometry->GetAxisVector(1);
+  points[3] = points[1] + worldGeometry->GetAxisVector(1);
+
+  //normally, we would need to transform the surface and cut the transformed surface with the cutter.
+  //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
+  //@todo It probably does not work for scaling operations yet:scaling operations have to be
+  //dealed with after the cut is performed by scaling the contour.
+  vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
+  for (int i = 0; i < 4; ++i) {
+      double vp[3];
+      itk2vtk(points[i], vp);
+      inversetransform->TransformPoint(vp, vp);
+      vtk2itk(vp, points[i]);
+  }
+
+
+  vtkSmartPointer<vtkPolyData> cutResult = surface->CutWithPlane(points, this->GetTimestep());
+
+  if (!cutResult || cutResult->GetNumberOfPoints() == 0) {
+      localStorage->m_Actor->VisibilityOff();
+      return;
+  } 
+
+  localStorage->m_Actor->VisibilityOn();
+
   vtkSmartPointer<vtkTransformPolyDataFilter> filter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   filter->SetTransform(vtktransform);
-  filter->SetInputData(inputPolyData);
-  localStorage->m_Cutter->SetInputConnection(filter->GetOutputPort());
-  localStorage->m_Cutter->Update();
+  filter->SetInputData(cutResult.Get());
+  filter->Update();
+
+  localStorage->m_Mapper->SetInputData(filter->GetOutput());
+
 
   bool generateNormals = false;
   node->GetBoolProperty("draw normals 2D", generateNormals);
   if(generateNormals)
   {
-    localStorage->m_NormalGlyph->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
+    localStorage->m_NormalGlyph->SetInputData(filter->GetOutput());
     localStorage->m_NormalGlyph->Update();
 
     localStorage->m_NormalMapper->SetInputConnection( localStorage->m_NormalGlyph->GetOutputPort() );
@@ -231,7 +259,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   }
   else
   {
-    localStorage->m_NormalGlyph->SetInputConnection( NULL );
+    localStorage->m_NormalGlyph->SetInputConnection(nullptr);
     localStorage->m_PropAssembly->RemovePart( localStorage->m_NormalActor );
   }
 
@@ -240,7 +268,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   if(generateInverseNormals)
   {
 
-    localStorage->m_ReverseSense->SetInputConnection( localStorage->m_Cutter->GetOutputPort() );
+    localStorage->m_ReverseSense->SetInputData( filter->GetOutput() );
     localStorage->m_ReverseSense->ReverseCellsOff();
     localStorage->m_ReverseSense->ReverseNormalsOn();
 
@@ -253,7 +281,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   }
   else
   {
-    localStorage->m_ReverseSense->SetInputConnection( NULL );
+    localStorage->m_ReverseSense->SetInputConnection( nullptr );
     localStorage->m_PropAssembly->RemovePart( localStorage->m_InverseNormalActor );
   }
 }

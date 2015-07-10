@@ -17,8 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurface_h
 #define mitkSurface_h
 
+#include <memory>
+#include <vector>
+
 #include "mitkBaseData.h"
 #include "itkImageRegion.h"
+#include "mitkISurfaceCutter.h"
+
 #include <vtkSmartPointer.h>
 
 class vtkPolyData;
@@ -46,6 +51,7 @@ namespace mitk
     virtual const RegionType& GetRequestedRegion() const;
     unsigned int GetSizeOfPolyDataSeries() const;
     virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0) const;
+    virtual vtkSmartPointer<vtkPolyData> CutWithPlane(mitk::Point3D planePoints[4], unsigned int t = 0);
     virtual void Graft( const DataObject* data ) override;
     virtual bool IsEmptyTimeStep(unsigned int t) const override;
     virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
@@ -74,6 +80,8 @@ namespace mitk
 
   private:
     std::vector< vtkSmartPointer<vtkPolyData> > m_PolyDatas;
+    std::vector<std::unique_ptr<ISurfaceCutter>> m_Cutters;
+
     mutable RegionType m_LargestPossibleRegion;
     mutable RegionType m_RequestedRegion;
     bool m_CalculateBoundingBox;

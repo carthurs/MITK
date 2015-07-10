@@ -52,8 +52,8 @@ void mitk::PointCloudScoringFilter::GenerateData()
       MITK_ERROR << "Cannot convert segmGrid into Surfaces" << std::endl;
   }
 
-  vtkSmartPointer<vtkUnstructuredGrid> edgevtkGrid = edgeGrid->GetVtkUnstructuredGrid();
-  vtkSmartPointer<vtkUnstructuredGrid> segmvtkGrid = segmGrid->GetVtkUnstructuredGrid();
+  vtkSmartPointer<vtkUnstructuredGridBase> edgevtkGrid = edgeGrid->GetVtkUnstructuredGrid();
+  vtkSmartPointer<vtkUnstructuredGridBase> segmvtkGrid = segmGrid->GetVtkUnstructuredGrid();
 
   // KdTree from here
   vtkSmartPointer<vtkPoints> kdPoints = vtkSmartPointer<vtkPoints>::New();

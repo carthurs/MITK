@@ -14,32 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSurfaceCutterVtk_h
-#define mitkSurfaceCutterVtk_h
+#ifndef mitkSurfaceCutterFactoryPerformanceSelector_h
+#define mitkSurfaceCutterFactoryPerformanceSelector_h
 
-#include <memory>
-
-#include "mitkISurfaceCutter.h"
+#include "mitkISurfaceCutterFactory.h"
 
 namespace mitk
 {
   /**
-    * \brief Class for cutting surfaces using VTK
+    * \brief The factory for surface cutter which selects one with highest performance out of all available cutters
     * \ingroup Data
     */
-      class SurfaceCutterVtkPrivate;
-      class MITK_CORE_EXPORT SurfaceCutterVtk : public ISurfaceCutter
+      class MITKCORE_EXPORT SurfaceCutterFactoryPerformanceSelector : public ISurfaceCutterFactory
       {
       public:
-          SurfaceCutterVtk();
-          virtual ~SurfaceCutterVtk();
+          SurfaceCutterFactoryPerformanceSelector();
+          virtual ~SurfaceCutterFactoryPerformanceSelector();
 
-          virtual vtkSmartPointer<vtkPolyData> cutWithPlane(const mitk::Point3D planePoints[4]) const;
-          virtual void setPolyData(vtkPolyData* surface);
-
-      private:
-          std::unique_ptr<SurfaceCutterVtkPrivate> p;
+          virtual ISurfaceCutter* createSurfaceCutter() const;
       };
 } // namespace mitk
 
-#endif // mitkSurfaceCutterVtk_h
+#endif // mitkSurfaceCutterFactoryPerformanceSelector_h

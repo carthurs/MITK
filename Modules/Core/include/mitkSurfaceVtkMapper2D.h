@@ -105,14 +105,6 @@ public:
        * @brief m_Mapper VTK mapper for all types of 2D polydata e.g. werewolves.
        */
     vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-    /**
-       * @brief m_Cutter Filter to cut out the 2D slice.
-       */
-    vtkSmartPointer<vtkCutter> m_Cutter;
-    /**
-       * @brief m_CuttingPlane The plane where to cut off the 2D slice.
-       */
-    vtkSmartPointer<vtkPlane> m_CuttingPlane;
 
     /**
      * @brief m_NormalMapper Mapper for the normals.
