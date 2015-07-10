@@ -40,9 +40,9 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
     QString name,
     mitk::VtkPropRenderer* /*renderer*/,
     mitk::RenderingManager* renderingManager,mitk::BaseRenderer::RenderingMode::Type renderingMode) :
-    QVTKWidget2(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+    QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
-  // Needed if QVTKWidget2 is used instead of QVTKWidget
+  // Needed if QVTKWidget is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
   /*QGLFormat newform = this->format();
   newform.setSamples(8);
@@ -115,7 +115,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
-    QVTKWidget2::mousePressEvent(me);
+    QVTKWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -134,7 +134,7 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
-    QVTKWidget2::mousePressEvent(me);
+    QVTKWidget::mousePressEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -153,7 +153,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
-    QVTKWidget2::mouseReleaseEvent(me);
+    QVTKWidget::mouseReleaseEvent(me);
   }
 
   if (m_ResendQtEvents)
@@ -174,7 +174,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseMoveMitkEvent(&myevent);
-    QVTKWidget2::mouseMoveEvent(me);
+    QVTKWidget::mouseMoveEvent(me);
   }
 }
 
@@ -190,7 +190,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   { // TODO: INTERACTION_LEGACY
     mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
     this->wheelMitkEvent(&myevent);
-    QVTKWidget2::wheelEvent(we);
+    QVTKWidget::wheelEvent(we);
   }
 
   if (m_ResendQtEvents)
@@ -209,7 +209,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
     this->keyPressMitkEvent(&mke);
     ke->accept();
-    QVTKWidget2::keyPressEvent(ke);
+    QVTKWidget::keyPressEvent(ke);
   }
 
   if (m_ResendQtEvents)
@@ -219,7 +219,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
   // TODO implement new event
-  QVTKWidget2::enterEvent(e);
+  QVTKWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::DeferredHideMenu()
@@ -239,7 +239,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();
 
-  QVTKWidget2::leaveEvent(e);
+  QVTKWidget::leaveEvent(e);
 }
 
 void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
@@ -264,14 +264,14 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
 {
   this->resizeMitkEvent(event->size().width(), event->size().height());
 
-  QVTKWidget2::resizeEvent(event);
+  QVTKWidget::resizeEvent(event);
 
   emit resized();
 }
 
 void QmitkRenderWindow::moveEvent(QMoveEvent* event)
 {
-  QVTKWidget2::moveEvent(event);
+  QVTKWidget::moveEvent(event);
 
   // after a move the overlays need to be positioned
   emit moved();
@@ -279,7 +279,7 @@ void QmitkRenderWindow::moveEvent(QMoveEvent* event)
 
 void QmitkRenderWindow::showEvent(QShowEvent* event)
 {
-  QVTKWidget2::showEvent(event);
+  QVTKWidget::showEvent(event);
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of moved() is no use here!!
