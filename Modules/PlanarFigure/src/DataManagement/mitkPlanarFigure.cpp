@@ -47,11 +47,6 @@ mitk::PlanarFigure::PlanarFigure()
 }
 
 
-mitk::PlanarFigure::~PlanarFigure()
-{
-}
-
-
 mitk::PlanarFigure::PlanarFigure(const Self& other)
   : BaseData(other),
     m_ControlPoints(other.m_ControlPoints),
@@ -288,7 +283,7 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index)
         m_PolyLineUpToDate = true;
     }
 
-    return m_PolyLines.at(index);;
+  return m_PolyLines.at( index );
 }
 
 
@@ -349,7 +344,13 @@ unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
 }
 
 
-const char *mitk::PlanarFigure::GetFeatureName(unsigned int index) const
+int mitk::PlanarFigure::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int /*polyLineIndex*/ ) const
+{
+  return indexOfPolylinePoint;
+}
+
+
+const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
 {
     if (index < m_Features.size())
     {

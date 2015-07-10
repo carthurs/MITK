@@ -72,7 +72,6 @@ public:
 
 protected:
   PlanarArrow();
-  virtual ~PlanarArrow();
 
   mitkCloneMacro(Self);
 

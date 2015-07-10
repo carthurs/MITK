@@ -71,7 +71,6 @@ public:
 
 protected:
   PlanarAngle();
-  virtual ~PlanarAngle();
 
   mitkCloneMacro(Self);
 

@@ -27,11 +27,6 @@ mitk::PlanarFourPointAngle::PlanarFourPointAngle()
 }
 
 
-mitk::PlanarFourPointAngle::~PlanarFourPointAngle()
-{
-}
-
-
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();

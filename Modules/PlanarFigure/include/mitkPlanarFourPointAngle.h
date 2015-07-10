@@ -73,7 +73,6 @@ public:
 
 protected:
   PlanarFourPointAngle();
-  virtual ~PlanarFourPointAngle();
 
   mitkCloneMacro(Self);
 

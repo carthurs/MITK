@@ -106,7 +106,6 @@ public:
 
 protected:
   PlanarCircle();
-  virtual ~PlanarCircle();
 
   mitkCloneMacro(Self);
 

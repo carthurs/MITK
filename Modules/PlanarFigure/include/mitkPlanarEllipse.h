@@ -110,7 +110,6 @@ public:
 
 protected:
   PlanarEllipse();
-  virtual ~PlanarEllipse();
 
   mitkCloneMacro(Self);
 

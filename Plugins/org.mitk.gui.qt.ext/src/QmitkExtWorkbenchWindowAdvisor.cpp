@@ -51,13 +51,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkExtFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
+#include <QmitkUndoAction.h>
+#include <QmitkRedoAction.h>
 #include <QmitkDefaultDropTargetListener.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 #include <QmitkPreferencesDialog.h>
 #include <QmitkOpenDicomEditorAction.h>
-#include <QmitkOpenXnatEditorAction.h>
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
@@ -80,8 +81,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAboutDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack
-* QmitkExtWorkbenchWindowAdvisorHack::undohack =
-new QmitkExtWorkbenchWindowAdvisorHack();
+  * QmitkExtWorkbenchWindowAdvisorHack::undohack =
+  new QmitkExtWorkbenchWindowAdvisorHack();
 
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
@@ -194,7 +195,6 @@ public:
 
 private:
     QAction* viewNavigatorAction;
-
 };
 
 class PartListenerForImageNavigator: public berry::IPartListener
@@ -246,7 +246,6 @@ public:
 
 private:
  QAction* imageNavigatorAction;
-
 };
 
 class PerspectiveListenerForTitle: public berry::IPerspectiveListener
@@ -306,10 +305,6 @@ public:
      {
         windowAdvisor->openDicomEditorAction->setEnabled(true);
      }
-     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-     {
-        windowAdvisor->openXnatEditorAction->setEnabled(true);
-     }
      windowAdvisor->fileSaveProjectAction->setEnabled(true);
      windowAdvisor->closeProjectAction->setEnabled(true);
      windowAdvisor->undoAction->setEnabled(true);
@@ -350,10 +345,6 @@ public:
      if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
      {
         windowAdvisor->openDicomEditorAction->setEnabled(false);
-     }
-     if(windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-     {
-       windowAdvisor->openXnatEditorAction->setEnabled(false);
      }
      windowAdvisor->fileSaveProjectAction->setEnabled(false);
      windowAdvisor->closeProjectAction->setEnabled(false);
@@ -411,8 +402,6 @@ public:
 private:
  QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
 };
-
-
 
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
                   berry::IWorkbenchWindowConfigurer::Pointer configurer) :
@@ -607,7 +596,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     bool skip = false;
     for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
     {
-
       // if viewExcludeList is set, it contains the id-strings of view, which
       // should not appear as an menu-entry in the menu
       if (viewExcludeList.size() > 0)
@@ -648,10 +636,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       viewActions.push_back(viewAction);
     }
 
-
     if (!USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
     {
-
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");
     fileMenu->addAction(fileOpenProjectAction);
@@ -734,7 +720,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
          perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
     {
-
       // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
       // should not appear as an menu-entry in the perspective menu
       if (perspectiveExcludeList.size() > 0)
@@ -768,7 +753,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       }
     }
 
-
     // ===== Help menu ====================================
     QMenu* helpMenu = menuBar->addMenu("&Help");
     helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
@@ -776,20 +760,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
     helpMenu->addAction("&About",this, SLOT(onAbout()));
     // =====================================================
-
-
     }
     else
     {
-      undoAction = new QAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
-                                       "&Undo", nullptr);
-      undoAction->setToolTip("Undo the last action (not supported by all modules)");
-      redoAction = new QAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg"))
-                                       , "&Redo", nullptr);
-      redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
-
+    //undoAction = new QAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
+    //  "&Undo", nullptr);
+    undoAction = new QmitkUndoAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")), nullptr);
+    undoAction->setShortcut(QKeySequence::Undo);
+    redoAction = new QmitkRedoAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg")), nullptr);
+    redoAction->setShortcut(QKeySequence::Redo);
     }
-
 
     // toolbar for showing file open, undo, redo and other main actions
     auto   mainActionsToolBar = new QToolBar;
@@ -807,10 +787,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
     {
       openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
-    }
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-    {
-      openXnatEditorAction = new QmitkOpenXnatEditorAction(QIcon(":/org.mitk.gui.qt.ext/xnat-icon.png"),window);
     }
 
     if (imageNavigatorViewFound)
@@ -865,10 +841,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     {
       mainActionsToolBar->addAction(openDicomEditorAction);
     }
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-    {
-      mainActionsToolBar->addAction(openXnatEditorAction);
-    }
     if (imageNavigatorViewFound)
     {
       mainActionsToolBar->addAction(imageNavigatorAction);
@@ -878,7 +850,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       mainActionsToolBar->addAction(viewNavigatorAction);
     }
     mainWindow->addToolBar(mainActionsToolBar);
-
 
     // ==== Perspective Toolbar ==================================
     auto   qPerspectiveToolbar = new QToolBar;
@@ -904,7 +875,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       {
         qToolbar->addAction(viewAction);
       }
-
     }
     else
       delete qToolbar;
@@ -912,23 +882,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
     mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
 
-
-#ifdef __APPLE__
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    mainWindow->setUnifiedTitleAndToolBarOnMac(true);
-    // default is false
-#endif
-#endif
-
-
     auto   qStatusBar = new QStatusBar();
 
     //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
     auto  statusBar = new QmitkStatusBar(qStatusBar);
     //disabling the SizeGrip in the lower right corner
     statusBar->SetSizeGripEnabled(false);
-
-
 
     auto  progBar = new QmitkProgressBar();
 
@@ -944,7 +903,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       auto   memoryIndicator = new QmitkMemoryUsageIndicatorView();
       qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
-
 }
 
 void QmitkExtWorkbenchWindowAdvisor::onProjectNameChanged(QString fileName)
@@ -1075,7 +1033,6 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
  configurer->AddEditorAreaTransfer(QStringList("text/uri-list"));
  configurer->ConfigureEditorAreaDropListener(dropTargetListener.data());
-
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowOpen()
@@ -1125,12 +1082,10 @@ void QmitkExtWorkbenchWindowAdvisor::onAbout()
 
 QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack() : QObject()
 {
-
 }
 
 QmitkExtWorkbenchWindowAdvisorHack::~QmitkExtWorkbenchWindowAdvisorHack()
 {
-
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onUndo()
@@ -1248,7 +1203,6 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
   berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
  if (!hasIntro)
  {
-
   QRegExp reg("(.*)<title>(\\n)*");
   QRegExp reg2("(\\n)*</title>(.*)");
   QFile file(":/org.mitk.gui.qt.ext/index.html");
@@ -1266,7 +1220,6 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
   QMessageBox::information(nullptr, title,
    text, "Close");
-
  }
  else
  {
@@ -1436,7 +1389,7 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 
 
 
-    title += " (Not for use in diagnosis or treatment of patients)";
+  title += " (Not for use in diagnosis or treatment of patients)";
 
  return title;
 }
@@ -1514,7 +1467,6 @@ void QmitkExtWorkbenchWindowAdvisor::PropertyChange(const berry::Object::Pointer
   }
  }
 }
-
 
 void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(const QList<QString>& v)
 {

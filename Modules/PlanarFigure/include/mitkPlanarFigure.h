@@ -168,6 +168,12 @@ public:
   /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
 
+  /**
+  * \brief Returns the id of the control-point that corresponds to the given
+  * polyline-point.
+  */
+  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
@@ -294,7 +300,6 @@ public:
 
 protected:
   PlanarFigure();
-  virtual ~PlanarFigure();
 
   PlanarFigure(const Self& other);
 

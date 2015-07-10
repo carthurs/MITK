@@ -188,7 +188,6 @@ private:
   QAction* resetPerspAction;
   QAction* closePerspAction;
   QAction* openDicomEditorAction;
-  QAction* openXnatEditorAction;
   QMenu* openRecentProjectMenu;
 };
 

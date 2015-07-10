@@ -99,8 +99,9 @@ public:
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
-    typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+    typedef itk::VectorImage< short, 3 >    ItkDwiType;
     typedef itk::Image<double, 3>           ItkDoubleImgType;
+    typedef itk::Image<float, 3>            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
@@ -164,7 +165,7 @@ protected:
 
     void SimulateForExistingDwi(mitk::DataNode* imageNode);     ///< add artifacts to existing diffusion weighted image
     void SimulateImageFromFibers(mitk::DataNode* fiberNode);    ///< simulate new diffusion weighted image
-    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters();  ///< update fiberfox paramater object (template parameter defines noise model type)
+    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters(bool all=true);  ///< update fiberfox paramater object (template parameter defines noise model type)
     void UpdateGui();                                           ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends
@@ -194,7 +195,7 @@ protected:
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
-    mitk::DataNode::Pointer                             m_SelectedImage;
+    mitk::DataNode::Pointer                             m_SelectedImageNode;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
