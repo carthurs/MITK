@@ -365,6 +365,27 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
+# if(MITK_USE_CGAL)
+  # CGAL requires boost library
+  if(NOT MITK_USE_Boost)
+    message("> Forcing MITK_USE_Boost to ON because of MITK_USE_CGAL")
+    set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
+  endif()
+  # CGAL requires boost system library
+  list(FIND MITK_USE_Boost_LIBRARIES system _result)
+  if(_result LESS 0)
+    message("> Adding 'system' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES system)
+  endif()
+  # CGAL requires boost thread library
+  list(FIND MITK_USE_Boost_LIBRARIES thread _result)
+  if(_result LESS 0)
+    message("> Adding 'thread' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES thread)
+  endif()
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
+# endif()
+
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
 if(MITK_USE_Qt5 AND MITK_USE_Python)
   set(minimum_required_python_qt5_version "5.3.0")

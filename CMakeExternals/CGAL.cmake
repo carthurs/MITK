@@ -9,15 +9,23 @@ if(MITK_USE_CGAL)
     message(FATAL_ERROR "CGAL_ROOT variable is defined but corresponds to non-existing directory")
   endif()
 
-  string(REPLACE "^^" ";" MITK_USE_CGAL_LIBRARIES "${MITK_USE_CGAL_LIBRARIES}")
-
   set(proj CGAL)
-  set(proj_DEPENDENCIES )
+  set(proj_DEPENDENCIES Boost)
   set(CGAL_DEPENDS ${proj})
 
   if(NOT DEFINED CGAL_ROOT AND NOT MITK_USE_SYSTEM_CGAL)
 
-    ExternalProject_Add(${proj}
+    set(additional_cmake_args "")
+    if(NOT MITK_USE_SYSTEM_Boost)
+      list(APPEND additional_cmake_args
+        -DBoost_NO_SYSTEM_PATHS:BOOL=ON
+        -DBOOST_ROOT:PATH=${BOOST_ROOT}
+        -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
+      )
+    endif()
+
+
+   ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL https://gforge.inria.fr/frs/download.php/file/34898/CGAL-4.6.1.tar.gz
       #URL_MD5 a744cf167b05d72335f27c88115f211d
@@ -29,6 +37,7 @@ if(MITK_USE_CGAL)
       -DWITH_CGAL_ImageIO:BOOL=OFF
       -DWITH_CGAL_Qt3:BOOL=OFF
       -DWITH_CGAL_Qt4:BOOL=OFF
+      ${additional_cmake_args}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS
