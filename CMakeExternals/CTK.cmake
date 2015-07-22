@@ -80,6 +80,7 @@ if(MITK_USE_CTK)
       #GIT_TAG origin/master
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
