@@ -37,6 +37,7 @@ if(MITK_USE_CGAL)
       -DWITH_CGAL_ImageIO:BOOL=OFF
       -DWITH_CGAL_Qt3:BOOL=OFF
       -DWITH_CGAL_Qt4:BOOL=OFF
+      -DCMAKE_DEBUG_POSTFIX:STRING=""
       ${additional_cmake_args}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
