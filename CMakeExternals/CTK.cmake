@@ -45,12 +45,8 @@ if(MITK_USE_CTK)
     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
+           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
           )
-      if(NOT MITK_USE_Python)
-        list(APPEND ctk_optional_cache_args
-            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-            )
-      endif()
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()
       list(APPEND ctk_optional_cache_args
@@ -84,6 +80,7 @@ if(MITK_USE_CTK)
       #GIT_TAG origin/master
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
