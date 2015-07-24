@@ -54,7 +54,7 @@ public:
   * \brief Returns the id of the control-point that corresponds to the given
   * polyline-point.
   */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
 
 
   /** \brief Parameter w_tension defines the tension.
@@ -78,6 +78,8 @@ public:
   void DecreaseSubdivisions();
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
+
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const override { return m_PolyLineSegmentInfo; }
 
 protected:
   PlanarSubdivisionPolygon();
