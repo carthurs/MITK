@@ -614,7 +614,7 @@ bool mitk::PlanarFigure::ResetOnPointSelect()
 
 void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
 {
-    if (index >= (int)GetNumberOfControlPoints())
+    if (index >= GetNumberOfControlPoints())
         return;
 
     if ((m_ControlPoints.size() - 1) < this->GetMinimumNumberOfControlPoints())
