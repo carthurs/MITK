@@ -193,16 +193,6 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *rend
   if (localStorage->m_Actor->GetMapper() == NULL)
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
 
-  double origin[3];
-  origin[0] = planeGeometry->GetOrigin()[0];
-  origin[1] = planeGeometry->GetOrigin()[1];
-  origin[2] = planeGeometry->GetOrigin()[2];
-
-  double normal[3];
-  normal[0] = planeGeometry->GetNormal()[0];
-  normal[1] = planeGeometry->GetNormal()[1];
-  normal[2] = planeGeometry->GetNormal()[2];
-
   vtkSmartPointer<vtkLinearTransform> vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
   PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
