@@ -72,6 +72,11 @@ if(MITK_USE_CTK)
       ENDIF()
     ENDFOREACH()
 
+    set(ctk_patch_command "")
+    if (WIN32)
+        set(ctk_patch_command ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
@@ -80,7 +85,7 @@ if(MITK_USE_CTK)
       #GIT_TAG origin/master
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
+      PATCH_COMMAND ${ctk_patch_command}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
