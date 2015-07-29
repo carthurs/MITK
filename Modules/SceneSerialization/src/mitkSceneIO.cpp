@@ -560,7 +560,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     }
     else
     {
-        m_CompressorTask = std::make_unique<CompressorTask>(this, filename, incrementalSave, filesToMaintain);
+        m_CompressorTask.reset(new CompressorTask(this, filename, incrementalSave, filesToMaintain));
         m_CompressionThread.start(*m_CompressorTask);
         return true;
     }
