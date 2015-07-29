@@ -80,6 +80,17 @@ void mitk::PaintbrushTool::SetSize(int value)
   m_Size = value;
 }
 
+void mitk::PaintbrushTool::Notify(InteractionEvent* interactionEvent, bool isHandled)
+{
+    DataNode* workingNode(m_ToolManager->GetWorkingData(0));
+
+    if (!workingNode || !workingNode->IsVisible(interactionEvent->GetSender())) {
+        return;
+    }
+
+    Superclass::Notify(interactionEvent, isHandled);
+}
+
 mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 {
    p[0] -= 0.5;

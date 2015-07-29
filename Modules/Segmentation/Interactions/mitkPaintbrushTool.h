@@ -58,7 +58,9 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
 
     void SetSize(int value);
 
-  protected:
+    void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
+
+protected:
 
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~PaintbrushTool();
