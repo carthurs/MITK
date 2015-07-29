@@ -34,6 +34,7 @@ namespace mitk
 
 class BaseData;
 class PropertyList;
+class CompressorTask; 
 
 class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 {
