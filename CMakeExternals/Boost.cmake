@@ -18,7 +18,7 @@ if(MITK_USE_Boost)
 
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-    set(_boost_version 1_56)
+    set(_boost_version 1_58)
     set(_boost_install_include_dir include/boost)
     if(WIN32)
       set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -140,8 +140,8 @@ if(MITK_USE_Boost)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
-      URL_MD5 a744cf167b05d72335f27c88115f211d
+      URL https://www.dropbox.com/s/7dy3sg6khkxa1kk/boost_1_58_0.tar.bz2
+      # URL_MD5 a744cf167b05d72335f27c88115f211d
       # We use in-source builds for Boost
       BINARY_DIR ${ep_prefix}/src/${proj}
       CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
