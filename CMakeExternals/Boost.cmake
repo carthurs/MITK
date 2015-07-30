@@ -10,7 +10,8 @@ if(MITK_USE_Boost)
   endif()
 
   string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
-
+  list(REMOVE_DUPLICATES MITK_USE_Boost_LIBRARIES)
+  
   set(proj Boost)
   set(proj_DEPENDENCIES )
   set(Boost_DEPENDS ${proj})
