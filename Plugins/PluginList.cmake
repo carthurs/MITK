@@ -37,8 +37,8 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.properties:ON
-  org.mitk.gui.qt.basicimageprocessing:OFF
-  org.mitk.gui.qt.dicom:OFF
+  org.mitk.gui.qt.basicimageprocessing:ON
+  org.mitk.gui.qt.dicom:ON
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
@@ -46,9 +46,9 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
   org.mitk.gui.qt.igtlplugin:OFF
-  org.mitk.gui.qt.imagecropper:OFF
+  org.mitk.gui.qt.imagecropper:ON
   org.mitk.gui.qt.imagenavigator:ON
-  org.mitk.gui.qt.viewnavigator:OFF
+  org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
@@ -57,7 +57,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
-  org.mitk.gui.qt.segmentation:OFF
+  org.mitk.gui.qt.segmentation:ON
   org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.toftutorial:OFF
@@ -65,7 +65,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
-  org.mitk.gui.qt.volumevisualization:OFF
+  org.mitk.gui.qt.volumevisualization:ON
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
