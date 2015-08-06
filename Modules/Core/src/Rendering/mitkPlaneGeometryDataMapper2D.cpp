@@ -210,7 +210,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       otherPlanesIt = m_OtherPlaneGeometries.begin();
       int gapsize = 32;
-      this->GetDataNode()->GetPropertyValue( "Crosshair.Gap Size", gapsize, NULL );
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapsize, NULL);
+
 
       boost::icl::interval_set<double> intervals;
       intervals += boost::icl::interval<double>::closed(0, 1);
@@ -224,19 +225,22 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
       while ( otherPlanesIt != otherPlanesEnd )
       {
+        bool ignorePlane = false;
+        (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
+        if (ignorePlane) 
+        {
+            ++otherPlanesIt;
+            continue;
+        }
+
         PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
               static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
         if (otherPlane != inputPlaneGeometry && otherPlane != worldPlaneGeometry)
         {
-          Point3D planeIntersection;
-          otherPlane->IntersectionPoint(crossLine,planeIntersection);
-          ScalarType sectionLength = point1.EuclideanDistanceTo(planeIntersection);
-          ScalarType lineValue = sectionLength/lineLength;
-
-          Point2D intersectionInOtherPlane;
-          if (otherPlane->Map(planeIntersection, intersectionInOtherPlane)) {
-              intervals -= boost::icl::interval<double>::open(lineValue - gapSizeParam, lineValue + gapSizeParam);
+            double intersectionParam;
+            if (otherPlane->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 && intersectionParam < 1) {
+                intervals -= boost::icl::interval<double>::open(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
           }
         }
         ++otherPlanesIt;
