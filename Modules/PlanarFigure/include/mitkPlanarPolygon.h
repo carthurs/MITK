@@ -76,6 +76,8 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int) const override { return m_PolyLineSegmentInfo; }
+
 protected:
   PlanarPolygon();
 
@@ -98,6 +100,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  PolyLineSegmentInfoType m_PolyLineSegmentInfo;
 
 private:
 

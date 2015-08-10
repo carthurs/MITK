@@ -112,8 +112,8 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       // For all other polyline points, use the index of the control point succeeding it
       // (for polyline points lying on control points, the index of the previous control point
       // is used)
-      nextIndex = (((i - 1) >> this->GetSubdivisionRounds())) % m_ControlPoints.size();
-      if(!isInitiallyPlaced && nextIndex > m_ControlPoints.size()-3)
+      nextIndex = (((i - 1) >> this->GetSubdivisionRounds()) + 1) % m_ControlPoints.size();
+      if(!isInitiallyPlaced && nextIndex > m_ControlPoints.size()-2)
       {
         this->AppendPointToPolyLine( 0, m_ControlPoints[m_ControlPoints.size()-1] );
         break;
