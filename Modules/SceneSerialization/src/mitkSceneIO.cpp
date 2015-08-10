@@ -344,7 +344,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
     //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
-    bool incrementalSave = Poco::File(filename).path() == Poco::File(m_LoadedProjectFileName).path() && m_FileTimeStamp == Poco::File(filename).getLastModified();
+    Poco::File fileInfo(filename);
+    bool incrementalSave = fileInfo.exists() && fileInfo.path() == Poco::File(m_LoadedProjectFileName).path() && m_FileTimeStamp == fileInfo.getLastModified();
 
     std::set<std::string> filesToMaintain;
     if (sceneNodes.IsNull())

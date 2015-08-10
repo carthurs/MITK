@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>
 
+#include <mitkUIDGenerator.h>
+
 mitk::BaseDataSerializer::BaseDataSerializer()
     : m_FilenameHint("unnamed")
     , m_WorkingDirectory("")
@@ -49,7 +51,7 @@ std::string mitk::BaseDataSerializer::GetUniqueFilenameInWorkingDirectory()
         name << char('a' + (n % 26));
         n /= 26;
     }
-    std::string myname;
+    std::string myname = mitk::UIDGenerator("SceneIOTempUID_").GetUID();
     myname.append(name.str());
     return myname;
 }
