@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCLCoreExports.h>
 
+
 #include <mitkBaseData.h>
 
 // Eigen
@@ -158,14 +159,26 @@ protected:
   Eigen::MatrixXd m_OutProbability;
   bool m_IsUsingPointWiseProbability;
 
+private:
+  void MethodForBuild();
+
 public:
+
+
+  void SetNthItems(const char *val, unsigned int idx);
+  std::string GetNthItems(unsigned int idx) const;
+
+  void SetItemList(std::vector<std::string>);
+  std::vector<std::string> GetItemList() const;
 
 #ifndef DOXYGEN_SKIP
 
   virtual void SetRequestedRegionToLargestPossibleRegion(){}
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
   virtual bool VerifyRequestedRegion(){return false;}
-  virtual void SetRequestedRegion(const itk::DataObject * /*data*/){}
+
+  virtual void SetRequestedRegion(const itk::DataObject* /*data*/){}
+
 
   // Override
   virtual bool IsEmpty() const override

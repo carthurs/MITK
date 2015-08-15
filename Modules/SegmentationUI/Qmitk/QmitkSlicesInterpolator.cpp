@@ -78,11 +78,11 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
     m_ToolManager(NULL),
     m_Initialized(false),
-    m_FirstRun(true),
     m_LastSNC(0),
     m_LastSliceIndex(0),
     m_2DInterpolationEnabled(false),
-    m_3DInterpolationEnabled(false)
+    m_3DInterpolationEnabled(false),
+    m_FirstRun(true)
 {
   m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
 
@@ -772,8 +772,13 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 {
   if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
   {
+    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
+    mitk::Image* currSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
+
     mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
     s2iFilter->MakeOutputBinaryOn();
+    if (currSeg->GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
+      s2iFilter->SetUShortBinaryPixelType(true);
     s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
 
     // check if ToolManager holds valid ReferenceData
@@ -784,9 +789,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 
-    mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
     mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
-    mitk::Image* currSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
 
     unsigned int timestep = m_LastSNC->GetTime()->GetPos();
     mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(timestep));

@@ -222,7 +222,7 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools Help)
+    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
     find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
     if(Qt5_DIR)
       get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
@@ -745,6 +745,13 @@ set(MITK_CXX_FLAGS_RELEASE )
 
 set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
+
+find_package(OpenMP)
+
+if (OPENMP_FOUND)
+  set(MITK_C_FLAGS "${MITK_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
 if(WIN32)
   set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")

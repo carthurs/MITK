@@ -29,7 +29,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
 
       mitk_create_executable(${appname}
       DEPENDS MitkCore MitkCLCore ${dependencies_list}
-      PACKAGE_DEPENDS ITK Qt4 Vigra
+      PACKAGE_DEPENDS ITK Qt4|QtCore Qt5|Core Vigra
       CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
       )
 
@@ -98,6 +98,18 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   mitk_create_executable(CLVoxelClassification
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
+  )
+  mitk_create_executable(CLMRNormalization
+    DEPENDS MitkCore MitkCLUtilities
+    CPP_FILES CLMRNormalization.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLBrainMask
+    DEPENDS MitkCore MitkCLUtilities
+    CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLImageConverter
+    DEPENDS MitkCore
+    CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application
