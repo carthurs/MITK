@@ -154,6 +154,10 @@ void mitk::ExtractSliceFilter::GenerateData(){
     normal = abstractGeometry->GetPlane()->GetNormal();
     normal.Normalize();
 
+    MITK_INFO << "ExtractSliceFilter";
+    inputTimeGeometry->GetGeometryForTimeStep(m_TimeStep)->GetVtkTransform()->GetLinearInverse()->GetMatrix()->PrintSelf(std::cout, vtkIndent(4));
+
+
     // Use a combination of the InputGeometry *and* the possible non-rigid
     // AbstractTransformGeometry for reslicing the 3D Image
     vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkSmartPointer<vtkGeneralTransform>::New();
@@ -164,12 +168,23 @@ void mitk::ExtractSliceFilter::GenerateData(){
       abstractGeometry->GetVtkAbstractTransform()
       );
 
+    mitk::Point3D points[] = { origin, origin + right * m_OutPutSpacing[0] * extent[0],
+        origin + bottom * m_OutPutSpacing[1] * extent[1],
+        origin + right * m_OutPutSpacing[0] * extent[0] + bottom * m_OutPutSpacing[1] * extent[1] };
+
+    for (const auto& p : points) {
+        double* tp = composedResliceTransform->TransformPoint(p[0], p[1], p[2]);
+        MITK_INFO << tp[0] << " " << tp[1] << " " << tp[2];
+    }
+
     m_Reslicer->SetResliceTransform( composedResliceTransform );
 
     // Set background level to BLACK instead of translucent, to avoid
     // boundary artifacts (see PlaneGeometryDataVtkMapper3D)
     // Note: Backgroundlevel was hardcoded before to -1023
     m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
+
+    planeGeometry = abstractGeometry->GetPlane();
   }
   else{
     if ( planeGeometry != nullptr )
@@ -242,7 +257,16 @@ void mitk::ExtractSliceFilter::GenerateData(){
     }
   }
 
-  if(m_ResliceTransform.IsNotNull()){
+#ifdef _DEBUG
+  static volatile bool jjj = false;
+  if (jjj) {
+      m_Reslicer->TransformInputSamplingOff();
+  }
+#endif
+
+
+  static volatile bool iii = true;
+  if(m_ResliceTransform.IsNotNull() && iii){
     //if the resliceTransform is set the reslice axis are recalculated.
     //Thus the geometry information is not fitting. Therefor a unitSpacingFilter
     //is used to set up a global spacing of 1 and compensate the transform.

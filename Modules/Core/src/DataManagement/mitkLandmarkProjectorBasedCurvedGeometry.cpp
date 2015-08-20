@@ -19,21 +19,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
-  : AbstractTransformGeometry(), m_LandmarkProjector(nullptr), m_InterpolatingAbstractTransform(nullptr), m_TargetLandmarks(nullptr)
+  : AbstractTransformGeometry(), m_LandmarkProjector(nullptr), m_TargetLandmarks(nullptr)
 {
 }
 
-mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) : Superclass(other)
+mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) 
+    : AbstractTransformGeometry(other)
+    , m_LandmarkProjector(other.m_LandmarkProjector)
+    , m_TargetLandmarks(other.m_TargetLandmarks)
 {
-  SetTargetLandmarks(other.m_TargetLandmarks);
-  this->SetLandmarkProjector(other.m_LandmarkProjector);
-  this->ComputeGeometry();
+//  SetTargetLandmarks(other.m_TargetLandmarks);
+//  this->SetLandmarkProjector(other.m_LandmarkProjector);
+//  this->ComputeGeometry();
 }
 
 mitk::LandmarkProjectorBasedCurvedGeometry::~LandmarkProjectorBasedCurvedGeometry()
 {
-  if(m_InterpolatingAbstractTransform!=nullptr)
-    m_InterpolatingAbstractTransform->Delete();
 }
 
 void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::LandmarkProjector* aLandmarkProjector)
@@ -47,7 +48,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
       if(m_FrameGeometry.IsNotNull())
         m_LandmarkProjector->SetFrameGeometry(m_FrameGeometry);
 
-      if(m_InterpolatingAbstractTransform == nullptr)
+      if (GetInterpolatingAbstractTransform() == nullptr)
       {
         itkWarningMacro(<<"m_InterpolatingAbstractTransform not set.");
       }
@@ -77,7 +78,5 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
 }
 itk::LightObject::Pointer mitk::LandmarkProjectorBasedCurvedGeometry::InternalClone() const
 {
-  mitk::BaseGeometry::Pointer newGeometry = new LandmarkProjectorBasedCurvedGeometry(*this);
-  newGeometry->UnRegister();
-  return newGeometry.GetPointer();
+    itkExceptionMacro(<< "LandmarkProjectorBasedCurvedGeometry::InternalClone shouldn't be called.");
 }

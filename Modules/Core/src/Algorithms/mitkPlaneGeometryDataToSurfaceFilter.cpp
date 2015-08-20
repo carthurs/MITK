@@ -39,6 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkClipPolyData.h>
 #include <vtkTextureMapToPlane.h>
 
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkNew.h>
+
 
 mitk::PlaneGeometryDataToSurfaceFilter::PlaneGeometryDataToSurfaceFilter()
 : m_UseGeometryParametricBounds( true ), m_XResolution( 10 ),
@@ -153,7 +156,18 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
       BaseGeometry *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
-      g3d->SetIndexToWorldTransform( affineTransform );
+      g3d->SetIdentity();
+
+#ifdef _DEBUG
+      static volatile bool jjj = false;
+      if (jjj) {
+          g3d->SetIndexToWorldTransform(affineTransform);
+      }
+#endif
+
+      MITK_INFO << "PlaneGeometryToSurfaceFilter";
+      abstractGeometry->GetVtkTransform()->GetLinearInverse()->GetMatrix()->PrintSelf(std::cout, vtkIndent(4));
+
 
       vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
       composedResliceTransform->Identity();
@@ -175,7 +189,8 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
       );
     }
 
-    if ( m_UseBoundingBox )
+    static volatile bool iii = true;
+    if ( m_UseBoundingBox && iii )
     {
       mitk::BoundingBox::PointType boundingBoxMin = m_BoundingBox->GetMinimum();
       mitk::BoundingBox::PointType boundingBoxMax = m_BoundingBox->GetMaximum();
@@ -191,11 +206,28 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
       m_Box->SetXMax( 10000.0, 10000.0, 10000.0 );
     }
 
-    m_Transform->Identity();
-    m_Transform->Concatenate( input->GetPlaneGeometry()->GetVtkTransform() );
-    m_Transform->PreMultiply();
 
-    m_Box->SetTransform( m_Transform );
+    m_Transform->Identity();
+    //m_Transform->Concatenate(input->GetPlaneGeometry()->GetVtkTransform()->GetLinearInverse());
+
+    m_Box->SetTransform(m_Transform);
+
+
+//    m_Transform->Identity();
+//
+//    BaseGeometry *referenceGeometry = input->GetPlaneGeometry()->GetReferenceGeometry();
+//    if (referenceGeometry)
+//    {
+//        m_Transform->Concatenate(
+//            referenceGeometry->GetVtkTransform()
+//            );
+//    }
+//
+//    m_Transform->Concatenate(
+//        input->GetPlaneGeometry()->GetVtkTransform()
+//        );
+//
+//    m_Box->SetTransform( m_Transform );
 
     m_PlaneClipper->SetInputConnection(m_VtkTransformPlaneFilter->GetOutputPort() );
     m_PlaneClipper->SetClipFunction( m_Box );
@@ -205,6 +237,29 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
     m_PlaneClipper->Update();
 
     planeSurface = m_PlaneClipper->GetOutput();
+
+#ifdef _DEBUG
+    static volatile bool kkk = false;
+    if (kkk) {
+        vtkNew<vtkTransformPolyDataFilter> f;
+        f->SetInputConnection(m_PlaneClipper->GetOutputPort());
+        m_Transform->Identity();
+        m_Transform->Concatenate(input->GetPlaneGeometry()->GetVtkTransform());
+        f->SetTransform(m_Transform);
+
+
+        vtkNew<vtkXMLPolyDataWriter> writer;
+        char arr[100];
+        static int i = 0;
+        itoa(i++, arr, 10);
+        writer->SetFileName(("d:/11/" + std::string(arr) + ".vtp").c_str());
+        writer->SetInputConnection(f->GetOutputPort());
+        writer->Update();
+        m_Transform->Identity();
+    }
+#endif
+
+
   }
     // Does the PlaneGeometryData contain a PlaneGeometry?
   else if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != nullptr )

@@ -49,6 +49,8 @@ namespace mitk {
 
     virtual bool IsValid() const override;
 
+      vtkAbstractTransform* GetInterpolatingAbstractTransform() override;
+
   protected:
     ThinPlateSplineCurvedGeometry();
     ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other);

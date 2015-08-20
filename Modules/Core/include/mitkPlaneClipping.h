@@ -33,6 +33,14 @@ static bool LineIntersectZero( vtkPoints *points, int p1, int p2, double *bounds
   points->GetPoint( p1, point1 );
   points->GetPoint( p2, point2 );
 
+  if (abs(point1[2]) < 1e-8) {
+      point1[2] = 0;
+  }
+
+  if (abs(point2[2]) < 1e-8) {
+      point2[2] = 0;
+  }
+
   if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
   {
     double x, y;

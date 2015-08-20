@@ -40,7 +40,7 @@ namespace mitk {
 
     virtual void ComputeGeometry();
 
-    itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform*);
+    virtual vtkAbstractTransform* GetInterpolatingAbstractTransform() = 0;
 
     itk::LightObject::Pointer InternalClone() const override;
 
@@ -59,9 +59,6 @@ namespace mitk {
     virtual ~LandmarkProjectorBasedCurvedGeometry();
 
     mitk::LandmarkProjector::Pointer m_LandmarkProjector;
-
-    vtkAbstractTransform* m_InterpolatingAbstractTransform;
-
     mitk::PointSet::DataType::PointsContainer::ConstPointer m_TargetLandmarks;
 
     //##Documentation

@@ -510,7 +510,7 @@ void mitk::BaseRenderer::SetWorldGeometry3D(mitk::BaseGeometry* geometry)
 {
   itkDebugMacro("setting WorldGeometry3D to " << geometry);
 
-  if (m_WorldGeometry != geometry)
+  if (m_WorldGeometry != geometry || true)
   {
     if (geometry->GetBoundingBox()->GetDiagonalLength2() == 0)
       return;
@@ -565,7 +565,7 @@ void mitk::BaseRenderer::SetDisplayGeometry(mitk::DisplayGeometry* geometry2d)
 
 void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(mitk::PlaneGeometry* geometry2d)
 {
-  if (m_CurrentWorldPlaneGeometry != geometry2d)
+  if (m_CurrentWorldPlaneGeometry != geometry2d || true)
   {
     m_CurrentWorldPlaneGeometry = geometry2d;
     m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);

@@ -52,7 +52,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
-  org.mitk.gui.qt.pointsetinteraction:OFF
+  org.mitk.gui.qt.pointsetinteraction:ON
   org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
@@ -70,4 +70,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
+  
+  org.mitk.example.gui.imaging:ON
 )

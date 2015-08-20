@@ -53,6 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
 
+#include <vtkBMPWriter.h>
+#include <vtkNew.h>
+
 //ITK
 #include <itkRGBAPixel.h>
 #include <mitkRenderingModeProperty.h>
@@ -231,23 +234,25 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
+  bool out = false;
+  const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+  if (abstractGeometry != NULL) {
+      planeGeometry = abstractGeometry->GetPlane();
+      out = true;
+  }
+
   if(thickSlicesMode > 0)
   {
     double dataZSpacing = 1.0;
 
     Vector3D normInIndex, normal;
 
-
-    const mitk::AbstractTransformGeometry* abstractGeometry = dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
-    if(abstractGeometry != NULL)
-        normal = abstractGeometry->GetPlane()->GetNormal();
-    else{
-      if ( planeGeometry != NULL ){
+    if (planeGeometry != NULL) {
         normal = planeGeometry->GetNormal();
-      }
-      else
-        return; //no fitting geometry set
     }
+    else
+        return; //no fitting geometry set
+
     normal.Normalize();
 
     input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() )->WorldToIndex( normal, normInIndex );
@@ -397,6 +402,19 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   // connect the texture with the output of the levelwindow filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+
+#ifdef _DEBUG
+  if (out) {
+      static int i = 0;
+      char arr[100];
+      itoa(i++, arr, 10);
+
+      vtkNew<vtkBMPWriter> writer;
+      writer->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+      writer->SetFileName(("D:/11/" + std::string(arr) + ".bmp").c_str());
+      writer->Update();
+  }
+#endif
 
   this->TransformActor( renderer );
 

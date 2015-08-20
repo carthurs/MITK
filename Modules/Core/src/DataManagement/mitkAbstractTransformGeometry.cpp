@@ -34,7 +34,8 @@ mitk::AbstractTransformGeometry::AbstractTransformGeometry(const AbstractTransfo
   this->SetPlane(other.m_Plane);
 
   this->SetFrameGeometry(other.m_FrameGeometry);
-  m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
+  m_ItkVtkAbstractTransform = other.m_ItkVtkAbstractTransform->Clone();
+  m_ItkVtkAbstractTransform->SetVtkAbstractTransform(other.m_ItkVtkAbstractTransform->GetVtkAbstractTransform());
 }
 
 mitk::AbstractTransformGeometry::~AbstractTransformGeometry()

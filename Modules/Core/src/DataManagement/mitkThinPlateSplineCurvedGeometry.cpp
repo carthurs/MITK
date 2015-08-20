@@ -21,16 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry()
   : Superclass()
 {
-  m_InterpolatingAbstractTransform = m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
+  m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
 
   m_VtkTargetLandmarks = vtkPoints::New();
   m_VtkProjectedLandmarks = vtkPoints::New();
   m_ThinPlateSplineTransform->SetInverseIterations(5000);
+  //m_ThinPlateSplineTransform->SetBasisToR();
 }
 
-mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other ) : Superclass(other)
+mitk::ThinPlateSplineCurvedGeometry::ThinPlateSplineCurvedGeometry(const ThinPlateSplineCurvedGeometry& other ) 
+    : Superclass(other)
 {
-  this->SetSigma(other.GetSigma());
+    m_ThinPlateSplineTransform = vtkThinPlateSplineTransform::New();
+    m_ThinPlateSplineTransform->DeepCopy(other.m_ThinPlateSplineTransform);
+
+    m_LandmarkProjector->SetInterpolatingAbstractTransform(m_ThinPlateSplineTransform);
+
+    m_VtkTargetLandmarks = vtkPoints::New();
+    m_VtkTargetLandmarks->DeepCopy(other.m_VtkTargetLandmarks);
+
+    m_VtkProjectedLandmarks = vtkPoints::New();
+    m_VtkProjectedLandmarks->DeepCopy(other.m_VtkProjectedLandmarks);
+
+    this->SetSigma(other.GetSigma());
+    ThinPlateSplineCurvedGeometry::ComputeGeometry();
 }
 
 mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
@@ -48,6 +62,11 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
 bool mitk::ThinPlateSplineCurvedGeometry::IsValid() const
 {
   return m_TargetLandmarks.IsNotNull() && (m_TargetLandmarks->Size() >= 3) && m_LandmarkProjector.IsNotNull();
+}
+
+vtkAbstractTransform* mitk::ThinPlateSplineCurvedGeometry::GetInterpolatingAbstractTransform()
+{
+    return m_ThinPlateSplineTransform;
 }
 
 void mitk::ThinPlateSplineCurvedGeometry::SetSigma(double sigma)

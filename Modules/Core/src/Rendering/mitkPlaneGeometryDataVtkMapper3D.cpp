@@ -273,8 +273,10 @@ namespace mitk
 
       double tubeRadius = 1.0; // Radius of tubular edge surrounding plane
 
+      static volatile bool temp = true;
+
       // Clip the PlaneGeometry with the reference geometry bounds (if available)
-      if ( input->GetPlaneGeometry()->HasReferenceGeometry() )
+      if ( input->GetPlaneGeometry()->HasReferenceGeometry() && temp)
       {
         BaseGeometry *referenceGeometry =
             input->GetPlaneGeometry()->GetReferenceGeometry();

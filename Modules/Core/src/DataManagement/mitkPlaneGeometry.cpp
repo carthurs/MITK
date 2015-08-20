@@ -54,7 +54,14 @@ namespace mitk
     ScalarType len = transform->GetMatrix()
       .GetVnlMatrix().get_column(2).two_norm();
 
-    if (len==0) len = 1;
+    if (len == 0) {
+        len = 1;
+    } 
+
+    if (dot_product(transform->GetMatrix().GetVnlMatrix().get_column(2), normal) < 0) {
+        len = -len;
+    }
+
     normal*=len;
     Matrix3D matrix = transform->GetMatrix();
     matrix.GetVnlMatrix().set_column(2, normal);

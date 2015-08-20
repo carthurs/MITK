@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/isosurface">
+        <file>curvedmpr.xpm</file>
+    </qresource>
+</RCC>
