@@ -67,7 +67,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         Vector2D vec1 = point - centerPoint;
         Vector2D vec2;
 
-        if (index == 1 && m_TreatAsCircle )
+        if (index == 1 && !m_FigureFinalized )
         {
             float x = vec1[0];
             vec2[0] = vec1[1];
@@ -110,7 +110,9 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
 mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-    return point;
+    if (!m_FigureFinalized) {
+        return point;
+    }
 
     Point2D indexPoint;
     this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );

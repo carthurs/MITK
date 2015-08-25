@@ -98,6 +98,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  std::vector<unsigned long> m_PolyLineSegmentInfo;
 
 private:
 

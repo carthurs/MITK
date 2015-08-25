@@ -44,20 +44,20 @@ public:
 
   unsigned int GetPlacementNumberOfControlPoints() const override
   {
-      return 3;
+      return 4;
   }
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
-    return 3;
+    return 4;
   }
 
 
   /** \brief Ellipse has 3 control points per definition. */
   unsigned int GetMaximumNumberOfControlPoints() const override
   {
-    return 3;
+    return 4;
   }
 
   /** \brief Sets the minimum radius

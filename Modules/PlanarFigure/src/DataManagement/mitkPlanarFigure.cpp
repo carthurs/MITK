@@ -51,17 +51,17 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
   : BaseData(other),
     m_ControlPoints(other.m_ControlPoints),
     m_SelectedControlPoint(other.m_SelectedControlPoint),
-    m_PolyLines(other.m_PolyLines),
-    m_HelperPolyLines(other.m_HelperPolyLines),
-    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
     m_PreviewControlPoint(other.m_PreviewControlPoint),
     m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
     m_FigurePlaced(other.m_FigurePlaced),
     m_FigureFinalized(other.m_FigureFinalized),
-    m_PlaneGeometry(other.m_PlaneGeometry), // do not clone since SetPlaneGeometry() doesn't clone either
+    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
+    m_PlaneGeometry(other.m_PlaneGeometry),
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
-    m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
+    m_HelperLinesUpToDate(other.m_HelperLinesUpToDate), // do not clone since SetPlaneGeometry() doesn't clone either
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
+    m_PolyLines(other.m_PolyLines),
+    m_HelperPolyLines(other.m_HelperPolyLines),
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)
@@ -136,11 +136,6 @@ bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D& point, int positio
             SelectControlPoint(position);
         }
 
-        // polylines & helperpolylines need to be repainted
-        m_PolyLineUpToDate = false;
-        m_HelperLinesUpToDate = false;
-        m_FeaturesUpToDate = false;
-
         this->Modified();
         return true;
     }
@@ -178,12 +173,9 @@ bool mitk::PlanarFigure::SetControlPoint(unsigned int index, const Point2D& poin
 
     if (controlPointSetCorrectly)
     {
-        m_PolyLineUpToDate = false;
-        m_HelperLinesUpToDate = false;
-        m_FeaturesUpToDate = false;
+        this->Modified();
     }
 
-    this->Modified();
     return controlPointSetCorrectly;
 }
 
@@ -239,12 +231,12 @@ void mitk::PlanarFigure::ResetPreviewContolPoint()
     m_PreviewControlPointVisible = false;
 }
 
-mitk::Point2D mitk::PlanarFigure::GetPreviewControlPoint()
+mitk::Point2D mitk::PlanarFigure::GetPreviewControlPoint() const
 {
     return m_PreviewControlPoint;
 }
 
-bool mitk::PlanarFigure::IsPreviewControlPointVisible()
+bool mitk::PlanarFigure::IsPreviewControlPointVisible() const
 {
     return m_PreviewControlPointVisible;
 }
@@ -259,6 +251,80 @@ mitk::Point2D mitk::PlanarFigure::GetControlPoint(unsigned int index) const
     itkExceptionMacro(<< "GetControlPoint(): Invalid index!");
 }
 
+bool mitk::PlanarFigure::IsPointNearLine(
+    const mitk::Point2D& point,
+    const mitk::Point2D& startPoint,
+    const mitk::Point2D& endPoint,
+    double maxDistance,
+    mitk::Point2D& projectedPoint
+    ) 
+{
+    mitk::Vector2D n1 = endPoint - startPoint;
+    n1.Normalize();
+
+    // Determine dot products between line vector and startpoint-point / endpoint-point vectors
+    double l1 = n1 * (point - startPoint);
+    double l2 = -n1 * (point - endPoint);
+
+    // Determine projection of specified point onto line defined by start / end point
+    mitk::Point2D crossPoint = startPoint + n1 * l1;
+    projectedPoint = crossPoint;
+
+    float dist1 = crossPoint.SquaredEuclideanDistanceTo(point);
+    float dist2 = endPoint.SquaredEuclideanDistanceTo(point);
+    float dist3 = startPoint.SquaredEuclideanDistanceTo(point);
+
+    // Point is inside encompassing rectangle IF
+    // - its distance to its projected point is small enough
+    // - it is not further outside of the line than the defined tolerance
+    if (((dist1 < maxDistance * maxDistance) && (l1 > 0.0) && (l2 > 0.0))
+        || dist2 < maxDistance * maxDistance
+        || dist3 < maxDistance * maxDistance)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+std::tuple<int, int, mitk::Point2D> mitk::PlanarFigure::FindClosestPolyLinePoint( const mitk::Point2D& point, double maxDistance ) const
+{
+    mitk::Point2D pointProjectedOntoLine;
+
+    for (unsigned short polyLineIndex = 0; polyLineIndex < GetPolyLinesSize(); ++polyLineIndex)
+    {
+        auto polyLine = GetPolyLine(polyLineIndex);
+
+        for (std::size_t polyLinePointIndex = 1; polyLinePointIndex < polyLine.size(); ++polyLinePointIndex)
+        {
+            if (IsPointNearLine(point, polyLine[polyLinePointIndex - 1], polyLine[polyLinePointIndex], maxDistance, pointProjectedOntoLine)) {
+                return std::make_tuple(static_cast<int>(polyLineIndex), static_cast<int>(polyLinePointIndex), pointProjectedOntoLine);
+            }
+        }
+
+        // For closed figures, also check last line segment
+        if (IsClosed()
+            && IsPointNearLine(point, *polyLine.rbegin(), polyLine[0], maxDistance, pointProjectedOntoLine))
+        {
+            return std::make_tuple(static_cast<int>(polyLineIndex), static_cast<int>(polyLine.size()), pointProjectedOntoLine);
+        }
+    }
+    return std::make_tuple(-1, -1, mitk::Point2D{});
+}
+
+int mitk::PlanarFigure::FindClosestControlPoint(const mitk::Point2D & point, double maxDistance) const
+{
+    int numberOfControlPoints = GetNumberOfControlPoints();
+    for (auto i = 0u; i < GetNumberOfControlPoints(); ++i)
+    {
+        if (point.SquaredEuclideanDistanceTo(GetControlPoint(i)) < maxDistance * maxDistance)
+        {
+            return static_cast<int>(i);
+        }
+    }
+
+    return -1;
+}
 
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
 {
@@ -274,24 +340,18 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
 
 
 const mitk::PlanarFigure::PolyLineType
-mitk::PlanarFigure::GetPolyLine(unsigned int index)
+mitk::PlanarFigure::GetPolyLine(unsigned int index) const
 {
     mitk::PlanarFigure::PolyLineType polyLine;
     if (index > m_PolyLines.size() || !m_PolyLineUpToDate)
     {
-        this->GeneratePolyLine();
+        const_cast<mitk::PlanarFigure*>(this)->GeneratePolyLine();
         m_PolyLineUpToDate = true;
     }
 
   return m_PolyLines.at( index );
 }
 
-
-const mitk::PlanarFigure::PolyLineType
-mitk::PlanarFigure::GetPolyLine(unsigned int index) const
-{
-    return m_PolyLines.at(index);
-}
 
 void mitk::PlanarFigure::ClearPolyLines()
 {
@@ -304,7 +364,7 @@ void mitk::PlanarFigure::ClearPolyLines()
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine(unsigned int index,
     double mmPerDisplayUnit,
-    unsigned int displayHeight)
+    unsigned int displayHeight) const
 {
     mitk::PlanarFigure::PolyLineType helperPolyLine;
     if (index < m_HelperPolyLines.size())
@@ -313,7 +373,7 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine(uns
         // two parameters as well
         if (!m_HelperLinesUpToDate || m_DisplaySize.first != mmPerDisplayUnit || m_DisplaySize.second != displayHeight)
         {
-            this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
+            const_cast<mitk::PlanarFigure*>(this)->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
             m_HelperLinesUpToDate = true;
 
             // store these parameters to be able to check next time if somebody zoomed in or out
@@ -340,13 +400,12 @@ void mitk::PlanarFigure::ClearHelperPolyLines()
 * (such as, radius, area, ...). */
 unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
 {
+    if (m_FigurePlaced && !m_FeaturesUpToDate) {
+        const_cast<mitk::PlanarFigure*>(this)->EvaluateFeaturesInternal();
+        m_FeaturesUpToDate = true;
+    }
+
     return m_Features.size();
-}
-
-
-int mitk::PlanarFigure::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int /*polyLineIndex*/ ) const
-{
-  return indexOfPolylinePoint;
 }
 
 
@@ -378,6 +437,15 @@ const char *mitk::PlanarFigure::GetFeatureUnit(unsigned int index) const
 
 double mitk::PlanarFigure::GetQuantity(unsigned int index) const
 {
+    if (!m_FigurePlaced) {
+        return 0;
+    }
+
+    if (!m_FeaturesUpToDate) {
+        const_cast<mitk::PlanarFigure*>(this)->EvaluateFeaturesInternal();
+        m_FeaturesUpToDate = true;
+    }
+
     if (index < m_Features.size())
     {
         return m_Features[index].Quantity;
@@ -421,22 +489,13 @@ void mitk::PlanarFigure::SetFeatureVisible(unsigned int index, bool visible)
     }
 }
 
-
-void mitk::PlanarFigure::EvaluateFeatures()
+void mitk::PlanarFigure::Modified() const
 {
-    if (!m_FeaturesUpToDate || !m_PolyLineUpToDate)
-    {
-        if (!m_PolyLineUpToDate)
-        {
-            this->GeneratePolyLine();
-        }
-
-        this->EvaluateFeaturesInternal();
-
-        m_FeaturesUpToDate = true;
-    }
+    this->m_FeaturesUpToDate = false;
+    this->m_PolyLineUpToDate = false;
+    this->m_HelperLinesUpToDate = false;
+    Superclass::Modified();
 }
-
 
 void mitk::PlanarFigure::UpdateOutputInformation()
 {
@@ -584,24 +643,24 @@ void mitk::PlanarFigure::PrintSelf(std::ostream& os, itk::Indent indent) const
 }
 
 
-unsigned short mitk::PlanarFigure::GetPolyLinesSize()
+unsigned short mitk::PlanarFigure::GetPolyLinesSize() const
 {
     if (!m_PolyLineUpToDate)
     {
-        this->GeneratePolyLine();
+        const_cast<mitk::PlanarFigure*>(this)->GeneratePolyLine();
         m_PolyLineUpToDate = true;
     }
     return m_PolyLines.size();
 }
 
 
-unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize()
+unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize() const
 {
     return m_HelperPolyLines.size();
 }
 
 
-bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index)
+bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index) const
 {
     return m_HelperPolyLinesToBePainted->GetElement(index);
 }
@@ -625,9 +684,6 @@ void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
 
     m_ControlPoints.erase(iter);
 
-    m_PolyLineUpToDate = false;
-    m_HelperLinesUpToDate = false;
-    m_FeaturesUpToDate = false;
     this->Modified();
 }
 
@@ -650,7 +706,7 @@ void mitk::PlanarFigure::AppendPointToPolyLine(unsigned int index, PolyLineEleme
 {
     if (index < m_PolyLines.size())
     {
-    m_PolyLines[index].push_back(element);
+        m_PolyLines[index].push_back(element);
         m_PolyLineUpToDate = false;
     }
     else
@@ -663,7 +719,7 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine(unsigned int index, PolyLin
 {
     if (index < m_HelperPolyLines.size())
     {
-    m_HelperPolyLines[index].push_back(element);
+        m_HelperPolyLines[index].push_back(element);
         m_HelperLinesUpToDate = false;
     }
     else
@@ -710,11 +766,11 @@ void mitk::PlanarFigure::ExecuteOperation(Operation* operation)
         break;
 
     case OpCLOSECELL:
-        this->SetFigureFinalized(true);
+        this->SetFinalized(true);
         break;
 
     case OpOPENCELL:
-        this->SetFigureFinalized(false);
+        this->SetFinalized(false);
         break;
 
     default:
@@ -753,7 +809,7 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
 
   //check poly lines
-  if (this->m_PolyLines.size() != other.m_PolyLines.size())
+  if (this->GetPolyLinesSize() != other.GetPolyLinesSize())
   {
     return false;
   }
@@ -830,11 +886,6 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
 
   return true;
-}
-
-const mitk::PlanarFigure::PolyLineSegmentInfoType mitk::PlanarFigure::GetPolyLineSegmentInfo(unsigned int) const
-{
-    return PolyLineSegmentInfoType();
 }
 
 bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType /*eps*/, bool /*verbose*/ )

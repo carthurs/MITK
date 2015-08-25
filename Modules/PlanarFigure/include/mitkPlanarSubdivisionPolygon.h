@@ -50,13 +50,6 @@ public:
     m_SubdivisionRounds = subdivisionRounds;
   }
 
-  /**
-  * \brief Returns the id of the control-point that corresponds to the given
-  * polyline-point.
-  */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
-
-
   /** \brief Parameter w_tension defines the tension.
    * the higher w_tension, the lower the "tension" on points.
    * Rule: 0 < w_tension < 0.1
@@ -79,7 +72,7 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
-  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int) const override { return m_PolyLineSegmentInfo; }
+  std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const override;
 
 protected:
   PlanarSubdivisionPolygon();
@@ -91,8 +84,6 @@ protected:
 
   float m_TensionParameter;
   int m_SubdivisionRounds;
-
-  PolyLineSegmentInfoType m_PolyLineSegmentInfo;
 
 private:
 
