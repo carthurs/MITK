@@ -67,6 +67,9 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
     bool AssignProperty(const BaseProperty & property);
 
     virtual std::string GetValueAsString() const;
+    
+    bool IsTransient() const { return m_isTransient; }
+    void SetTransient(bool transient) { m_isTransient = transient; }
 
   protected:
     BaseProperty();
@@ -92,7 +95,9 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
       @return True if the argument could be assigned to this property.
      */
     virtual bool Assign(const BaseProperty& ) = 0;
-};
+
+    bool m_isTransient{false};
+  };
 
 } // namespace mitk
 

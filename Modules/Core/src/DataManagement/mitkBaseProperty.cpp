@@ -48,6 +48,7 @@ bool mitk::BaseProperty::AssignProperty(const BaseProperty& rhs)
 
   if (typeid(*this) == typeid(rhs) && Assign(rhs))
   {
+    m_isTransient = rhs.IsTransient();
     this->Modified();
     return true;
   }
