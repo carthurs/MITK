@@ -51,7 +51,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.viewnavigator:ON
   org.mitk.gui.qt.materialeditor:OFF
   org.mitk.gui.qt.measurementtoolbox:OFF
-  org.mitk.gui.qt.moviemaker:OFF
+  org.mitk.gui.qt.moviemaker:ON
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
