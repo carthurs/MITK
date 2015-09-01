@@ -948,8 +948,6 @@ mitk::Point2D mitk::PlanarFigureInteractor::TransformDisplayToObject(
     // Map circle point from local 2D geometry into 3D world space
     rendererGeometry->Map(result, point3D);
 
-    double planeThickness = objectGeometry->GetExtentInMM(2);
-
     // Project 3D world point onto display geometry
     objectGeometry->Map(point3D, result);
     return result;

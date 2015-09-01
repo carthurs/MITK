@@ -61,7 +61,7 @@ namespace mitk {
 
     void InternalDrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer) override;
 
-    void CalculateTimeStep( BaseRenderer* renderer ) override {  }
+    void CalculateTimeStep( BaseRenderer* ) override {  }
 
   private:
 

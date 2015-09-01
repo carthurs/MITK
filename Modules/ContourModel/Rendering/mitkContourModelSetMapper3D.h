@@ -103,7 +103,7 @@ namespace mitk {
 
     virtual void ApplyContourProperties(mitk::BaseRenderer* renderer);
 
-    void CalculateTimeStep( BaseRenderer* renderer ) override {  }
+    void CalculateTimeStep( BaseRenderer* ) override {  }
   };
 }
 #endif

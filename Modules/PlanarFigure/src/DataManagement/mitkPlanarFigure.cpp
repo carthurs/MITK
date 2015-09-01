@@ -324,7 +324,6 @@ std::tuple<int, int, mitk::Point2D> mitk::PlanarFigure::FindClosestPolyLinePoint
 
 int mitk::PlanarFigure::FindClosestControlPoint(const mitk::Point2D & point, double maxDistance) const
 {
-    int numberOfControlPoints = GetNumberOfControlPoints();
     for (auto i = 0u; i < GetNumberOfControlPoints(); ++i)
     {
         if (point.SquaredEuclideanDistanceTo(GetControlPoint(i)) < maxDistance * maxDistance)
