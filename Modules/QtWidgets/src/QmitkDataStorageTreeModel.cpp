@@ -195,7 +195,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
       // Select the target index position, or put it at the end of the list.
       int dropIndex = dropItemModelIndex.row();
-      if (dropIndex == -1)
+      if (dropIndex == -1 || dropIndex > parentItem->GetChildCount())
       {
         dropIndex = parentItem->GetChildCount();
       }
