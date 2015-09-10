@@ -63,7 +63,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   }
 
   Initialize(renderingManager, name.toStdString().c_str(),renderingMode); // Initialize mitkRenderWindowBase
-  this->GetRenderer()->GetRenderingManager()->RemoveRenderWindow(this->GetVtkRenderWindow());
+//   this->GetRenderer()->GetRenderingManager()->RemoveRenderWindow(this->GetVtkRenderWindow());
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -250,12 +250,12 @@ void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
 
 void QmitkRenderWindow::setVisible(bool visible)
 {
-    if (visible) {
-        this->GetRenderer()->GetRenderingManager()->AddRenderWindow(this->GetVtkRenderWindow());
-    }
-    else {
-        this->GetRenderer()->GetRenderingManager()->RemoveRenderWindow(this->GetVtkRenderWindow());
-    }
+//     if (visible) {
+//         this->GetRenderer()->GetRenderingManager()->AddRenderWindow(this->GetVtkRenderWindow());
+//     }
+//     else {
+//         this->GetRenderer()->GetRenderingManager()->RemoveRenderWindow(this->GetVtkRenderWindow());
+//     }
 
     QWidget::setVisible(visible);
 }
