@@ -122,6 +122,14 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     if(WIN32)
       set(_python_install_dir -DCMAKE_INSTALL_PREFIX:PATH=${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION})
     endif()
+    
+    if (MSVC)
+        set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release) # always build release
+        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target INSTALL) # always build release
+    else()
+        set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
+        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL) # always build release
+    endif()
 
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
@@ -132,6 +140,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       # fix to build python on i686 and i386 with the python cmake build system,
       # the x86 path must be set as default
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
+      BUILD_COMMAND ${_python_build_command}
+      INSTALL_COMMAND ${_python_install_command}
       CMAKE_ARGS
         ${ep_common_args}
       CMAKE_CACHE_ARGS
@@ -196,6 +206,7 @@ ${PYTHON_EXECUTABLE} -m compileall
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
       set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")
       set(PYTHON_LIBRARY "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}.lib")
+#      set(PYTHON_LIBRARY_DEBUG "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}_d.lib")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/Lib/site-packages")
 
       # pre compile all *.py files in the runtime after install step

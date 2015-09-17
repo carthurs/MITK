@@ -33,6 +33,8 @@ if(MITK_USE_CTK)
            -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
            -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
            -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+           -DPYTHON_LIBRARY_DEBUG:FILEPATH=${PYTHON_LIBRARY}
+           -DPYTHON_DEBUG_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
       )
     else()
       list(APPEND ctk_optional_cache_args
@@ -77,6 +79,13 @@ if(MITK_USE_CTK)
         set(ctk_patch_command ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
     endif()
 
+   set(ctk_additional_c_flags)
+   set(ctk_additional_cxx_flags)
+   if(MSVC_VERSION)
+       set(ctk_additional_c_flags /bigobj /MP)
+       set(ctk_additional_cxx_flags /bigobj /MP)
+   endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
@@ -91,6 +100,8 @@ if(MITK_USE_CTK)
         ${ep_common_args}
         ${ctk_optional_cache_args}
         ${ctk_qt_args}
+       -DADDITIONAL_C_FLAGS:STRING=${ctk_additional_c_flags}
+       -DADDITIONAL_CXX_FLAGS:STRING=${ctk_additional_cxx_flags}
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
