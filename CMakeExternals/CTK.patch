@@ -345,6 +345,39 @@ index c599642..9cd3454 100644
   *   }
   *   ...
   * }
+diff --git a/CMakeExternals/PythonQt.cmake b/CMakeExternals/PythonQt.cmake
+index 81764e8..c07722e 100644
+--- a/CMakeExternals/PythonQt.cmake
++++ b/CMakeExternals/PythonQt.cmake
+@@ -92,6 +92,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
++      -DCMAKE_DEBUG_POSTFIX:STRING=${PYTHONQT_DEBUG_POSTFIX}
+       ${ep_PythonQt_args}
+     DEPENDS
+       ${${proj}_DEPENDENCIES}
+@@ -111,6 +112,7 @@ mark_as_superbuild(
+     PYTHON_INCLUDE_DIR:PATH # FindPythonQt expects PYTHON_INCLUDE_DIR variable to be defined
+     PYTHON_INCLUDE_DIR2:PATH
+     PYTHON_LIBRARY:FILEPATH # FindPythonQt expects PYTHON_LIBRARY variable to be defined
++    PYTHONQT_DEBUG_POSTFIX:STRING
+   LABELS "FIND_PACKAGE_VARS"
+   )
+ mark_as_superbuild(
+diff --git a/Utilities/CMake/FindPythonQt.cmake b/Utilities/CMake/FindPythonQt.cmake
+index 5e61d97..1d3fc28 100644
+--- a/Utilities/CMake/FindPythonQt.cmake
++++ b/Utilities/CMake/FindPythonQt.cmake
+@@ -22,7 +22,7 @@ find_path(PYTHONQT_INCLUDE_DIR PythonQt.h
+         "${PYTHONQT_INSTALL_DIR}/src"
+   DOC "Path to the PythonQt include directory")
+ find_library(PYTHONQT_LIBRARY_RELEASE PythonQt PATHS "${PYTHONQT_INSTALL_DIR}/lib" DOC "The PythonQt library.")
+-find_library(PYTHONQT_LIBRARY_DEBUG NAMES PythonQt${CTK_CMAKE_DEBUG_POSTFIX} PythonQt${CMAKE_DEBUG_POSTFIX} PythonQt PATHS "${PYTHONQT_INSTALL_DIR}/lib" DOC "The PythonQt library.")
++find_library(PYTHONQT_LIBRARY_DEBUG NAMES PythonQt${CTK_CMAKE_DEBUG_POSTFIX} PythonQt${CMAKE_DEBUG_POSTFIX} PythonQt${PYTHONQT_DEBUG_POSTFIX} PythonQt PATHS "${PYTHONQT_INSTALL_DIR}/lib" DOC "The PythonQt library.")
+ set(PYTHONQT_LIBRARY)
+ if(PYTHONQT_LIBRARY_RELEASE)
+   list(APPEND PYTHONQT_LIBRARY optimized ${PYTHONQT_LIBRARY_RELEASE})
 -- 
 1.8.4.msysgit.0
 
