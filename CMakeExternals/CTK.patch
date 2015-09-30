@@ -349,7 +349,45 @@ diff --git a/CMakeExternals/PythonQt.cmake b/CMakeExternals/PythonQt.cmake
 index 81764e8..c07722e 100644
 --- a/CMakeExternals/PythonQt.cmake
 +++ b/CMakeExternals/PythonQt.cmake
-@@ -92,6 +92,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+@@ -32,23 +32,16 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+   endif()
+ 
+   # Enable Qt libraries PythonQt wrapping if required
+-  if (CTK_QT_VERSION VERSION_GREATER "4")
+-    set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools WebKit WebKitWidgets Xml)
+-  else()
++  if (CTK_QT_VERSION VERSION_LESS "5")
+     list(APPEND ep_PythonQt_args
+       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+       )
+-    set(qtlibs core gui network opengl sql svg uitools webkit xml)
+   endif()
++  set(qtlibs Core Gui Multimedia Network OpenGL Sql Svg UiTools WebKit Xml XmlPatterns)
+ 
+   # Set desired qt version for PythonQt
+   list(APPEND ep_PythonQt_args -DPythonQt_QT_VERSION:STRING=${CTK_QT_VERSION})
+ 
+-  foreach(qtlib All ${qtlibs})
+-    string(TOUPPER ${qtlib} qtlib_uppercase)
+-    list(APPEND ep_PythonQt_args -DPythonQt_Wrap_Qt${qtlib}:BOOL=${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QT${qtlib_uppercase}})
+-  endforeach()
+-
+   # Force wrap option to ON if WRAP_QTALL was set to ON
+   if(${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTALL})
+     foreach(qtlib ${qtlibs})
+@@ -57,6 +50,11 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+     endforeach()
+   endif()
+ 
++  foreach(qtlib All ${qtlibs})
++    string(TOUPPER ${qtlib} qtlib_uppercase)
++    list(APPEND ep_PythonQt_args -DPythonQt_Wrap_Qt${qtlib}:BOOL=${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QT${qtlib_uppercase}})
++  endforeach()
++
+   # Python is required
+   find_package(PythonLibs)
+   if(NOT PYTHONLIBS_FOUND)
+@@ -92,6 +90,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
        -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
@@ -357,7 +395,7 @@ index 81764e8..c07722e 100644
        ${ep_PythonQt_args}
      DEPENDS
        ${${proj}_DEPENDENCIES}
-@@ -111,6 +112,7 @@ mark_as_superbuild(
+@@ -111,6 +110,7 @@ mark_as_superbuild(
      PYTHON_INCLUDE_DIR:PATH # FindPythonQt expects PYTHON_INCLUDE_DIR variable to be defined
      PYTHON_INCLUDE_DIR2:PATH
      PYTHON_LIBRARY:FILEPATH # FindPythonQt expects PYTHON_LIBRARY variable to be defined
@@ -378,6 +416,32 @@ index 5e61d97..1d3fc28 100644
  set(PYTHONQT_LIBRARY)
  if(PYTHONQT_LIBRARY_RELEASE)
    list(APPEND PYTHONQT_LIBRARY optimized ${PYTHONQT_LIBRARY_RELEASE})
+diff --git a/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp b/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp
+index 66f5240..547f5e6 100644
+--- a/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp
++++ b/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp
+@@ -28,10 +28,7 @@
+ 
+ // PythonQT includes
+ #include <PythonQt.h>
+-
+-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+-  #include <PythonQt_QtBindings.h>
+-#endif
++#include <PythonQt_QtBindings.h>
+ 
+ // STD includes
+ #include <csignal>
+@@ -155,9 +152,7 @@ void ctkAbstractPythonManager::initPythonQt(int flags)
+   this->connect(PythonQt::self(), SIGNAL(pythonStdErr(QString)),
+                 SLOT(printStderr(QString)));
+ 
+-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+   PythonQt_init_QtBindings();
+-#endif
+ 
+   QStringList initCode;
+ 
 -- 
 1.8.4.msysgit.0
 

@@ -11,18 +11,19 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
 
     set(MITK_PYTHON_MAJOR_VERSION 2)
     set(MITK_PYTHON_MINOR_VERSION 7)
-    set(MITK_PYTHON_PATCH_VERSION 3)
+    set(MITK_PYTHON_PATCH_VERSION 8)
+    set(MITK_PYTHON_VERSION ${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
 
-    set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
+    set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_VERSION})
     set(proj ${PYTHON_SOURCE_PACKAGE})
 
     # download the source code
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/${PYTHON_SOURCE_PACKAGE}.tgz
-      URL_MD5  "2cf641732ac23b18d139be077bd906cd"
+      URL https://www.python.org/ftp/python/${MITK_PYTHON_VERSION}/${PYTHON_SOURCE_PACKAGE}.tgz
+      URL_MD5  "d4bca0159acb0b44a781292b5231936f"
       # patch the VS compiler config
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.3.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.8.patch
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
@@ -86,13 +87,13 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILTIN_PYEXPAT:BOOL=ON
         -DBUILTIN_READLINE:BOOL=ON
         -DBUILTIN_RESOURCE:BOOL=ON
-        -DBULTIN_RANDOM:BOOL=ON
+        -DBULTIN_RANDOM:BOOL=OFF
         -DBUILTIN_SCPROXY:BOOL=OFF
         -DBUILTIN_SELECT:BOOL=ON
         -DBUILTIN_SHA:BOOL=ON
         -DBUILTIN_SHA256:BOOL=ON
         -DBUILTIN_SHA512:BOOL=ON
-        -DBUILTIN_SOCKET:BOOL=ON
+        -DBUILTIN_SOCKET:BOOL=OFF
         -DBUILTIN_SPWD:BOOL=ON
         -DBUILTIN_SQLITE3:BOOL=OFF
         -DBUILTIN_SSL:BOOL=ON
@@ -104,7 +105,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         #-DBUILTIN_TESTCAPI:BOOL=OFF
         -DBUILTIN_TIME:BOOL=ON
         -DBUILTIN_TKINTER:BOOL=ON
-        -DBUILTIN_UNICODEDATA:BOOL=ON
+        -DBUILTIN_UNICODEDATA:BOOL=OFF
         -DBUILTIN_WINREG:BOOL=ON
         -DBUILTIN_ZLIB:BOOL=OFF
         -DUSE_SYSTEM_ZLIB:BOOL=ON
@@ -128,18 +129,14 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target INSTALL) # always build release
     else()
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
-        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL) # always build release
+        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL)
     endif()
 
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/python-cmake-buildsystem-47845c55.tar.gz
-      URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
-      # fix to build python on i686 and i386 with the python cmake build system,
-      # the x86 path must be set as default
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
+      GIT_REPOSITORY https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
       BUILD_COMMAND ${_python_build_command}
       INSTALL_COMMAND ${_python_install_command}
       CMAKE_ARGS

@@ -3,6 +3,8 @@
 #------------------------------------------------------------------
 if(MITK_USE_ZLIB)
   if(NOT DEFINED ZLIB_DIR)
+    include(${CMAKE_CURRENT_LIST_DIR}/ZLIB_URL.cmake)
+  
     set(proj ZLIB)
     set(${proj}_DEPENDENCIES )
     set(ZLIB_DEPENDS ${proj})
@@ -18,7 +20,7 @@ if(MITK_USE_ZLIB)
     # https://github.com/commontk/zlib
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/zlib-66a75305.tar.gz
+      URL ${ZLIB_URL}
       URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
       CMAKE_ARGS
         ${ep_common_args}

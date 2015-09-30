@@ -26,6 +26,7 @@ if(MITK_USE_CTK)
         list(APPEND proj_DEPENDENCIES Python)
       endif()
       list(APPEND ctk_optional_cache_args
+           -DCTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTALL:BOOL=ON
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=ON
            -DCTK_APP_ctkSimplePythonShell:BOOL=ON
@@ -120,7 +121,8 @@ if(MITK_USE_CTK)
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
         # See bug 19073
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
+        -DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
+        -DPythonQt_REVISION_TAG:STRING=origin/patched-5
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS
