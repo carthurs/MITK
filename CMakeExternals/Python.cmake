@@ -127,9 +127,11 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     if (MSVC)
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release) # always build release
         set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target INSTALL) # always build release
+        set(_python_patch_command ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem.patch)
     else()
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
         set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL)
+        set(_python_patch_command "")
     endif()
 
     # CMake build environment for python from:
@@ -137,6 +139,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
+      PATCH_COMMAND ${_python_patch_command}
       BUILD_COMMAND ${_python_build_command}
       INSTALL_COMMAND ${_python_install_command}
       CMAKE_ARGS
@@ -202,7 +205,7 @@ ${PYTHON_EXECUTABLE} -m compileall
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
       set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")
-      set(PYTHON_LIBRARY "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}.lib")
+      set(PYTHON_LIBRARY "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}_mitk.lib")
 #      set(PYTHON_LIBRARY_DEBUG "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}_d.lib")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/Lib/site-packages")
 
