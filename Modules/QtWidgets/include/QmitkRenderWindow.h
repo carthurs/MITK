@@ -20,7 +20,6 @@
 #include "mitkRenderWindowBase.h"
 
 #include <MitkQtWidgetsExports.h>
-#include "QVTKWidget.h"
 #include <vtkGenericOpenGLRenderWindow.h>
 #include "QmitkRenderWindowMenu.h"
 
@@ -32,11 +31,23 @@ class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
 
+#ifdef WIN32
+#include "QVTKWidget.h"
+namespace mitk {
+    using QVTKWidget = ::QVTKWidget;
+}
+#else
+#include "QVTKWidget2.h"
+namespace mitk {
+    using QVTKWidget = ::QVTKWidget2;
+}
+#endif
+
 /**
  * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
  */
-class MITKQTWIDGETS_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
+class MITKQTWIDGETS_EXPORT QmitkRenderWindow: public mitk::QVTKWidget, public mitk::RenderWindowBase
 {
 Q_OBJECT
 
