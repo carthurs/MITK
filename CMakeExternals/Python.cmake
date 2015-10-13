@@ -127,19 +127,19 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     if (MSVC)
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release) # always build release
         set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --config Release --target INSTALL) # always build release
-        set(_python_patch_command ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem.patch)
+        set(_python_git_branch win32_mitk)
     else()
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
         set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL)
-        set(_python_patch_command "")
+        set(_python_git_branch master)
     endif()
 
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/python-cmake-buildsystem/python-cmake-buildsystem
-      PATCH_COMMAND ${_python_patch_command}
+      GIT_REPOSITORY https://github.com/rkhlebnikov/python-cmake-buildsystem
+      GIT_TAG ${_python_git_branch}
       BUILD_COMMAND ${_python_build_command}
       INSTALL_COMMAND ${_python_install_command}
       CMAKE_ARGS
