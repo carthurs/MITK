@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkStructuredPoints.h>
 #include <vtkErrorCode.h>
 #include <vtkSmartPointer.h>
+#include <vtkPointData.h>
+#include <vtkDataArray.h>
 
 namespace mitk {
 
@@ -44,9 +46,28 @@ std::vector<BaseData::Pointer> ImageVtkLegacyIO::Read()
 
   if ( reader->GetOutput() != NULL )
   {
+    auto pointData = reader->GetOutput()->GetPointData();
+
+    if (pointData->GetScalars() == nullptr) 
+    {
+        for (int i = 0; i < pointData->GetNumberOfArrays(); ++i) 
+        {
+            if (pointData->GetArray(i)->GetNumberOfComponents() == 1) 
+            {
+                pointData->SetActiveAttribute(i, vtkDataSetAttributes::SCALARS);
+                break;
+            }
+        }
+    }
+
+    if (pointData->GetScalars() == nullptr) 
+    {
+        mitkThrow() << "mitkImageVtkXmlIO error: could not find scalars in the image.";
+    }
+
     mitk::Image::Pointer output = mitk::Image::New();
     output->Initialize(reader->GetOutput());
-    output->SetVolume(reader->GetOutput()->GetScalarPointer());
+    output->SetVolume(pointData->GetScalars()->GetVoidPointer(0));
     std::vector<BaseData::Pointer> result;
     result.push_back(output.GetPointer());
     return result;
