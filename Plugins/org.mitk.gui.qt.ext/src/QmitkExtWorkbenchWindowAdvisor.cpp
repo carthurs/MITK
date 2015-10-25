@@ -418,8 +418,19 @@ showClosePerspectiveMenuItem(true),
 viewNavigatorFound(false),
 showMemoryIndicator(true),
 dropTargetListener(new QmitkDefaultDropTargetListener),
-fileOpenProjectAction(nullptr)
-
+fileOpenProjectAction(nullptr),
+fileSaveProjectAction(nullptr),
+fileSaveProjectAsAction(nullptr),
+fileImportAction(nullptr),
+closeProjectAction(nullptr),
+undoAction(nullptr),
+redoAction(nullptr),
+imageNavigatorAction(nullptr),
+viewNavigatorAction(nullptr),
+resetPerspAction(nullptr),
+closePerspAction(nullptr),
+openDicomEditorAction(nullptr),
+openRecentProjectMenu(nullptr)
 {
  productName = QCoreApplication::applicationName();
   viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
@@ -427,6 +438,20 @@ fileOpenProjectAction(nullptr)
 
 QmitkExtWorkbenchWindowAdvisor::~QmitkExtWorkbenchWindowAdvisor()
 {
+    qDeleteAll(viewActions);
+    delete fileOpenProjectAction;
+    delete fileSaveProjectAction;
+    delete fileSaveProjectAsAction;
+    delete fileImportAction;
+    delete closeProjectAction;
+    delete undoAction;
+    delete redoAction;
+    delete imageNavigatorAction;
+    delete viewNavigatorAction;
+    delete resetPerspAction;
+    delete closePerspAction;
+    delete openDicomEditorAction;
+    delete openRecentProjectMenu;
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
