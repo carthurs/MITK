@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
 
+#include <itkEuler3DTransform.h>
+
 namespace mitk {
 
 class VtkXMLImageDataReader : public ::vtkXMLImageDataReader
@@ -50,9 +52,23 @@ public:
   std::ostream* GetStream() const { return this->Stream; }
 };
 
+#define DEFINE_STRING(name, value) \
+    static const std::string& name() { static const std::string r = value; return r; };
+
+DEFINE_STRING(OUTPUT_TYPE, "org.mitk.io.Output type")
+DEFINE_STRING(OUTPUT_TYPE_ENUM, OUTPUT_TYPE() + ".enum")
+DEFINE_STRING(OUTPUT_TYPE_VTK, "VTK (vti only)")
+DEFINE_STRING(OUTPUT_TYPE_PARAVIEW, "Paraview (vti + py)")
+
 ImageVtkXmlIO::ImageVtkXmlIO()
   : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_MIMETYPE(), "VTK XML Image")
 {
+
+  Options defaultOptions;
+  defaultOptions[OUTPUT_TYPE()] = OUTPUT_TYPE_VTK();
+  defaultOptions[OUTPUT_TYPE_ENUM()] = std::vector<std::string>{OUTPUT_TYPE_VTK(), OUTPUT_TYPE_PARAVIEW()};
+  this->SetDefaultWriterOptions(defaultOptions);
+
   this->RegisterService();
 }
 
@@ -137,7 +153,48 @@ void ImageVtkXmlIO::Write()
     writer->SetFileName(this->GetOutputLocation().c_str());
   }
 
-  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
+  auto outputType = GetWriterOptions().find(OUTPUT_TYPE())->second.ToString();
+
+  auto outputImage = mitk::Image::ConstPointer{};
+  if (outputType == OUTPUT_TYPE_VTK()) {
+      outputImage = input;
+  }
+  else if (outputType == OUTPUT_TYPE_PARAVIEW()) {
+      auto imageCopy = input->Clone();
+      imageCopy->GetGeometry()->SetIdentity();
+
+      auto eulerTransform = itk::Euler3DTransform<double>::New();
+
+      auto m = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+
+      m.set_column(0, m.get_column(0).normalize());
+      m.set_column(1, m.get_column(1).normalize());
+      m.set_column(2, m.get_column(2).normalize());
+
+      eulerTransform->SetComputeZYX(true);
+      eulerTransform->SetMatrix(itk::Matrix<double>{m}, 1e-4);
+
+      std::ofstream pyFile{ this->GetOutputLocation() + ".py" };
+
+      pyFile << "from paraview.simple import *\n";
+      pyFile << "img = XMLImageDataReader(FileName=r'" << GetOutputLocation() << "')\n";
+      pyFile << "renderView = CreateView('RenderView')\n";
+      pyFile << "imgDisplay = Show(img, renderView)\n";
+
+      pyFile << "imgDisplay.Position = [" << input->GetGeometry()->GetOrigin()[0] << ", " << input->GetGeometry()->GetOrigin()[1] << ", " << input->GetGeometry()->GetOrigin()[2] << "]\n";
+      pyFile << "imgDisplay.Scale = [" << input->GetGeometry()->GetSpacing()[0] << ", " << input->GetGeometry()->GetSpacing()[1] << ", " << input->GetGeometry()->GetSpacing()[2] << "]\n";
+      pyFile << "imgDisplay.Orientation = ["
+          << eulerTransform->GetAngleX() * 180 / vnl_math::pi << ", "
+          << eulerTransform->GetAngleY() * 180 / vnl_math::pi << ", "
+          << eulerTransform->GetAngleZ() * 180 / vnl_math::pi << "]\n";
+
+      outputImage = imageCopy;
+  }
+  else {
+      mitkThrow() << "Unknown output type";
+  }
+
+  ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, outputImage->GetVtkImageData());
   writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
