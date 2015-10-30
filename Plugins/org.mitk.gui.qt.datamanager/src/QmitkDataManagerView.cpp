@@ -133,7 +133,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
    mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
    mitk::NodePredicateProperty::New("hidden object", mitk::BoolProperty::New(true)));
-  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateData::New(0);
+  m_NodeWithNoDataFilterPredicate = mitk::NodePredicateAnd::New(
+   mitk::NodePredicateData::New(0), 
+   mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("show empty data")));
 
   m_FilterModel = new QmitkDataStorageFilterProxyModel();
   m_FilterModel->setSourceModel(m_NodeTreeModel);

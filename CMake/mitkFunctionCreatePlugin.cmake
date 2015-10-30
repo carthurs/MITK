@@ -247,9 +247,13 @@ function(mitk_create_plugin)
 
     set(_autoload_targets )
     foreach(_dependency ${_module_deps})
-      get_target_property(_dep_autoloads ${_dependency} MITK_AUTOLOAD_TARGETS)
-      if (_dep_autoloads)
-        list(APPEND _autoload_targets ${_dep_autoloads})
+      get_property(type TARGET ${_dependency} PROPERTY TYPE)
+
+      if (NOT ${type} STREQUAL "INTERFACE_LIBRARY")
+        get_target_property(_dep_autoloads ${_dependency} MITK_AUTOLOAD_TARGETS)
+        if (_dep_autoloads)
+          list(APPEND _autoload_targets ${_dep_autoloads})
+        endif()
       endif()
     endforeach()
 
