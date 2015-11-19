@@ -23,8 +23,8 @@ if(MITK_USE_matplotlib_LIBPNG)
       LIST_SEPARATOR ${sep}
       BUILD_COMMAND ${matplotlib_LIBPNG_build_command}
       INSTALL_COMMAND ${matplotlib_LIBPNG_install_command} 
-      URL ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.18.tar.gz 
-      URL_MD5 "685ce2ebbf4ad9a03992fb5f10c38df1"
+      URL ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.19.tar.gz 
+      #URL_MD5 "685ce2ebbf4ad9a03992fb5f10c38df1"
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}
