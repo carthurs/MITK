@@ -130,7 +130,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(_python_git_branch win32_mitk)
     else()
         set(_python_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
-        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target INSTALL)
+        set(_python_install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target install)
         set(_python_git_branch master)
     endif()
 
