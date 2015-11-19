@@ -54,7 +54,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.moviemaker:ON
   org.mitk.gui.qt.pointsetinteraction:OFF
   org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
-  org.mitk.gui.qt.python:OFF
+  org.mitk.gui.qt.python:ON
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:ON
