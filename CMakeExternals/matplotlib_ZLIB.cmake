@@ -16,7 +16,7 @@ if(MITK_USE_matplotlib_ZLIB)
         set(matplotlib_ZLIB_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/Release/zlib${CMAKE_IMPORT_LIBRARY_SUFFIX} <BINARY_DIR>/z${CMAKE_IMPORT_LIBRARY_SUFFIX}) 
     else()
         set(matplotlib_ZLIB_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
-        set(matplotlib_ZLIB_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/zlib${CMAKE_IMPORT_LIBRARY_SUFFIX} <BINARY_DIR>/z${CMAKE_IMPORT_LIBRARY_SUFFIX}) 
+        set(matplotlib_ZLIB_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libzlib.a <BINARY_DIR>/z.a) 
     endif()
 
     # Using the ZLIB from CTK:
