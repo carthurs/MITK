@@ -1404,6 +1404,7 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+configure_file(MITKPython.cmake.in ${MITK_BINARY_DIR}/MITKPython.cmake @ONLY)
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
