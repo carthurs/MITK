@@ -33,6 +33,7 @@ if(MITK_USE_matplotlib_LIBPNG)
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
         -DBUILD_SHARED_LIBS:BOOL=OFF
+        -DPNG_SHARED=OFF
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
       DEPENDS ${matplotlib_LIBPNG_DEPENDENCIES}
