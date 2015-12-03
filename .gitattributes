@@ -5,7 +5,7 @@
 # Set general file size limit on all files
 *               hooks.MaxObjectKiB=1024
 
-CTK.patch       -crlf
+CTK.patch       eol=crlf
 *.bat           -crlf
 *.bin           -crlf
 *.blend         -crlf
