@@ -12,8 +12,13 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(${proj}_DEPENDENCIES Python Numpy matplotlib_ZLIB matplotlib_LIBPNG matplotlib_FREETYPE)
     set(matplotlib_DEPENDS ${proj})
     
-    string(REPLACE ${sep} ";" matplotlib_ZLIB_INCLUDE_DIR_semicolon ${matplotlib_ZLIB_INCLUDE_DIR})
-    string(REPLACE ${sep} ";" matplotlib_LIBPNG_INCLUDE_DIR_semicolon ${matplotlib_LIBPNG_INCLUDE_DIR})
+    set(platform_sep ":")
+    if (WIN32)
+        set(platform_sep ";")
+    endif()
+    
+    string(REPLACE ${sep} ${platform_sep} matplotlib_ZLIB_INCLUDE_DIR_platform_sep ${matplotlib_ZLIB_INCLUDE_DIR})
+    string(REPLACE ${sep} ${platform_sep} matplotlib_LIBPNG_INCLUDE_DIR_platform_sep ${matplotlib_LIBPNG_INCLUDE_DIR})
     
     # setup build environment and disable fortran, blas and lapack
     set(_matplotlib_env
@@ -30,8 +35,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{CFLAGS} \"${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}\")
         set(ENV{CXX} \"${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}\")
         set(ENV{CXXFLAGS} \"${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}\")
-        set(ENV{INCLUDE} \"${matplotlib_ZLIB_INCLUDE_DIR_semicolon};${matplotlib_LIBPNG_INCLUDE_DIR_semicolon};${matplotlib_FREETYPE_INCLUDE_DIR}\")
-        set(ENV{LIB} \"${matplotlib_ZLIB_LIBRARY_DIR};${matplotlib_LIBPNG_LIBRARY_DIR};${matplotlib_FREETYPE_LIBRARY_DIR}\")
+        set(ENV{INCLUDE} \"${matplotlib_ZLIB_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}\")
+        set(ENV{LIB} \"${matplotlib_ZLIB_LIBRARY_DIR}${platform_sep}${matplotlib_LIBPNG_LIBRARY_DIR}${platform_sep}${matplotlib_FREETYPE_LIBRARY_DIR}\")
         ")
 
     set(_matplotlib_build_step ${MITK_SOURCE_DIR}/CMake/mitkFunctionExternalPythonBuildStep.cmake)
