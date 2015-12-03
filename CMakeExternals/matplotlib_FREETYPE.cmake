@@ -15,6 +15,7 @@ if(MITK_USE_matplotlib_FREETYPE)
     else()
         set(matplotlib_FREETYPE_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
         set(matplotlib_FREETYPE_install_command "") 
+        set(additional_cmake_args  -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC -DCMAKE_CXX_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC 
     endif()
 
     ExternalProject_Add(${proj}
@@ -26,6 +27,7 @@ if(MITK_USE_matplotlib_FREETYPE)
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}
+        
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
         -DBUILD_SHARED_LIBS:BOOL=OFF
