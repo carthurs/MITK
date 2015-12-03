@@ -35,7 +35,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{CFLAGS} \"${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}\")
         set(ENV{CXX} \"${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}\")
         set(ENV{CXXFLAGS} \"${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}\")
-        set(ENV{INCLUDE} \"${matplotlib_ZLIB_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}\")
+        set(ENV{INCLUDE} \"${matplotlib_ZLIB_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR_platform_sep}${platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}${platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}/freetype2\")
         set(ENV{LIB} \"${matplotlib_ZLIB_LIBRARY_DIR}${platform_sep}${matplotlib_LIBPNG_LIBRARY_DIR}${platform_sep}${matplotlib_FREETYPE_LIBRARY_DIR}\")
         ")
 
