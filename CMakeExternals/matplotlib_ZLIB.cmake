@@ -19,6 +19,7 @@ if(MITK_USE_matplotlib_ZLIB)
         set(matplotlib_ZLIB_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
         set(matplotlib_ZLIB_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libzlib.a <BINARY_DIR>/z.a) 
         set(matplotlib_ZLIB_library_name z.a)
+        set(additional_cmake_args  -DCMAKE_C_FLAGS:STRING=-fPIC -DCMAKE_CXX_FLAGS:STRING=-fPIC)
     endif()
 
     # Using the ZLIB from CTK:

@@ -14,7 +14,9 @@ if(MITK_USE_matplotlib_LIBPNG)
         set(matplotlib_LIBPNG_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/Release/libpng16_static${CMAKE_IMPORT_LIBRARY_SUFFIX} <BINARY_DIR>/png${CMAKE_IMPORT_LIBRARY_SUFFIX}) 
     else()
         set(matplotlib_LIBPNG_build_command ${CMAKE_COMMAND} --build <BINARY_DIR>)
-        set(matplotlib_LIBPNG_install_command ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libpng16.a <BINARY_DIR>/png.a) 
+        set(matplotlib_LIBPNG_install_command "") 
+
+        set(additional_cmake_args  -DCMAKE_C_FLAGS:STRING=-fPIC -DCMAKE_CXX_FLAGS:STRING=-fPIC)
     endif()
 
     # Using the LIBPNG from CTK:
