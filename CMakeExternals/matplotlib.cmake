@@ -16,7 +16,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(_include_env_var "CPLUS_INCLUDE_PATH")
     set(_lib_env_var "LIBRARY_PATH")
     if (WIN32)
-        set(_platform_sep ";")
+        set(_platform_sep "\;")
         set(_include_env_var "INCLUDE")
         set(_lib_env_var "LIB")
     endif()
@@ -80,7 +80,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\${_install_dir})
        ")
 
-    set(matplotlib_URL https://www.dropbox.com/s/qpvn3loqvsi8pq4/matplotlib-1.1.0.zip)
+    set(matplotlib_URL https://onedrive.live.com/download?resid=3DAFE2A24FA4A2EB!3490&authkey=!ACZo7JJo08mca88&ithint=file%2czip)
     #set(matplotlib_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/matplotlib-1.4.1.tar.gz)
     #set(matplotlib_MD5 "5c7b5349dc3161763f7f366ceb96516b")
     #set(matplotlib_MD5 "a1ed53432dbcd256398898d35bc8e645")
@@ -95,6 +95,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${matplotlib_URL}
+      DOWNLOAD_NAME matplotlib-1.1.0.zip
       #URL_MD5 ${matplotlib_MD5}
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
