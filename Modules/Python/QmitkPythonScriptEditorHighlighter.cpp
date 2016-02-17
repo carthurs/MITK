@@ -33,14 +33,14 @@ void QmitkPythonScriptEditorHighlighter::highlightBlock(const QString &text)
 
   QTextCharFormat keywordFormat;
   keywordFormat.setFontWeight(QFont::Bold);
-  keywordFormat.setForeground(Qt::blue);
+  keywordFormat.setForeground(QColor(138, 43, 226)); // BlueViolet
   QString pattern = "\\b(and|assert|break|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|not|or|pass|print|raise|return|try|while|yield|None|True|False)\\b";
 
   QTextCharFormat qouteFormat;
-  qouteFormat.setForeground(Qt::gray);
+  qouteFormat.setForeground(Qt::darkMagenta);
 
   QTextCharFormat numberFormat;
-  numberFormat.setForeground(Qt::red);
+  numberFormat.setForeground(QColor(165, 42, 42)); // Brown
 
   QRegExp numberExpression("\\d+");
   int indexNumbers = text.indexOf(numberExpression);

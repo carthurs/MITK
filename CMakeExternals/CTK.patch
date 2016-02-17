@@ -442,6 +442,26 @@ index 66f5240..547f5e6 100644
  
    QStringList initCode;
  
+diff --git a/Libs/Widgets/ctkConsole.cpp b/Libs/Widgets/ctkConsole.cpp
+index cad9211..308d090 100644
+--- a/Libs/Widgets/ctkConsole.cpp
++++ b/Libs/Widgets/ctkConsole.cpp
+@@ -108,12 +108,12 @@ void ctkConsolePrivate::init()
+   this->setAcceptRichText(false);
+   this->setUndoRedoEnabled(false);
+ 
+-  this->PromptColor = QColor(0, 0, 0);    // Black
++  this->PromptColor = QColor(Qt::gray);    
+   this->OutputTextColor = QColor(0, 150, 0);  // Green
+   this->ErrorTextColor = QColor(255, 0, 0);   // Red
+   this->StdinTextColor = QColor(Qt::darkGray);
+-  this->CommandTextColor = QColor(0, 0, 150); // Blue
+-  this->WelcomeTextColor = QColor(0, 0, 255); // Dark Blue
++  this->CommandTextColor = QColor(138, 43, 226); // BlueViolet
++  this->WelcomeTextColor = QColor(123, 104, 238); // MedumSlateBlue
+ 
+   QFont shellFont;
+   shellFont.setFamily("Courier");
 -- 
 1.8.4.msysgit.0
 
