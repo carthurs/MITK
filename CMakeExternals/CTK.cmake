@@ -75,10 +75,7 @@ if(MITK_USE_CTK)
       ENDIF()
     ENDFOREACH()
 
-    set(ctk_patch_command "")
-    if (WIN32)
-        set(ctk_patch_command ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
-    endif()
+   set(ctk_patch_command ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
 
    set(ctk_additional_c_flags)
    set(ctk_additional_cxx_flags)

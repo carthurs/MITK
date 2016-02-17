@@ -12,8 +12,17 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     set(${proj}_DEPENDENCIES Python Numpy matplotlib_ZLIB matplotlib_LIBPNG matplotlib_FREETYPE)
     set(matplotlib_DEPENDS ${proj})
     
-    string(REPLACE ${sep} ";" matplotlib_ZLIB_INCLUDE_DIR_semicolon ${matplotlib_ZLIB_INCLUDE_DIR})
-    string(REPLACE ${sep} ";" matplotlib_LIBPNG_INCLUDE_DIR_semicolon ${matplotlib_LIBPNG_INCLUDE_DIR})
+    set(_platform_sep ":")
+    set(_include_env_var "CPLUS_INCLUDE_PATH")
+    set(_lib_env_var "LIBRARY_PATH")
+    if (WIN32)
+        set(_platform_sep "\;")
+        set(_include_env_var "INCLUDE")
+        set(_lib_env_var "LIB")
+    endif()
+    
+    string(REPLACE ${sep} ${_platform_sep} matplotlib_ZLIB_INCLUDE_DIR__platform_sep ${matplotlib_ZLIB_INCLUDE_DIR})
+    string(REPLACE ${sep} ${_platform_sep} matplotlib_LIBPNG_INCLUDE_DIR__platform_sep ${matplotlib_LIBPNG_INCLUDE_DIR})
     
     # setup build environment and disable fortran, blas and lapack
     set(_matplotlib_env
@@ -30,8 +39,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{CFLAGS} \"${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}\")
         set(ENV{CXX} \"${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}\")
         set(ENV{CXXFLAGS} \"${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}\")
-        set(ENV{INCLUDE} \"${matplotlib_ZLIB_INCLUDE_DIR_semicolon};${matplotlib_LIBPNG_INCLUDE_DIR_semicolon};${matplotlib_FREETYPE_INCLUDE_DIR}\")
-        set(ENV{LIB} \"${matplotlib_ZLIB_LIBRARY_DIR};${matplotlib_LIBPNG_LIBRARY_DIR};${matplotlib_FREETYPE_LIBRARY_DIR}\")
+        set(ENV{${_include_env_var}} \"${matplotlib_ZLIB_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}/freetype2\")
+        set(ENV{${_lib_env_var}} \"${matplotlib_ZLIB_LIBRARY_DIR}${_platform_sep}${matplotlib_LIBPNG_LIBRARY_DIR}${_platform_sep}${matplotlib_FREETYPE_LIBRARY_DIR}\")
         ")
 
     set(_matplotlib_build_step ${MITK_SOURCE_DIR}/CMake/mitkFunctionExternalPythonBuildStep.cmake)
@@ -71,7 +80,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\${_install_dir})
        ")
 
-    set(matplotlib_URL https://www.dropbox.com/s/qpvn3loqvsi8pq4/matplotlib-1.1.0.zip)
+    set(matplotlib_URL https://onedrive.live.com/download?resid=3DAFE2A24FA4A2EB!3490&authkey=!ACZo7JJo08mca88&ithint=file%2czip)
     #set(matplotlib_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/matplotlib-1.4.1.tar.gz)
     #set(matplotlib_MD5 "5c7b5349dc3161763f7f366ceb96516b")
     #set(matplotlib_MD5 "a1ed53432dbcd256398898d35bc8e645")
@@ -86,6 +95,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${matplotlib_URL}
+      DOWNLOAD_NAME matplotlib-1.1.0.zip
       #URL_MD5 ${matplotlib_MD5}
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
