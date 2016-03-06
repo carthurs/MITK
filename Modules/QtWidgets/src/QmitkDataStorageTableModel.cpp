@@ -379,7 +379,13 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
 
     if(index.column() == 0)
     {
-      node->SetStringProperty("name", value.toString().toStdString().c_str());
+      auto name = value.toString().toStdString();
+      node->SetStringProperty("name", name.c_str());
+      auto propagateNameToData = false;
+      node->GetBoolProperty("propagate_name_to_data", propagateNameToData);
+      if (propagateNameToData && node->GetData() != nullptr) {
+        node->GetData()->GetPropertyList()->SetStringProperty("name", name.c_str());
+      }
     }
     else if(index.column() == 2)
     {

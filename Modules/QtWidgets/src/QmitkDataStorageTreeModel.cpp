@@ -599,7 +599,13 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
 
   if(role == Qt::EditRole && !value.toString().isEmpty())
   {
-    dataNode->SetStringProperty("name", value.toString().toStdString().c_str());
+    auto name = value.toString().toStdString();
+    dataNode->SetStringProperty("name", name.c_str());
+    auto propagateNameToData = false;
+    dataNode->GetBoolProperty("propagate_name_to_data", propagateNameToData);
+    if (propagateNameToData && dataNode->GetData() != nullptr) {
+        dataNode->GetData()->GetPropertyList()->SetStringProperty("name", name.c_str());
+    }
 
     mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(dataNode->GetData());
 
