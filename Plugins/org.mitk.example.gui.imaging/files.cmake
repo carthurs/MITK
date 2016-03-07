@@ -25,7 +25,7 @@ set(UI_FILES
   src/internal/simplemeasurement/QmitkSimpleMeasurementControls.ui
   src/internal/viewinitialization/QmitkViewInitializationViewControls.ui
   src/internal/volumetry/QmitkVolumetryViewControls.ui
-  #src/internal/surfaceutilities/QmitkSurfaceUtilitiesControls.ui
+  src/internal/surfaceutilities/QmitkSurfaceUtilitiesControls.ui
   src/internal/curvedmpr/QmitkCurvedMPRViewControls.ui
 )
 
