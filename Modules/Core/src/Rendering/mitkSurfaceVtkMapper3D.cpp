@@ -327,6 +327,8 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
 
     if(scalarVisibility)
     {
+      ls->m_VtkPolyDataMapper->ColorByArrayComponent(-1, -1); // To allow vtkScalarsToColors to handle multi-component data
+        
       mitk::VtkScalarModeProperty* scalarMode;
       if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
         ls->m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
