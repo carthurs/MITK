@@ -51,6 +51,8 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
 
   m_VtkTriangleFilter = vtkDataSetTriangleFilter::New();
   m_ExtractGeometryFilter = vtkExtractGeometry::New();
+  m_ClipDataSetFilter = vtkClipDataSet::New();
+  m_ClipDataSetFilter->InsideOutOn();
 
   m_Assembly = vtkAssembly::New();
 
@@ -195,10 +197,13 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       }
 
       m_ExtractGeometryFilter->ExtractBoundaryCellsOn();
+
       if (planes->GetPoints()->GetNumberOfPoints() > 0) {
           m_ExtractGeometryFilter->SetImplicitFunction(planes.Get());
+          m_ClipDataSetFilter->SetClipFunction(planes.Get());
       } else {
           m_ExtractGeometryFilter->SetImplicitFunction(nullptr);
+          m_ClipDataSetFilter->SetClipFunction(nullptr);
       }
   }
 
@@ -226,12 +231,20 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
     return;
   }
 
-  if (m_ExtractGeometryFilter->GetImplicitFunction() != nullptr) {
-      m_ExtractGeometryFilter->SetInputData(grid);
-      m_ExtractGeometryFilter->Update();
-      m_VtkTriangleFilter->SetInputData(m_ExtractGeometryFilter->GetOutput());
-      m_VtkDataSetMapper->SetInput(m_ExtractGeometryFilter->GetOutput());
-      m_VtkDataSetMapper2->SetInput(m_ExtractGeometryFilter->GetOutput());
+  bool hasClippingFunction = m_ExtractGeometryFilter->GetImplicitFunction() != nullptr;
+  if (hasClippingFunction) {
+
+      std::string sliceTypeProp = "Clip";
+      node->GetStringProperty("SliceType", sliceTypeProp, renderer);
+
+      vtkUnstructuredGridAlgorithm* clippingAlgorithm = sliceTypeProp == "Clip" ?
+          static_cast<vtkUnstructuredGridAlgorithm*>(m_ClipDataSetFilter.Get()) : 
+          static_cast<vtkUnstructuredGridAlgorithm*>(m_ExtractGeometryFilter.Get());
+      clippingAlgorithm->SetInputData(grid);
+      clippingAlgorithm->Update();
+      m_VtkTriangleFilter->SetInputData(clippingAlgorithm->GetOutput());
+      m_VtkDataSetMapper->SetInput(clippingAlgorithm->GetOutput());
+      m_VtkDataSetMapper2->SetInput(clippingAlgorithm->GetOutput());
   } else {
       m_VtkTriangleFilter->SetInputData(grid);
       m_VtkDataSetMapper->SetInput(grid);

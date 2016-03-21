@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkSmartPointer.h>
 #include <vtkExtractGeometry.h>
+#include <vtkClipDataSet.h>
 
 
 
@@ -83,6 +84,7 @@ protected:
 
   vtkDataSetTriangleFilter* m_VtkTriangleFilter;
   vtkSmartPointer<vtkExtractGeometry> m_ExtractGeometryFilter;
+  vtkSmartPointer<vtkClipDataSet> m_ClipDataSetFilter;
 
   vtkUnstructuredGridMapper* m_VtkDataSetMapper;
   vtkUnstructuredGridMapper* m_VtkDataSetMapper2;
