@@ -82,6 +82,7 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
       pointel->SetDoubleAttribute("sharpness", myVal[5]);
       pointlist->LinkEndChild( pointel );
     }
+    pointlist->SetAttribute("colorspace", ctf->GetColorSpace());
     element->LinkEndChild( pointlist );
     return element;
   }
@@ -166,6 +167,11 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   vtkColorTransferFunction* ctf = tf->GetColorTransferFunction();
   if (ctf == nullptr)
     return nullptr;
+
+  int colorspace;
+  if (rgbPointlist->QueryIntAttribute("colorspace", &colorspace) == TIXML_SUCCESS) {
+      ctf->SetColorSpace(colorspace);
+  }
 
   ctf->RemoveAllPoints();
 

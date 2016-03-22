@@ -42,6 +42,11 @@ public:
     update();
   }
 
+  vtkColorTransferFunction* GetColorTransferFunction() const
+  {
+      return this->m_ColorTransferFunction;
+  }
+
   int AddFunctionPoint(double x, double) override
   {
     return m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
