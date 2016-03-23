@@ -101,6 +101,10 @@ bool TransferFunction::operator==(Self& other)
     if (equal == false)
       return false;
   }
+  if (m_ColorTransferFunction->GetColorSpace() != other.m_ColorTransferFunction->GetColorSpace()) {
+      return false;
+  }
+
   for (int i = 0; i < m_ColorTransferFunction->GetSize(); i++ )
   {
     double myVal[6];
