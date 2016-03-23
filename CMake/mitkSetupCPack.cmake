@@ -11,7 +11,7 @@ if(NOT CPACK_GENERATOR)
     if(NOT NSIS_MAKENSIS)
       set(CPACK_GENERATOR ZIP)
     else()
-      set(CPACK_GENERATOR "NSIS;ZIP")
+      set(CPACK_GENERATOR NSIS)
 
     endif(NOT NSIS_MAKENSIS)
   else()
