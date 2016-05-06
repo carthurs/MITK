@@ -193,7 +193,9 @@ QString QmitkIOUtil::Save(const mitk::BaseData* data, const QString& defaultBase
   dataVector.push_back(data);
   QStringList defaultBaseNames;
   defaultBaseNames.push_back(defaultBaseName);
-  return Save(dataVector, defaultBaseNames, defaultPath, parent).back();
+
+  QStringList ret = Save(dataVector, defaultBaseNames, defaultPath, parent);
+  return ret.isEmpty() ? QString{} : ret.back();
 }
 
 QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
