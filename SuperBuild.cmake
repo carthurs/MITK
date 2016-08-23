@@ -50,21 +50,6 @@ if(NOT PATCH_COMMAND)
 endif()
 
 #-----------------------------------------------------------------------------
-# Qt options for external projects and MITK
-#-----------------------------------------------------------------------------
-
-if(MITK_USE_QT)
-  set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
-else()
-  set(qt_project_args )
-endif()
-
-if(MITK_USE_Qt4)
-  list(APPEND qt_project_args
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
-endif()
-
-#-----------------------------------------------------------------------------
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
@@ -95,12 +80,10 @@ foreach(proj ${nice_external_projects})
   endif()
 endforeach()
 
-if(MITK_USE_Boost)
-  set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
-  mark_as_advanced(EXTERNAL_BOOST_ROOT)
-  if(EXTERNAL_BOOST_ROOT)
-    set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
-  endif()
+set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+mark_as_advanced(EXTERNAL_BOOST_ROOT)
+if(EXTERNAL_BOOST_ROOT)
+  set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
 # Setup file for setting custom ctest vars
@@ -172,7 +155,6 @@ set(ep_common_args
   -DCMAKE_CXX_EXTENSIONS:STRING=${CMAKE_CXX_EXTENSIONS}
   -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
   -DCMAKE_CXX_STANDARD_REQUIRED:BOOL=${CMAKE_CXX_STANDARD_REQUIRED}
-  -DCMAKE_DEBUG_POSTFIX:STRING=d
   -DCMAKE_MACOSX_RPATH:BOOL=TRUE
   "-DCMAKE_INSTALL_RPATH:STRING=${_install_rpath}"
   -DBUILD_TESTING:BOOL=OFF
@@ -197,6 +179,14 @@ set(ep_common_args
   -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
+
+set(DCMTK_CMAKE_DEBUG_POSTFIX )
+
+# python libraries wont work with it
+if(NOT MITK_USE_Python)
+  list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
+  set(DCMTK_CMAKE_DEBUG_POSTFIX d)
+endif()
 
 set(ep_common_cache_args
 )
@@ -384,7 +374,6 @@ ExternalProject_Add(${proj}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
     -DMITK_WHITELISTS_EXTERNAL_PATH:STRING=${MITK_WHITELISTS_EXTERNAL_PATH}
     -DMITK_WHITELISTS_INTERNAL_PATH:STRING=${MITK_WHITELISTS_INTERNAL_PATH}
-    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
@@ -395,7 +384,7 @@ ExternalProject_Add(${proj}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}
     -DCppMicroServices_DIR:PATH=${CppMicroServices_DIR}
     -DMITK_KWSTYLE_EXECUTABLE:FILEPATH=${MITK_KWSTYLE_EXECUTABLE}
-    -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+    -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=${DCMTK_CMAKE_DEBUG_POSTFIX}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}

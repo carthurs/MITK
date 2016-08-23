@@ -53,8 +53,8 @@ namespace
   class SimpleInterval {
   public:
     SimpleInterval(T start = T(), T end = T())
-      :  m_LowerBoundary{std::min(start, end)}
-      ,  m_UpperBoundary{std::max(start, end)}
+      :  m_LowerBoundary(std::min(start, end))
+      ,  m_UpperBoundary(std::max(start, end))
     {
 
     }
@@ -77,11 +77,11 @@ namespace
   template<typename T>
   class IntervalSet {
   public:
-    using IntervalType = SimpleInterval<T>;
+    typedef SimpleInterval<T> IntervalType;
 
     IntervalSet(IntervalType startingInterval)
     {
-      m_IntervalsContainer.emplace(std::move(startingInterval));
+      m_IntervalsContainer.insert(std::move(startingInterval));
     }
 
     void operator-=(const IntervalType& interval)
@@ -102,7 +102,7 @@ namespace
             // Add the new interval to the set
             // emplace_hint adds the element at the closest valid place before the hint iterator,
             //   which is exactly where the new interval should be
-            iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
+            iter = m_IntervalsContainer.insert(iter, std::move(interval));
             ++iter;
           }
         }
@@ -116,7 +116,7 @@ namespace
       return result;
     }
 
-    using IntervalsContainer = std::set<IntervalType>;
+    typedef std::set<IntervalType> IntervalsContainer;
 
     const IntervalsContainer& getIntervals() const
     {
@@ -134,18 +134,21 @@ namespace
       {
         if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
         {
-          return {IntervalType{}, IntervalType{}} ; // firstInterval completely enclosed
+          std::array<IntervalType, 2> result = { { IntervalType(), IntervalType() } };
+      return result; // firstInterval completely enclosed
         }
-        return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} }; // secondInterval removes the beginning of firstInterval
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary()), IntervalType() } };
+    return result; // secondInterval removes the beginning of firstInterval
       }
 
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-        return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} }; // secondInterval removes the end of firstInterval
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()), IntervalType() } };
+      return result; // secondInterval removes the end of firstInterval
       }
-
-      return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
-        IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } }; // secondInterval is completely enclosed in firstInterval and removes the middle
+      std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()),
+        IntervalType(secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary()) } };
+      return result; // secondInterval is completely enclosed in firstInterval and removes the middle
     }
   };
 }
@@ -297,52 +300,52 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       otherPlanesIt = m_OtherPlaneGeometries.begin();
-      int gapsize = 32;
-      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapsize, NULL);
+      int gapSize = 32;
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
 
 
-      auto intervals = IntervalSet<double>{{0, 1}};
+      auto intervals = IntervalSet<double>( SimpleInterval<double>(0, 1));
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
-      DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+      ScalarType gapInMM = gapSize * renderer->GetScaleFactorMMPerDisplayUnit();
+      float gapSizeParam = gapInMM / lineLength;
 
-      ScalarType gapinmm = gapsize * displayGeometry->GetScaleFactorMMPerDisplayUnit();
-
-      float gapSizeParam = gapinmm / lineLength;
-
-      while ( otherPlanesIt != otherPlanesEnd )
+      if( gapSize != 0 )
       {
-        bool ignorePlane = false;
-        (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
-        if (ignorePlane)
+        while ( otherPlanesIt != otherPlanesEnd )
         {
-            ++otherPlanesIt;
-            continue;
-        }
+          bool ignorePlane = false;
+          (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
+          if (ignorePlane)
+          {
+              ++otherPlanesIt;
+              continue;
+          }
 
-        PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
-              static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
+          PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
+                static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
-        if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
-        {
-            double intersectionParam;
-            if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
-                intersectionParam < 1)
-            {
-              Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
-
-              bool intersectionPointInsideOtherPlane =
-                otherPlaneGeometry->HasReferenceGeometry() ?
-                  TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
-                  TestPointInPlaneGeometry(otherPlaneGeometry, point);
-
-              if (intersectionPointInsideOtherPlane)
+          if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
+          {
+              double intersectionParam;
+              if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
+                  intersectionParam < 1)
               {
-                intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
+                Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
+
+                bool intersectionPointInsideOtherPlane =
+                  otherPlaneGeometry->HasReferenceGeometry() ?
+                    TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
+                    TestPointInPlaneGeometry(otherPlaneGeometry, point);
+
+                if (intersectionPointInsideOtherPlane)
+                {
+                  intervals -= SimpleInterval<double>(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
+                }
               }
-            }
+          }
+          ++otherPlanesIt;
         }
-        ++otherPlanesIt;
       }
 
       for (const auto& interval : intervals.getIntervals()) {
@@ -388,7 +391,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       ls->m_Arrowmapper->SetInputData(arrowPolyData);
       if(this->m_RenderOrientationArrows)
       {
-        ScalarType triangleSizeMM = 7.0 * displayGeometry->GetScaleFactorMMPerDisplayUnit();
+        ScalarType triangleSizeMM = 7.0 * renderer->GetScaleFactorMMPerDisplayUnit();
 
         vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> triPoints = vtkSmartPointer<vtkPoints>::New();

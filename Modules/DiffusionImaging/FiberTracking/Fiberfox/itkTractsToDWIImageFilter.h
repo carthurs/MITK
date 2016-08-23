@@ -52,7 +52,6 @@ public:
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
-    typedef itk::VectorImage< double, 4 >                               DoubleDwiType4D;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
@@ -65,6 +64,7 @@ public:
 
     /** Input */
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
+    itkSetMacro( InputImage, typename OutputImageType::Pointer )     ///< Input diffusion-weighted image. If no fiber bundle is set, then the acquisition is simulated for this image without a new diffusion simulation.
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
@@ -92,6 +92,8 @@ protected:
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
     double RoundToNearest(double num);
     std::string GetTime();
+    bool PrepareLogFile();  /** Prepares the log file and returns true if successful or false if failed. */
+    void PrintToLog(string m, bool addTime=true, bool linebreak=true, bool stdOut=true);
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts/effects. */
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
@@ -111,6 +113,7 @@ protected:
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
     FiberBundleType                             m_FiberBundle;
+    typename OutputImageType::Pointer           m_InputImage;
 
     // output
     typename OutputImageType::Pointer           m_OutputImage;
@@ -124,7 +127,9 @@ protected:
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
     bool                                        m_MaskImageSet;
-    ofstream                                    m_MotionLogfile;
+    ofstream                                    m_Logfile;
+    std::string                                 m_MotionLog;
+    std::string                                 m_SpikeLog;
 
     // signal generation
     FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle

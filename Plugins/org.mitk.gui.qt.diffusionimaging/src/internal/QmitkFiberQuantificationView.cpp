@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
 #include <mitkPlanarFigureInteractor.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkDataNodeObject.h>
 #include <mitkTensorImage.h>
@@ -245,6 +244,26 @@ void QmitkFiberQuantificationView::GenerateStats()
             stats += "Mean length:         "+ QString::number(fib->GetMeanFiberLength(),'f',1) + " mm\n";
             stats += "Median length:       "+ QString::number(fib->GetMedianFiberLength(),'f',1) + " mm\n";
             stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
+
+            vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fib->GetFiberPolyData()->GetCellData()->GetArray("FIBER_WEIGHTS"));
+            if (weights!=NULL)
+            {
+                stats += "Detected fiber weights:\n";
+                float weight=-1;
+                int c = 0;
+                for (int i=0; i<weights->GetSize(); i++)
+                    if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
+                    {
+                        c++;
+                        if (weight>0)
+                            stats += QString::number(i) + ":  "+ QString::number(weights->GetValue(i)) + "\n";
+                        stats += QString::number(c) + ". Fibers " + QString::number(i+1) + "-";
+                        weight = weights->GetValue(i);
+                    }
+                stats += QString::number(weights->GetSize()) + ":  "+ QString::number(weight) + "\n";
+            }
+            else
+                stats += "No fiber weight array found.\n";
         }
     }
     this->m_Controls->m_StatsTextEdit->setText(stats);

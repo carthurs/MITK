@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 
 /*!
-\brief
+\brief View to perform machine learning based fiber tractography. Includes training of the random forst classifier as well as the actual tractography.
 */
 
 // Forward Qt class declarations
@@ -51,7 +51,7 @@ public:
   static const std::string VIEW_ID;
 
   typedef itk::Image<unsigned char, 3>      ItkUcharImgType;
-  typedef itk::MLBSTrackingFilter<100>      TrackerType;
+  typedef itk::MLBSTrackingFilter<>         TrackerType;
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();
@@ -101,6 +101,10 @@ protected:
   std::vector< std::shared_ptr<QmitkMlbstTrainingDataWidget> > m_TrainingWidgets;
 
 private:
+
+  bool IsTrainingInputValid(void) const;
+
+  std::string m_LastLoadedForestName;
 
  };
 

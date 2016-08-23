@@ -51,6 +51,7 @@ QmitkMLBTView::QmitkMLBTView()
     , m_MultiWidget( NULL )
 {
     m_TrackingTimer = std::make_shared<QTimer>(this);
+    m_LastLoadedForestName = "(none)";
 }
 
 // Destructor
@@ -81,10 +82,6 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_AbortTrackingButton, SIGNAL ( clicked() ), this, SLOT( AbortTracking() ) );
         connect( m_Controls->m_AddTwButton, SIGNAL ( clicked() ), this, SLOT( AddTrainingWidget() ) );
         connect( m_Controls->m_RemoveTwButton, SIGNAL ( clicked() ), this, SLOT( RemoveTrainingWidget() ) );
-
-        int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
-        m_Controls->m_NumberOfThreadsBox->setMaximum(numThread);
-        m_Controls->m_NumberOfThreadsBox->setValue(numThread);
 
         m_Controls->m_TrackingMaskImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingSeedImageBox->SetDataStorage(this->GetDataStorage());
@@ -133,7 +130,8 @@ void QmitkMLBTView::UpdateGui()
 {
     if (m_ForestHandler.IsForestValid())
     {
-        m_Controls->statusLabel->setText("Random forest available");
+        std::string label_text="Random forest available: "+m_LastLoadedForestName;
+        m_Controls->statusLabel->setText( QString(label_text.c_str()) );
         m_Controls->m_SaveForestButton->setEnabled(true);
         m_Controls->m_StartTrackingButton->setEnabled(true);
     }
@@ -202,6 +200,9 @@ void QmitkMLBTView::LoadForest()
         return;
 
     m_ForestHandler.LoadForest( filename.toStdString() );
+    QFileInfo fi( filename );
+    m_LastLoadedForestName = QString( fi.baseName() + "." + fi.completeSuffix() ).toStdString();
+
     UpdateGui();
 }
 
@@ -272,8 +273,9 @@ void QmitkMLBTView::StartTracking()
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
     m_ForestHandler.AddRawData(dwi);
 
+//    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+
     tracker = TrackerType::New();
-    tracker->SetNumberOfThreads(m_Controls->m_NumberOfThreadsBox->value());
     tracker->SetInput(0,  mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi) );
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
     if (m_Controls->m_DemoModeBox->isChecked())
@@ -332,6 +334,12 @@ void QmitkMLBTView::SaveForest()
 
 void QmitkMLBTView::StartTrainingThread()
 {
+    if (!this->IsTrainingInputValid())
+    {
+        QMessageBox::warning(nullptr, "Training aborted", "Training could not be started. Not all necessary datasets were selected.");
+        return;
+    }
+
     QFuture<void> future = QtConcurrent::run( this, &QmitkMLBTView::StartTraining );
     m_TrainingWatcher.setFuture(future);
     m_Controls->m_StartTrainingButton->setEnabled(false);
@@ -356,12 +364,6 @@ void QmitkMLBTView::StartTraining()
 
     for (auto w : m_TrainingWidgets)
     {
-        if ( w->GetImage().IsNull() || w->GetFibers().IsNull() )
-        {
-            QMessageBox::information(nullptr, "Warning", "Training could not be started. Not all necessary datasets were selected.");
-            return;
-        }
-
         m_SelectedDiffImages.push_back(dynamic_cast<mitk::Image*>(w->GetImage()->GetData()));
         m_SelectedFB.push_back(dynamic_cast<mitk::FiberBundle*>(w->GetFibers()->GetData()));
 
@@ -414,4 +416,15 @@ void QmitkMLBTView::Activated()
 
 }
 
+bool QmitkMLBTView::IsTrainingInputValid(void) const
+{
+  for (auto widget : m_TrainingWidgets)
+  {
+    if (widget->GetImage().IsNull() || widget->GetFibers().IsNull())
+    {
+      return false;
+    }
+  }
 
+  return true;
+}

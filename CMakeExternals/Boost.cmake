@@ -2,7 +2,7 @@
 # Boost
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_Boost)
+include(mitkFunctionGetMSVCVersion)
 
   # Sanity checks
   if(DEFINED BOOST_ROOT AND NOT EXISTS ${BOOST_ROOT})
@@ -18,7 +18,7 @@ if(MITK_USE_Boost)
 
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-    set(_boost_version 1_58)
+  set(_boost_version 1_59)
     set(_boost_install_include_dir include/boost)
     if(WIN32)
       set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -48,17 +48,10 @@ if(MITK_USE_Boost)
       set(_shell_extension .bat)
       set(_boost_layout)
       if(MSVC)
-        if(MSVC_VERSION EQUAL 1600)
-          set(_boost_with_toolset "vc10")
-          set(_boost_toolset "msvc-10.0")
-        elseif(MSVC_VERSION EQUAL 1700)
-          set(_boost_with_toolset "vc11")
-          set(_boost_toolset "msvc-11.0")
-        elseif(MSVC_VERSION EQUAL 1800)
-          set(_boost_with_toolset "vc12")
-          set(_boost_toolset "msvc-12.0")
+      mitkFunctionGetMSVCVersion()
+      set(_boost_with_toolset "vc${VISUAL_STUDIO_VERSION_MAJOR}")
+      set(_boost_toolset "msvc-${VISUAL_STUDIO_VERSION_MAJOR}.0")
         endif()
-      endif()
       set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
       set(WIN32_CMAKE_SCRIPT ${ep_prefix}/src/${proj}-cmake/MoveBoostLibsToLibDirForWindows.cmake)
       configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/MoveBoostLibsToLibDirForWindows.cmake.in ${WIN32_CMAKE_SCRIPT} @ONLY)
@@ -143,9 +136,9 @@ if(MITK_USE_Boost)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL https://onedrive.live.com/download?resid=3DAFE2A24FA4A2EB!3493&authkey=!ACo2h7oppf2HZic&ithint=file%2cbz2
-      DOWNLOAD_NAME boost_1_58_0.tar.bz2
-      # URL_MD5 a744cf167b05d72335f27c88115f211d
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
+    URL_MD5 6aa9a5c6a4ca1016edd0ed1178e3cb87
+    # We use in-source builds for Boost
       # We use in-source builds for Boost
       BINARY_DIR ${ep_prefix}/src/${proj}
       CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
@@ -200,5 +193,3 @@ if(MITK_USE_Boost)
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 
   endif()
-
-endif()

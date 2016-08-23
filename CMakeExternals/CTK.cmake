@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 4d12a3b8)
+    set(revision_tag b721b7ca)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -48,8 +48,12 @@ if(MITK_USE_CTK)
     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
+          )
+      if(NOT MITK_USE_Python)
+        list(APPEND ctk_optional_cache_args
            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
           )
+      endif()
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()
       list(APPEND ctk_optional_cache_args
@@ -61,12 +65,6 @@ if(MITK_USE_CTK)
       list(APPEND ctk_optional_cache_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
-    endif()
-
-    set (ctk_qt_args -DCTK_QT_VERSION:STRING=${DESIRED_QT_VERSION})
-
-    if (DESIRED_QT_VERSION MATCHES "4")
-      list(APPEND ctk_qt_args -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
     endif()
 
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
@@ -87,9 +85,9 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 135910e407bd1f5de29d2a0a9efe5f80
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
+      URL_MD5 9ebeb78c78ff9f458045e0a5ecffc73f
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       PATCH_COMMAND ${ctk_patch_command}
@@ -97,13 +95,13 @@ if(MITK_USE_CTK)
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
-        ${ctk_qt_args}
        -DADDITIONAL_C_FLAGS:STRING=${ctk_additional_c_flags}
        -DADDITIONAL_CXX_FLAGS:STRING=${ctk_additional_cxx_flags}
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
+        -DCTK_QT_VERSION:STRING=5
         -DPYTHONQT_DEBUG_POSTFIX:STRING=d # for PythonQt
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
@@ -116,7 +114,7 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
+        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_c5e4c2a7.tar.gz
         # See bug 19073
         -DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
         -DPythonQt_REVISION_TAG:STRING=origin/patched-5

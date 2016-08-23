@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
+#include <vtkPolyLine.h>
 #include <vtkProperty.h>
 #include "mitkSurface.h"
 
@@ -52,46 +53,64 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModelSet* contourSet = static_cast< mitk::ContourModelSet* >( GetDataNode()->GetData() );
+  ContourModelSet* contourModelSet = dynamic_cast<ContourModelSet*>(this->GetDataNode()->GetData());
 
-  mitk::ContourModelSet::ContourModelSetIterator it = contourSet->Begin();
-  mitk::ContourModelSet::ContourModelSetIterator end = contourSet->End();
+  if (contourModelSet != NULL)
+  {
+      vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+      vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+      vtkIdType baseIndex = 0;
+
+      ContourModelSet::ContourModelSetIterator it = contourModelSet->Begin();
+      ContourModelSet::ContourModelSetIterator end = contourModelSet->End();
 
   while(it!=end)
   {
-    mitk::ContourModel* inputContour  = it->GetPointer();
-    vtkSmartPointer<vtkPolyData> polyData = this->CreateVtkPolyDataFromContour(inputContour, renderer);
+        ContourModel* contourModel = it->GetPointer();
 
-    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-    tubeFilter->SetInputData(polyData);
+        ContourModel::VertexIterator vertIt = contourModel->Begin();
+        ContourModel::VertexIterator vertEnd = contourModel->End();
 
-    float lineWidth(1.0);
-    if (this->GetDataNode()->GetFloatProperty( "contour.3D.width", lineWidth, renderer ))
+        while (vertIt != vertEnd)
     {
-      tubeFilter->SetRadius(lineWidth);
-    }else
-    {
-      tubeFilter->SetRadius(0.5);
+          points->InsertNextPoint((*vertIt)->Coordinates[0], (*vertIt)->Coordinates[1], (*vertIt)->Coordinates[2]);
+          ++vertIt;
     }
-    tubeFilter->CappingOn();
-    tubeFilter->SetNumberOfSides(10);
-    tubeFilter->Update();
 
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
+        vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
+        vtkIdList* pointIds = line->GetPointIds();
 
-    //mapper->SetInputConnection(tubeFilter->GetOutputPort());
+        vtkIdType numPoints = contourModel->GetNumberOfVertices();
+        pointIds->SetNumberOfIds(numPoints + 1);
+
+        for (vtkIdType i = 0; i < numPoints; ++i)
+          pointIds->SetId(i, baseIndex + i);
     mapper->SetInputData(polyData);
 
-    localStorage->m_Assembly->AddPart(actor);
+        pointIds->SetId(numPoints, baseIndex);
+
+        cells->InsertNextCell(line);
+
+        baseIndex += numPoints;
+
 
     ++it;
   }
 
+      vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+      polyData->SetPoints(points);
+      polyData->SetLines(cells);
 
+      vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+      vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+      actor->SetMapper(mapper);
+
+      mapper->SetInputData(polyData);
+
+      localStorage->m_Assembly->AddPart(actor);
+}
   this->ApplyContourProperties(renderer);
-
+  this->ApplyContourModelSetProperties(renderer);
 }
 
 
@@ -154,7 +173,25 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelSetMapper3D::CreateVtkPolyDataFro
   return polyData;
 }
 
+void mitk::ContourModelSetMapper3D::ApplyContourModelSetProperties(BaseRenderer* renderer)
+{
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+  DataNode* dataNode = this->GetDataNode();
 
+  if (dataNode != NULL)
+  {
+    float lineWidth = 1;
+    dataNode->GetFloatProperty("contour.3D.width", lineWidth, renderer);
+
+    vtkSmartPointer<vtkPropCollection> collection = vtkSmartPointer<vtkPropCollection>::New();
+    localStorage->m_Assembly->GetActors(collection);
+    collection->InitTraversal();
+    for(vtkIdType i = 0; i < collection->GetNumberOfItems(); i++)
+    {
+      vtkActor::SafeDownCast(collection->GetNextProp())->GetProperty()->SetLineWidth(lineWidth);
+    }
+  }
+}
 
 void mitk::ContourModelSetMapper3D::ApplyContourProperties(mitk::BaseRenderer* renderer)
 {

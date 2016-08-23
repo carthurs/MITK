@@ -50,7 +50,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       // Indices
       unsigned int index, indexPrev, indexNext, indexNextNext;
 
-      unsigned int numberOfPoints = subdivisionPoints.size();
+      const unsigned int numberOfPoints = subdivisionPoints.size();
 
       Point2D newPoint;
 
@@ -72,11 +72,11 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       }
 
       ControlPointListType mergedSubdivisionPoints;
-      ControlPointListType::iterator it, itNew;
+      ControlPointListType::const_iterator it, itNew;
 
 
-      for ( it = subdivisionPoints.begin() , itNew = newSubdivisionPoints.begin();
-            it != subdivisionPoints.end();
+      for ( it = subdivisionPoints.cbegin() , itNew = newSubdivisionPoints.cbegin();
+            it != subdivisionPoints.cend();
             ++it, ++itNew )
       {
         mergedSubdivisionPoints.push_back( *it );
@@ -94,9 +94,9 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   unsigned int prevIndex = 0;
   m_PolyLineSegmentInfo.clear();
   unsigned int i;
-  ControlPointListType::iterator it;
-  for ( it = subdivisionPoints.begin(), i = 0;
-        it != subdivisionPoints.end();
+  ControlPointListType::const_iterator it;
+  for ( it = subdivisionPoints.cbegin(), i = 0;
+        it != subdivisionPoints.cend();
         ++it, ++i )
   {
     unsigned int nextIndex;
@@ -157,3 +157,31 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
      return false;
    }
  }
+
+
+int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
+{
+  const mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
+
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
+    return -1;
+
+  mitk::PlanarFigure::ControlPointListType::const_iterator elem;
+  mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
+  mitk::PlanarFigure::ControlPointListType::const_iterator end = m_ControlPoints.cend();
+
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter;
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.cend();
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
+  polyLineStart += indexOfPolylinePoint;
+
+  for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)
+  {
+    elem = std::find(first, end, *polyLineIter);
+
+    if (elem != end)
+      return std::distance(first, elem);
+  }
+
+  return GetNumberOfControlPoints();
+}

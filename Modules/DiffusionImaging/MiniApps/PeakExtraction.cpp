@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
+using namespace std;
+
 template<int shOrder>
 int StartPeakExtraction(int argc, char* argv[])
 {
@@ -334,6 +336,9 @@ int StartPeakExtraction(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
+/*!
+\brief Extract maxima in the input spherical harmonics image.
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
@@ -351,7 +356,7 @@ int main(int argc, char* argv[])
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Peak Extraction");
-    parser.setDescription("");
+    parser.setDescription("Extract maxima in the input spherical harmonics image.");
     parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

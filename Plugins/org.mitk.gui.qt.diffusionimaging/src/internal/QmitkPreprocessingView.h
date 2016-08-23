@@ -40,7 +40,7 @@ struct PrpSelListener;
 /*!
  * \ingroup org_mitk_gui_qt_preprocessing_internal
  *
- * \brief QmitkPreprocessingView
+ * \brief Viewing and modifying diffusion weighted images (gradient reduction, resampling, b-value projection, ...)
  *
  * Document your class here.
  *
@@ -76,6 +76,8 @@ class QmitkPreprocessingView : public QmitkFunctionality
   virtual void Activated() override;
 
   virtual void Deactivated() override;
+
+  virtual void Visible() override;
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
   virtual void StdMultiWidgetNotAvailable() override;
@@ -126,6 +128,9 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension >
   void TemplatedUpdateGui( itk::Image<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedUpdateGui( itk::VectorImage<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >
   void TemplatedResampleImage( itk::Image<TPixel, VImageDimension>* itkImage);

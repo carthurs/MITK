@@ -49,12 +49,6 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
-    enum DiffusionDirectionMode : int {
-        FIBER_TANGENT_DIRECTIONS,
-        MAIN_FIBER_DIRECTIONS,
-        RANDOM_DIRECTIONS
-    };
-
     enum CoilSensitivityProfile : int {
         COIL_CONSTANT,
         COIL_LINEAR,
@@ -82,8 +76,6 @@ public:
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
         , m_DoDisablePartialVolume(false)
-        , m_DiffusionDirectionMode(SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS)
-        , m_FiberSeparationThreshold(30)
         , m_Spikes(0)
         , m_SpikeAmplitude(1)
         , m_KspaceLineOffset(0)
@@ -116,7 +108,7 @@ public:
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
-    AcquisitionType                     m_AcquisitionType;            ///< determines k-space trajectory and maximum echo position(s)
+    AcquisitionType                     m_AcquisitionType;          ///< determines k-space trajectory and maximum echo position(s)
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tRep;                     ///< Echo time TR.
@@ -131,8 +123,6 @@ public:
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
-    DiffusionDirectionMode              m_DiffusionDirectionMode;   ///< Determines how the main diffusion direction of the signal models is selected
-    double                              m_FiberSeparationThreshold; ///< Used for random and and mein fiber deriction DiffusionDirectionMode
 
     /** Artifacts and other effects */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image
@@ -222,7 +212,8 @@ public:
         , m_ParentNode(NULL)
         , m_SignalModelString("")
         , m_ArtifactModelString("")
-        , m_OutputPath("")
+        , m_OutputPath("/tmp/")
+        , m_OutputPrefix("fiberfox")
         , m_CheckOutputVolumeFractionsBox(false)
         , m_CheckAdvancedSignalOptionsBox(false)
         , m_CheckAddNoiseBox(false)
@@ -243,6 +234,7 @@ public:
     string              m_SignalModelString;                ///< Appendet to the name of the result node
     string              m_ArtifactModelString;              ///< Appendet to the name of the result node
     string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    string              m_OutputPrefix;  /** Prefix for filename of output files and logfile. */
     string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */

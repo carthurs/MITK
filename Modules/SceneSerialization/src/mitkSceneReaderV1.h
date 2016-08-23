@@ -48,12 +48,24 @@ class SceneReaderV1 : public SceneReader
 
       The baseDataNodeElem is supposed to be the <properties file="..."> element.
     */
+      there when saving the scene. Since they can produce problems, we clear the
+      list and use only those properties that we read from the scene file.
+
+      This method also handles some exceptions for backwards compatibility.
+      Those exceptions are documented directly in the code of the method.
+    */
+    void ClearNodePropertyListWithExceptions(DataNode& node, PropertyList& propertyList);
+
+    /**
+      \brief reads all properties assigned to a base data element and assigns the list to the base data object
+
+      The baseDataNodeElem is supposed to be the <properties file="..."> element.
+    */
+
     bool DecorateBaseDataWithProperties(DataNode* node, TiXmlElement* baseDataNodeElem, const std::string& workingDir, LoadedNodeFileNamesMap* nodeDataFileNameMap);
 
-    typedef std::multimap<int, std::string> UnorderedLayers;
-    typedef std::map<std::string, int> OrderedLayers;
     typedef std::pair<DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
-    typedef std::map<int, NodesAndParentsPair >   LayerPropertyMapType;
+    typedef std::list< NodesAndParentsPair > OrderedNodesList;
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;
 
@@ -61,7 +73,7 @@ class SceneReaderV1 : public SceneReader
 
     UnorderedLayers         m_UnorderedLayers;
     OrderedLayers           m_OrderedLayers;
-    LayerPropertyMapType    m_OrderedNodePairs;
+    OrderedNodesList   		m_OrderedNodePairs;
     IDToNodeMappingType     m_NodeForID;
     NodeToIDMappingType     m_IDForNode;
 

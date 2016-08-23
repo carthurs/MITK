@@ -8,7 +8,6 @@ set(CPP_FILES
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
   # Interactions
-  Interactions/mitkFiberBundleInteractor.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp
@@ -54,7 +53,6 @@ set(H_FILES
   Fiberfox/itkTractsToDWIImageFilter.h
   Fiberfox/itkKspaceImageFilter.h
   Fiberfox/itkDftImageFilter.h
-  Fiberfox/itkAddArtifactsToDwiImageFilter.h
   Fiberfox/itkFieldmapGeneratorFilter.h
 
   Fiberfox/SignalModels/mitkDiffusionSignalModel.h

@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
+#include <mitkPropertyPersistence.h>
 #include <mitkMimeTypeProvider.h>
 
 // Micro Services
@@ -70,6 +71,7 @@ private:
   std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
   std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
   std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::auto_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
   std::auto_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
   std::auto_ptr<mitk::ISurfaceCutterFactory> m_SurfaceCutterFactory;
 

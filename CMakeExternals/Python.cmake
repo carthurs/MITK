@@ -7,16 +7,17 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     message(FATAL_ERROR "Python_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  if(NOT DEFINED Python_DIR)
-
     set(MITK_PYTHON_MAJOR_VERSION 2)
     set(MITK_PYTHON_MINOR_VERSION 7)
     set(MITK_PYTHON_PATCH_VERSION 8)
     set(MITK_PYTHON_VERSION ${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
-
     set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_VERSION})
     set(proj ${PYTHON_SOURCE_PACKAGE})
+  set(proj_DEPENDENCIES )
+  set(${proj}_DEPENDS ${proj})
 
+  if(NOT DEFINED Python_DIR)
+    # download the source code
     # download the source code
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
@@ -28,10 +29,15 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
     )
+  else()
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+  endif()
 
     set(proj Python)
-    set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
+  set(proj_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
     set(Python_DEPENDS ${proj})
+
+  if(NOT DEFINED Python_DIR)
 
     set(additional_cmake_cache_args )
     list(APPEND additional_cmake_cache_args
@@ -56,7 +62,6 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILTIN_CSV:BOOL=ON
         -DBUILTIN_CTYPES:BOOL=OFF
         #-DBUILTIN_CTYPES_TEST:BOOL=OFF
-        #-DBUILTIN_CURSES:BOOL=ON
         -DBUILTIN_DATETIME:BOOL=ON
         -DBUILTIN_DBM:BOOL=ON
         -DBUILTIN_ELEMENTTREE:BOOL=ON
@@ -161,7 +166,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
       DEPENDS
-        ${Python_DEPENDENCIES}
+        ${proj_DEPENDENCIES}
     )
 
     # set versions, override

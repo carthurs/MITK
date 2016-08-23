@@ -27,75 +27,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
-{
-public:
-
-  mitkClassMacro(VigraRandomForestClassifier,AbstractClassifier)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  VigraRandomForestClassifier();
-  VigraRandomForestClassifier(const VigraRandomForestClassifier & other)
+  class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
   {
-    this->m_RandomForest = other.m_RandomForest;
-  }
+  public:
 
-  ~VigraRandomForestClassifier();
+    mitkClassMacro(VigraRandomForestClassifier,AbstractClassifier)
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-  void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
-  void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
-  Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
+    VigraRandomForestClassifier();
 
-  bool SupportsPointWiseWeight();
-  bool SupportsPointWiseProbability();
-  void ConvertParameter();
+    ~VigraRandomForestClassifier();
 
-  void SetRandomForest(const vigra::RandomForest<int> & rf)
-  {
-    m_RandomForest = rf;
-  }
-
-  const vigra::RandomForest<int> & GetRandomForest() const
-  {
-    return m_RandomForest;
-  }
-
-  void UsePointWiseWeight(bool);
-  void SetMaximumTreeDepth(int);
-  void SetMinimumSplitNodeSize(int);
-  void SetPrecision(double);
-  void SetSamplesPerTree(double);
-  void UseSampleWithReplacement(bool);
-  void SetTreeCount(int);
-  void SetWeightLambda(double);
-
-  void SetNthItems(const char *val, unsigned int idx);
-  std::string GetNthItem(unsigned int idx);
-
-  void SetItemList(std::vector<std::string>);
-  std::vector<std::string> GetItemList();
-
-  void PrintParameter(std::ostream &str = std::cout);
+    void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+    void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+    Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
 
 
-private:
-  // *-------------------
-  // * THREADING
-  // *-------------------
+    bool SupportsPointWiseWeight();
+    bool SupportsPointWiseProbability();
+    void ConvertParameter();
 
-  static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
-  static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    void SetRandomForest(const vigra::RandomForest<int> & rf);
+    const vigra::RandomForest<int> & GetRandomForest() const;
 
-  struct TrainingData;
-  struct PredictionData;
-  struct EigenToVigraTransform;
-  struct Parameter;
+    void UsePointWiseWeight(bool);
+    void SetMaximumTreeDepth(int);
+    void SetMinimumSplitNodeSize(int);
+    void SetPrecision(double);
+    void SetSamplesPerTree(double);
+    void UseSampleWithReplacement(bool);
+    void SetTreeCount(int);
+    void SetWeightLambda(double);
 
-  Parameter * m_Parameter;
-  vigra::RandomForest<int> m_RandomForest;
+    void SetTreeWeights(Eigen::MatrixXd weights);
+    void SetTreeWeight(int treeId, double weight);
+    Eigen::MatrixXd GetTreeWeights() const;
 
-};
+    void PrintParameter(std::ostream &str = std::cout);
+
+  private:
+    // *-------------------
+    // * THREADING
+    // *-------------------
+
+
+    struct TrainingData;
+    struct PredictionData;
+    struct EigenToVigraTransform;
+    struct Parameter;
+
+    Eigen::MatrixXd m_TreeWeights;
+
+    Parameter * m_Parameter;
+    vigra::RandomForest<int> m_RandomForest;
+
+    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
+    static void VigraPredictWeighted(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
+  };
 }
 
 #endif //mitkVigraRandomForestClassifier_h

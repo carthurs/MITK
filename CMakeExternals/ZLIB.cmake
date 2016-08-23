@@ -2,12 +2,14 @@
 # ZLIB
 #------------------------------------------------------------------
 if(MITK_USE_ZLIB)
-  if(NOT DEFINED ZLIB_DIR)
+
     include(${CMAKE_CURRENT_LIST_DIR}/ZLIB_URL.cmake)
   
     set(proj ZLIB)
-    set(${proj}_DEPENDENCIES )
+  set(proj_DEPENDENCIES )
     set(ZLIB_DEPENDS ${proj})
+
+  if(NOT DEFINED ZLIB_DIR)
 
     set(additional_cmake_args )
     if(CTEST_USE_LAUNCHERS)
@@ -32,7 +34,7 @@ if(MITK_USE_ZLIB)
         -DZLIB_INSTALL_INCLUDE_DIR:STRING=include/mitk_zlib
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
-      DEPENDS ${ZLIB_DEPENDENCIES}
+      DEPENDS ${proj_DEPENDENCIES}
       )
     set(ZLIB_DIR ${ep_prefix})
     set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include/mitk_zlib)
