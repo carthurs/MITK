@@ -143,7 +143,7 @@ if(MITK_USE_Boost)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL https://onedrive.live.com/download?resid=3DAFE2A24FA4A2EB!3493&authkey=!ACo2h7oppf2HZic&ithint=file%2cbz2
+      URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/boost_1_58_0.tar.bz2
       DOWNLOAD_NAME boost_1_58_0.tar.bz2
       # URL_MD5 a744cf167b05d72335f27c88115f211d
       # We use in-source builds for Boost
