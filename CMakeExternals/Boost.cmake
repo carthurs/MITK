@@ -138,6 +138,8 @@ include(mitkFunctionGetMSVCVersion)
       LIST_SEPARATOR ${sep}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
     URL_MD5 6aa9a5c6a4ca1016edd0ed1178e3cb87
+    #URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/boost_1_58_0.tar.bz2
+    #DOWNLOAD_NAME boost_1_58_0.tar.bz2
     # We use in-source builds for Boost
       # We use in-source builds for Boost
       BINARY_DIR ${ep_prefix}/src/${proj}
