@@ -25,7 +25,7 @@ if(MITK_USE_matplotlib_LIBPNG)
       LIST_SEPARATOR ${sep}
       BUILD_COMMAND ${matplotlib_LIBPNG_build_command}
       INSTALL_COMMAND ${matplotlib_LIBPNG_install_command} 
-      URL https://onedrive.live.com/download?resid=3DAFE2A24FA4A2EB!3488&authkey=!AH4DET3SwqPAKKA&ithint=file%2cgz
+      URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/libpng-1.6.19.tar.gz
       DOWNLOAD_NAME libpng-1.6.19.tar.gz 
       #URL_MD5 "685ce2ebbf4ad9a03992fb5f10c38df1"
       CMAKE_ARGS
