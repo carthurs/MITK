@@ -38,6 +38,7 @@ class IPropertyDescriptions;
 class IPropertyExtensions;
 class IPropertyFilters;
 class ISurfaceCutterFactory;
+class IPropertyPersistence;
 
 /**
  * @brief Access MITK core services.
@@ -101,6 +102,7 @@ public:
   * @param context The module context of the module getting the service.
   * @return A non-NULL IPropertyDescriptions instance.
   */
+  static IPropertyPersistence* GetPropertyPersistence(us::ModuleContext* context = us::GetModuleContext());
   static ISurfaceCutterFactory* GetSurfaceCutterFactory(us::ModuleContext* context = us::GetModuleContext());
 
   /**

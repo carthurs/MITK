@@ -129,7 +129,7 @@ protected:
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
     */
-    */
+    
   bool IsMousePositionAcceptableAsNewControlPoint( const mitk::InteractionPositionEvent* positionEvent, const PlanarFigure* );
 
   bool TransformPositionEventToPoint2D( const InteractionPositionEvent* positionEvent,
@@ -142,9 +142,9 @@ protected:
     const mitk::PlaneGeometry *rendererGeometry,
     const mitk::BaseRenderer *renderer) const;
 
-  mitk::Point2D TransformDisplayToObject(const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::DisplayGeometry * displayGeometry) const;
+  mitk::Point2D TransformDisplayToObject(const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
 
-  std::pair<double, mitk::Point2D> TransformDisplayToObject(double distanceInPixels, const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::DisplayGeometry * displayGeometry) const;
+  std::pair<double, mitk::Point2D> TransformDisplayToObject(double distanceInPixels, const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
 
   /** \brief Returns true if the point contained in the passed event (in display coordinates)
    * is over the planar figure (with a pre-defined tolerance range); false otherwise. */

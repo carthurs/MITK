@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIPythonService.h"
 #include <itkLightObject.h>
-#include <ctkAbstractPythonManager.h>
+#include <..\..\src\CTK\Libs\Scripting\Python\Core\ctkAbstractPythonManager.h>
 #include "mitkSurface.h"
 
 namespace mitk

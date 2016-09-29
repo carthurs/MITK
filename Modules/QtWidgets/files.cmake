@@ -7,7 +7,6 @@ QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp
 QmitkDataStorageTreeModel.cpp
 QmitkDataStorageFilterProxyModel.cpp         
-QmitkEventAdapter.cpp
 QmitkFileReaderOptionsDialog.cpp
 QmitkFileReaderWriterOptionsWidget.cpp
 QmitkFileWriterOptionsDialog.cpp

@@ -142,7 +142,7 @@ mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(const
   {
     //Get the cluster with "id" from all clusters, "id" is saved in sizeIDs.second
     //sizeIDs.first represent the number of points which is only needed for sorting the "id"s
-    vtkSmartPointer<vtkUnstructuredGrid> tmpGrid;
+	  vtkSmartPointer<vtkUnstructuredGridBase> tmpGrid;
 
     if(m_UseDistances)
       tmpGrid = m_Grids.at(avgDistances.at(j).second)->GetVtkUnstructuredGrid(); //highest distance
@@ -190,7 +190,7 @@ mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByLeastSquares(co
   {
     //Get the cluster with "id" from all clusters, "id" is saved in sizeIDs.second
     //sizeIDs.first represent the number of points which is only needed for sorting the "id"s
-    vtkSmartPointer<vtkUnstructuredGrid> tmpGrid;
+	  vtkSmartPointer<vtkUnstructuredGridBase> tmpGrid;
 
     if(m_UseDistances)
       tmpGrid = m_Grids.at(avgDistances.at(j).second)->GetVtkUnstructuredGrid(); //highest distance

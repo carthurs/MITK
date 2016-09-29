@@ -238,15 +238,6 @@ void QmitkRenderWindow::setVisible(bool visible)
     QWidget::setVisible(visible);
 }
 
-void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
-{
-  this->resizeMitkEvent(event->size().width(), event->size().height());
-
-  mitk::QVTKWidget::resizeEvent(event);
-
-  emit resized();
-}
-
 void QmitkRenderWindow::moveEvent(QMoveEvent* event)
 {
   mitk::QVTKWidget::moveEvent(event);

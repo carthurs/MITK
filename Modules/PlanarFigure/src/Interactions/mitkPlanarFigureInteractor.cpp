@@ -259,17 +259,16 @@ void mitk::PlanarFigureInteractor::FinalizeFigure()
     GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
     planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
     planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
+
 }
 
-bool mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     FinalizeFigure();
 
-  // Shape might change when figure is finalized, e.g., smoothing of subdivision polygon
-  planarFigure->EvaluateFeatures();
-
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-}
+
+ }
 
 void mitk::PlanarFigureInteractor::EndInteraction( StateMachineAction*, InteractionEvent* interactionEvent )
 {
@@ -363,7 +362,7 @@ void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
         m_PointMoved = false;
         mitk::OperationEvent::IncCurrGroupEventId();
         mitk::OperationEvent::IncCurrObjectEventId();
-        mitk::OperationEvent::ExecuteIncrement();
+        //mitk::OperationEvent::ExecuteIncrement();
 
         if (m_UndoEnabled)
         {
@@ -378,8 +377,6 @@ void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
         } 
     }
   }
-
-  return true;
 }
 
 void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -403,11 +400,6 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   }
 
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>(data.GetPointer());
-
-  // We can't derive a new control point from a polyline of a Bezier curve
-  // as all control points contribute to each polyline point.
-  if (dynamic_cast<PlanarBezierCurve*>(planarFigure) != nullptr && isFigureFinished)
-    return;
 
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
@@ -479,7 +471,7 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   if (planarFigure->IsFinalized()) {
       mitk::OperationEvent::IncCurrGroupEventId();
       mitk::OperationEvent::IncCurrObjectEventId();
-      mitk::OperationEvent::ExecuteIncrement();
+      //mitk::OperationEvent::ExecuteIncrement();
   }
 
   if (nextIndex == -1) {
@@ -549,7 +541,6 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
 
   mitk::OperationEvent::IncCurrGroupEventId();
   mitk::OperationEvent::IncCurrObjectEventId();
-  mitk::OperationEvent::ExecuteIncrement();
 
   std::unique_ptr<mitk::PlanarFigureOperation> doOp(new mitk::PlanarFigureOperation(
       OpADD, point2D, -1));
@@ -817,7 +808,7 @@ void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, Inte
 
   mitk::OperationEvent::IncCurrGroupEventId();
   mitk::OperationEvent::IncCurrObjectEventId();
-  mitk::OperationEvent::ExecuteIncrement();
+ 
   std::unique_ptr<mitk::PlanarFigureOperation> doOp(new mitk::PlanarFigureOperation(
       OpREMOVE, point2D, selectedControlPoint));
 
@@ -936,15 +927,16 @@ mitk::Point2D mitk::PlanarFigureInteractor::TransformDisplayToObject(
     const mitk::Point2D &displayPoint,
     const mitk::PlaneGeometry *objectGeometry,
     const mitk::PlaneGeometry *rendererGeometry,
-  const mitk::BaseRenderer *renderer) const
+	const mitk::BaseRenderer *renderer) const
 {
     mitk::Point3D point3D;
     mitk::Point2D result;
 
-    displayGeometry->DisplayToWorld(displayPoint, result);
+	//renderer->DisplayToWorld(displayPoint, result);
+	renderer->DisplayToWorld(displayPoint, point3D);
 
-    // Map circle point from local 2D geometry into 3D world space
-    rendererGeometry->Map(result, point3D);
+    //// Map circle point from local 2D geometry into 3D world space
+    //rendererGeometry->Map(result, point3D);
 
     // Project 3D world point onto display geometry
     objectGeometry->Map(point3D, result);
@@ -955,15 +947,15 @@ std::pair<double, mitk::Point2D> mitk::PlanarFigureInteractor::TransformDisplayT
     const mitk::Point2D &displayPoint,
     const mitk::PlaneGeometry *objectGeometry,
     const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry) const
+	const mitk::BaseRenderer *renderer) const
 {
     auto offsetPoint = displayPoint;
     offsetPoint[0] += distanceInPixels;
 
-    mitk::Point2D pointInObjectCoordinates = TransformDisplayToObject(displayPoint, objectGeometry, rendererGeometry, displayGeometry);
+	mitk::Point2D pointInObjectCoordinates = TransformDisplayToObject(displayPoint, objectGeometry, rendererGeometry, renderer);
 
     return std::make_pair(pointInObjectCoordinates.EuclideanDistanceTo(
-        TransformDisplayToObject(offsetPoint, objectGeometry, rendererGeometry, displayGeometry)), pointInObjectCoordinates);
+		TransformDisplayToObject(offsetPoint, objectGeometry, rendererGeometry, renderer)), pointInObjectCoordinates);
 
 }
 
@@ -980,7 +972,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   mitk::Point2D pointInObjectCoordinates;
 
   std::tie(maxDistanceInObjectCoordinates, pointInObjectCoordinates) =
-      TransformDisplayToObject(4, displayPosition, planarFigureGeometry, rendererGeometry, displayGeometry);
+	  TransformDisplayToObject(4, displayPosition, planarFigureGeometry, rendererGeometry, positionEvent->GetSender());
 
 
   int polyLineIndex;
@@ -1006,7 +998,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
     mitk::Point2D pointInObjectCoordinates;
 
     std::tie(maxDistanceInObjectCoordinates, pointInObjectCoordinates) =
-        TransformDisplayToObject(4, displayPosition, planarFigureGeometry, rendererGeometry, displayGeometry);
+		TransformDisplayToObject(4, displayPosition, planarFigureGeometry, rendererGeometry, renderer);
     
     return planarFigure->FindClosestControlPoint(pointInObjectCoordinates, maxDistanceInObjectCoordinates);
 }

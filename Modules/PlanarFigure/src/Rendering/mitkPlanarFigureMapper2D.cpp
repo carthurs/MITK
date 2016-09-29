@@ -159,7 +159,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   if ( m_DrawControlPoints )
   {
     // draw the control-points
-    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry);
+	  RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
   }
 
   // draw feature quantities (if requested) next to the anchor point,

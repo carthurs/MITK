@@ -45,14 +45,14 @@ if(MITK_USE_CTK)
       )
     endif()
 
-    if(MITK_USE_DCMTK)
+     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
           )
       if(NOT MITK_USE_Python)
         list(APPEND ctk_optional_cache_args
-           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-          )
+            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+            )
       endif()
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()
@@ -66,6 +66,7 @@ if(MITK_USE_CTK)
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
     endif()
+
 
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
@@ -85,9 +86,9 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+      URL_MD5 9ebeb78c78ff9f458045e0a5ecffc73f
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
-      URL_MD5 9ebeb78c78ff9f458045e0a5ecffc73f
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       PATCH_COMMAND ${ctk_patch_command}
@@ -95,13 +96,14 @@ if(MITK_USE_CTK)
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
+        ${ctk_qt_args}
        -DADDITIONAL_C_FLAGS:STRING=${ctk_additional_c_flags}
        -DADDITIONAL_CXX_FLAGS:STRING=${ctk_additional_cxx_flags}
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
-        -DCTK_QT_VERSION:STRING=5
+		-DCTK_QT_VERSION:STRING=5
         -DPYTHONQT_DEBUG_POSTFIX:STRING=d # for PythonQt
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}

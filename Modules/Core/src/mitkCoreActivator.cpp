@@ -301,6 +301,9 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   m_PropertyFilters.reset(new mitk::PropertyFilters);
   context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
 
+  m_PropertyPersistence.reset(new mitk::PropertyPersistence);
+  context->RegisterService<mitk::IPropertyPersistence>(m_PropertyPersistence.get());
+
   m_SurfaceCutterFactory.reset(new mitk::SurfaceCutterFactoryPerformanceSelector);
   context->RegisterService<mitk::ISurfaceCutterFactory>(m_SurfaceCutterFactory.get());
 

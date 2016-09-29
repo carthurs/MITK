@@ -62,8 +62,6 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
     m_HelperLinesUpToDate(other.m_HelperLinesUpToDate), // do not clone since SetPlaneGeometry() doesn't clone either
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
-    m_PolyLines(other.m_PolyLines),
-    m_HelperPolyLines(other.m_HelperPolyLines),
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)

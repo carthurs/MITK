@@ -85,8 +85,7 @@ void mitk::ContourModelSetMapper3D::GenerateDataForRenderer( mitk::BaseRenderer 
 
         for (vtkIdType i = 0; i < numPoints; ++i)
           pointIds->SetId(i, baseIndex + i);
-    mapper->SetInputData(polyData);
-
+ 
         pointIds->SetId(numPoints, baseIndex);
 
         cells->InsertNextCell(line);
