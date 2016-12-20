@@ -869,8 +869,11 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
   // get address of the object
   pyAddr = PyDict_GetItemString(pyDict,QString("%1_addr").arg(varName).toStdString().c_str());
 
-  // convert to long
-  addr = PyInt_AsLong(pyAddr);
+  // convert to long long (64 bit!)
+  addr = PyInt_AsUnsignedLongLongMask(pyAddr);
+
+  if (PyErr_Occurred())
+	  PyErr_Print();
 
   MITK_DEBUG << "Python object address: " << addr;
 
