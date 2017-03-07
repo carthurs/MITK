@@ -31,8 +31,8 @@ if(MITK_USE_VMTK)
         ${ep_common_args}
         ${additional_cmake_args}
         -DVTK_VMTK_BUILD_STREAMTRACER:BOOL=OFF
-        -DVTK_VMTK_BUILD_TETGEN:BOOL=OFF
-        -DVTK_VMTK_WRAP_PYTHON:BOOL=OFF
+        -DVTK_VMTK_BUILD_TETGEN:BOOL=ON
+        -DVTK_VMTK_WRAP_PYTHON:BOOL=ON
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS
