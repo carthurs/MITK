@@ -1,7 +1,7 @@
-diff --git a/CMakeOptions.cmake b/CMakeOptions.cmake
+diff --git a/vtkVmtk/CMakeOptions.cmake b/vtkVmtk/CMakeOptions.cmake
 index 17fc5b8..23b3f1f 100644
---- a/CMakeOptions.cmake
-+++ b/CMakeOptions.cmake
+--- a/vtkVmtk/CMakeOptions.cmake
++++ b/vtkVmtk/CMakeOptions.cmake
 @@ -16,6 +16,19 @@ IF ( NOT VTK_FOUND )
  ENDIF ( NOT VTK_FOUND )
  
@@ -24,46 +24,17 @@ index 17fc5b8..23b3f1f 100644
  IF ( NOT ITK_FOUND )
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 12c5a25..82d8f42 100644
+index ed43b4a..4c3361a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -17,9 +17,11 @@ set(dirs
-   Segmentation
-   )
+@@ -214,6 +214,10 @@ SET(VMTK_MODULE_SRCS
+    __init__.py.in
+    )
  
--IF (VTK_USE_RENDERING)
-+OPTION(VTK_VMTK_RENDERING "Build and install classes in the vtkVmtk/Rendering directory." ON)
++IF(NOT VMTK_INSTALL_INCLUDE_DIR)
++  SET(VMTK_INSTALL_INCLUDE_DIR include/vmtk)
++ENDIF(NOT VMTK_INSTALL_INCLUDE_DIR)
 +
-+IF (VTK_VMTK_RENDERING)
-   list(APPEND dirs Rendering)
--ENDIF (VTK_USE_RENDERING)
-+ENDIF (VTK_VMTK_RENDERING)
- 
- OPTION(VTK_VMTK_CONTRIB "Build and install classes in the vtkVmtk/Contrib directory." OFF)
- 
-@@ -69,9 +71,9 @@ INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/ComputationalGeometry)
- INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/DifferentialGeometry)
- INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/IO)
- INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/Misc)
--IF (VTK_USE_RENDERING)
-+IF (VTK_VMTK_RENDERING)
-   INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/Rendering)
--ENDIF (VTK_USE_RENDERING)
-+ENDIF (VTK_VMTK_RENDERING)
- INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/Segmentation)
- IF (VTK_VMTK_CONTRIB)
-   INCLUDE_DIRECTORIES (${VTK_VMTK_SOURCE_DIR}/Contrib)
-   
-diff --git a/Rendering/CMakeLists.txt b/Rendering/CMakeLists.txt
-index 3665581..692384d 100644
---- a/RenderingCMakeLists.txt
-+++ b/Rendering/CMakeLists.txt
-@@ -5,6 +5,8 @@ if( ${VTK_VERSION_MAJOR} GREATER 5 )
-     vtkCommonCore
-     vtkInteractionWidgets
-     vtkRenderingOpenGL
-+	vtkRenderingFreeTypeOpenGL
-+	vtkRenderingVolumeOpenGL
-     )
-   if (VTK_WRAP_PYTHON AND VTK_VMTK_WRAP_PYTHON)
-     list(APPEND VTK_VMTK_RENDERING_COMPONENTS
+ IF(NOT VMTK_INSTALL_BIN_DIR)
+   SET(VMTK_INSTALL_BIN_DIR bin)
+ ENDIF(NOT VMTK_INSTALL_BIN_DIR)
