@@ -70,7 +70,7 @@ diff --git a/vmtkScripts/CMakeLists.txt b/vmtkScripts/CMakeLists.txt
 index a92d172..c66f762 100644
 --- a/vmtkScripts/CMakeLists.txt
 +++ b/vmtkScripts/CMakeLists.txt
- @@ -161,6 +161,9 @@ ENDIF(NOT VMTK_SCRIPTS_INSTALL_BIN_DIR)
+@@ -161,6 +161,9 @@ ENDIF(NOT VMTK_SCRIPTS_INSTALL_BIN_DIR)
  IF(NOT VMTK_SCRIPTS_INSTALL_LIB_DIR)
    #SET(VMTK_SCRIPTS_INSTALL_LIB_DIR ${VMTK_SCRIPTS_INSTALL_ROOT}/lib/vmtk/vmtk)
    SET(VMTK_SCRIPTS_INSTALL_LIB_DIR lib/python2.7/Lib/site-packages/vmtk)
