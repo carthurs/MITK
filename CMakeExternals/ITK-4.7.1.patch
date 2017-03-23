@@ -55,10 +55,10 @@ diff --git a/Modules/ThirdParty/GDCM/CMakeLists.txt b/Modules/ThirdParty/GDCM/CM
  endif()
 
  itk_module_impl()
-diff --git a/Modules/IO/PhillipsREC/src/itkPhilipsPAR.cxx b/Modules/IO/PhillipsREC/src/itkPhilipsPAR.cxx
+diff --git a/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx b/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx
 index 68b09ea..4cdb36b 100644
---- a/Modules/IO/PhillipsREC/src/itkPhilipsPAR.cxx
-+++ b/Modules/IO/PhillipsREC/src/itkPhilipsPAR.cxx
+--- a/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx
++++ b/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx
 @@ -1560,6 +1560,7 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
        // Only 1 slice, but how many repetitions of that slice?
        else
@@ -78,10 +78,10 @@ index 68b09ea..4cdb36b 100644
  
  PhilipsPAR::PARSliceIndexImageTypeVector
  PhilipsPAR::GetRECSliceIndexImageTypes(std::string parFile)
-diff --git a/Modules/IO/PhillipsREC/src/itkPhillipsRECImageIO.cxx b/Modules/IO/PhillipsREC/src/itkPhillipsRECImageIO.cxx
+diff --git a/Modules/IO/PhilipsREC/src/itkPhilipsRECImageIO.cxx b/Modules/IO/PhilipsREC/src/itkPhilipsRECImageIO.cxx
 index 68b09ea..4cdb36b 100644
---- a/Modules/IO/PhillipsREC/src/itkPhillipsRECImageIO.cxx
-+++ b/Modules/IO/PhillipsREC/src/itkPhillipsRECImageIO.cxx
+--- a/Modules/IO/PhilipsREC/src/itkPhilipsRECImageIO.cxx
++++ b/Modules/IO/PhilipsREC/src/itkPhilipsRECImageIO.cxx
 @@ -234,7 +234,7 @@ void PhilipsRECImageIOSetupSliceIndex(
                                ITK_LOCATION);
      throw exception;
