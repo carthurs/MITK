@@ -90,6 +90,11 @@ std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& i
     extensions.push_back("");
   }
 
+  else if (imageIOName == "PhilipsRECImageIO")
+  {
+	  extensions.push_back("par");
+  }
+
   if (!extensions.empty())
   {
     MITK_DEBUG << "Fixing up known extensions for " << imageIOName;

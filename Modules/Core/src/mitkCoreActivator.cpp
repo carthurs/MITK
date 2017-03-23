@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkNiftiImageIO.h>
 #include <itkGDCMImageIO.h>
+#include <itkPhilipsRECImageIO.h>
+#include <itkPhilipsRECImageIOFactory.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
@@ -395,6 +397,7 @@ void MitkCoreActivator::RegisterDefaultMimeTypes()
 
 void MitkCoreActivator::RegisterItkReaderWriter()
 {
+	itk::PhilipsRECImageIOFactory::RegisterOneFactory();
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
 
