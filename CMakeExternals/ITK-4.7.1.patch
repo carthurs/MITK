@@ -86,8 +86,8 @@ index 68b09ea..4cdb36b 100644
                                ITK_LOCATION);
      throw exception;
      }
--  if ( parParam.dim[2] != ( parParam.slice * parParam.image_blocks / parParam.num_slice_repetitions ) )
-+  if ( parParam.dim[2] != ( parParam.slice * parParam.image_blocks ) )
+-  if ( parParam.dim[2] != ( parParam.slice * parParam.image_blocks ) )
++  if ( parParam.dim[2] != ( parParam.slice * parParam.image_blocks / parParam.num_slice_repetitions ) )
      {
      std::ostringstream message;
      message << "parParam.dim[2]: "
@@ -95,325 +95,339 @@ index 68b09ea..4cdb36b 100644
      }
  
    SizeType imageSliceSizeInBytes = this->GetImageSizeInBytes() / numberOfSlices;
--  
-+
+-
++  
    for ( IndexValueType slice = 0; slice < numberOfSlices; slice++ )
      {
      IndexValueType realIndex = this->GetSliceIndex( (int)slice );
-@@ -728,8 +728,7 @@ void PhilipsRECImageIO::ReadImageInformation()
+@@ -728,7 +728,8 @@ void PhilipsRECImageIO::ReadImageInformation()
    this->SetSpacing(2, par.vox[2]);
    if ( numberOfDimensions > 3 )
      {
--    //this->SetDimensions(3,par.image_blocks);
--		this->SetDimensions(3, par.dim[2]);
-+    this->SetDimensions(3,par.image_blocks);
+-    this->SetDimensions(3,par.image_blocks);
++    //this->SetDimensions(3,par.image_blocks);
++		this->SetDimensions(3, par.dim[2]);
      // Just 1 for the fourth dimension.
      this->SetSpacing(3,1.0f);
      }
-@@ -772,156 +771,156 @@ void PhilipsRECImageIO::ReadImageInformation()
+@@ -771,156 +772,156 @@ void PhilipsRECImageIO::ReadImageInformation()
    EncapsulateMetaData< std::string >( thisDic, ITK_FileNotes,
                                        std::string(par.series_type, 32) );
  
--//  typedef Matrix< double, 4, 4 > AffineMatrix;
--//  AffineMatrix spacing;
--//  spacing.SetIdentity();
--//
--//  SpatialOrientation::ValidCoordinateOrientationFlags coord_orient;
--//
--//  switch ( par.sliceorient )
--//    {
--//    case PAR_SLICE_ORIENTATION_TRANSVERSAL:
--//      // Transverse - the REC data appears to be stored as right-left,
--//      // anterior-posterior, and inferior-superior.
--//      // Verified using a marker on right side of brain.
--//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
--//      spacing[0][0] = par.vox[0];
--//      spacing[1][1] = par.vox[1];
--//      spacing[2][2] = par.vox[2];
--//      break;
--//    case PAR_SLICE_ORIENTATION_SAGITTAL:
--//      // Sagittal - the REC data appears to be stored as anterior-posterior,
--//      // superior-inferior, and right-left.
--//      // Verified using marker on right side of brain.
--//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
--//      spacing[0][0] = par.vox[2];
--//      spacing[1][1] = par.vox[0];
--//      spacing[2][2] = par.vox[1];
--//      break;
--//    case PAR_SLICE_ORIENTATION_CORONAL:
--//    // Coronal - the REC data appears to be stored as right-left,
--//    // superior-inferior, and anterior-posterior.
--//    // Verified using marker on right side of brain.
--//    // fall thru
--//    default:
--//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
--//      spacing[0][0] = par.vox[0];
--//      spacing[1][1] = par.vox[2];
--//      spacing[2][2] = par.vox[1];
--//    }
--//
--//  typedef SpatialOrientationAdapter OrientAdapterType;
--//  SpatialOrientationAdapter::DirectionType dir =
--//    OrientAdapterType().ToDirectionCosines(coord_orient);
--//
--//  AffineMatrix direction;
--//  direction.SetIdentity();
--//  int rows, columns;
--//  for(rows=0; rows<3; rows++)
--//    {
--//    for(columns=0; columns<3; columns++)
--//      {
--//      direction[columns][rows] = dir[columns][rows];
--//      }
--//    }
--////#define DEBUG_ORIENTATION
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Direction cosines = " << direction << std::endl;
--//  std::cout << "Spacing = " << spacing << std::endl;
--//#endif
--//  // Create right/left rotation matrix (about x axis).
--//  AffineMatrix r1;
--//  r1.SetIdentity();
--//  r1[1][1] = std::cos(par.angRL*Math::pi/180.0);
--//  r1[2][1] = -std::sin(par.angRL*Math::pi/180.0);
--//  r1[1][2] = std::sin(par.angRL*Math::pi/180.0);
--//  r1[2][2] = std::cos(par.angRL*Math::pi/180.0);
--//  // Create anterior/posterior rotation matrix (about y axis).
--//  AffineMatrix r2;
--//  r2.SetIdentity();
--//  r2[0][0] = std::cos(par.angAP*Math::pi/180.0);
--//  r2[2][0] = std::sin(par.angAP*Math::pi/180.0);
--//  r2[0][2] = -std::sin(par.angAP*Math::pi/180.0);
--//  r2[2][2] = std::cos(par.angAP*Math::pi/180.0);
--//  // Create foot/head rotation matrix (about z axis).
--//  AffineMatrix r3;
--//  r3.SetIdentity();
--//  r3[0][0] = std::cos(par.angFH*Math::pi/180.0);
--//  r3[1][0] = -std::sin(par.angFH*Math::pi/180.0);
--//  r3[0][1] = std::sin(par.angFH*Math::pi/180.0);
--//  r3[1][1] = std::cos(par.angFH*Math::pi/180.0);
--//  // Total rotation matrix.
--//  AffineMatrix rtotal = r1*r2*r3;
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Right-Left rotation = " << r1 << std::endl;
--//  std::cout << "Anterior-Posterior rotation = " << r2 << std::endl;
--//  std::cout << "Foot-Head rotation = " << r3 << std::endl;
--//  std::cout << "Total = " << rtotal << std::endl;
--//#endif
--//
--//  // Find and set origin
--//  AffineMatrix final = rtotal*spacing*direction;
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Final transformation = " << final << std::endl;
--//#endif
--//  typedef Vector< double, 4 > PointVector;
--//  PointVector center;
--//  center[0] = (par.dim[0]-1)/2.0;
--//  center[1] = (par.dim[0]-1)/2.0;
--//  center[2] = (par.slice-1)/2.0;
--//  center[3] = 1;
--//  PointVector origin = final*center;
--//  origin = -origin;
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Origin before offset = " << origin << std::endl;
--//#endif
--//  PointVector offset;
--//  offset[0] = par.offRL;
--//  offset[1] = par.offAP;
--//  offset[2] = par.offFH;
--//  offset[3] = 1;
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Offset = " << offset << std::endl;
--//#endif
--//  origin[0] = origin[0]+offset[0];
--//  origin[1] = origin[1]+offset[1];
--//  origin[2] = origin[2]+offset[2];
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Origin after offset = " << origin << std::endl;
--//#endif
--//
--//  this->SetOrigin(0, origin[0]);
--//  this->SetOrigin(1, origin[1]);
--//  this->SetOrigin(2, origin[2]);
--//
--//  // Find true direction cosines after taking rotations into account.
--//  direction = rtotal*direction;
--//#ifdef DEBUG_ORIENTATION
--//  std::cout << "Final direction cosines after rotation = " << direction << std::endl;
--//#endif
--//
--//  std::vector<double> dirx(numberOfDimensions,0),
--//  diry(numberOfDimensions,0),dirz(numberOfDimensions,0),
--//  dirBlock(numberOfDimensions,0);
--//  dirBlock[numberOfDimensions-1] = 1;
--//  dirx[0] = direction[0][0];
--//  dirx[1] = direction[1][0];
--//  dirx[2] = direction[2][0];
--//  diry[0] = direction[0][1];
--//  diry[1] = direction[1][1];
--//  diry[2] = direction[2][1];
--//  dirz[0] = direction[0][2];
--//  dirz[1] = direction[1][2];
--//  dirz[2] = direction[2][2];
--//
--//  this->SetDirection(0,dirx);
--//  this->SetDirection(1,diry);
--//  this->SetDirection(2,dirz);
--//  if ( numberOfDimensions > 3 )
--//    {
--//    this->SetDirection(3,dirBlock);
--//    }
--//
-+  typedef Matrix< double, 4, 4 > AffineMatrix;
-+  AffineMatrix spacing;
-+  spacing.SetIdentity();
-+
-+  SpatialOrientation::ValidCoordinateOrientationFlags coord_orient;
-+
-+  switch ( par.sliceorient )
-+    {
-+    case PAR_SLICE_ORIENTATION_TRANSVERSAL:
-+      // Transverse - the REC data appears to be stored as right-left,
-+      // anterior-posterior, and inferior-superior.
-+      // Verified using a marker on right side of brain.
-+      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
-+      spacing[0][0] = par.vox[0];
-+      spacing[1][1] = par.vox[1];
-+      spacing[2][2] = par.vox[2];
-+      break;
-+    case PAR_SLICE_ORIENTATION_SAGITTAL:
-+      // Sagittal - the REC data appears to be stored as anterior-posterior,
-+      // superior-inferior, and right-left.
-+      // Verified using marker on right side of brain.
-+      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
-+      spacing[0][0] = par.vox[2];
-+      spacing[1][1] = par.vox[0];
-+      spacing[2][2] = par.vox[1];
-+      break;
-+    case PAR_SLICE_ORIENTATION_CORONAL:
-+    // Coronal - the REC data appears to be stored as right-left,
-+    // superior-inferior, and anterior-posterior.
-+    // Verified using marker on right side of brain.
-+    // fall thru
-+    default:
-+      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
-+      spacing[0][0] = par.vox[0];
-+      spacing[1][1] = par.vox[2];
-+      spacing[2][2] = par.vox[1];
-+    }
-+
-+  typedef SpatialOrientationAdapter OrientAdapterType;
-+  SpatialOrientationAdapter::DirectionType dir =
-+    OrientAdapterType().ToDirectionCosines(coord_orient);
-+
-+  AffineMatrix direction;
-+  direction.SetIdentity();
-+  int rows, columns;
-+  for(rows=0; rows<3; rows++)
-+    {
-+    for(columns=0; columns<3; columns++)
-+      {
-+      direction[columns][rows] = dir[columns][rows];
-+      }
-+    }
-+//#define DEBUG_ORIENTATION
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Direction cosines = " << direction << std::endl;
-+  std::cout << "Spacing = " << spacing << std::endl;
-+#endif
-+  // Create right/left rotation matrix (about x axis).
-+  AffineMatrix r1;
-+  r1.SetIdentity();
-+  r1[1][1] = std::cos(par.angRL*Math::pi/180.0);
-+  r1[2][1] = -std::sin(par.angRL*Math::pi/180.0);
-+  r1[1][2] = std::sin(par.angRL*Math::pi/180.0);
-+  r1[2][2] = std::cos(par.angRL*Math::pi/180.0);
-+  // Create anterior/posterior rotation matrix (about y axis).
-+  AffineMatrix r2;
-+  r2.SetIdentity();
-+  r2[0][0] = std::cos(par.angAP*Math::pi/180.0);
-+  r2[2][0] = std::sin(par.angAP*Math::pi/180.0);
-+  r2[0][2] = -std::sin(par.angAP*Math::pi/180.0);
-+  r2[2][2] = std::cos(par.angAP*Math::pi/180.0);
-+  // Create foot/head rotation matrix (about z axis).
-+  AffineMatrix r3;
-+  r3.SetIdentity();
-+  r3[0][0] = std::cos(par.angFH*Math::pi/180.0);
-+  r3[1][0] = -std::sin(par.angFH*Math::pi/180.0);
-+  r3[0][1] = std::sin(par.angFH*Math::pi/180.0);
-+  r3[1][1] = std::cos(par.angFH*Math::pi/180.0);
-+  // Total rotation matrix.
-+  AffineMatrix rtotal = r1*r2*r3;
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Right-Left rotation = " << r1 << std::endl;
-+  std::cout << "Anterior-Posterior rotation = " << r2 << std::endl;
-+  std::cout << "Foot-Head rotation = " << r3 << std::endl;
-+  std::cout << "Total = " << rtotal << std::endl;
-+#endif
-+
-+  // Find and set origin
-+  AffineMatrix final = rtotal*spacing*direction;
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Final transformation = " << final << std::endl;
-+#endif
-+  typedef Vector< double, 4 > PointVector;
-+  PointVector center;
-+  center[0] = (par.dim[0]-1)/2.0;
-+  center[1] = (par.dim[0]-1)/2.0;
-+  center[2] = (par.slice-1)/2.0;
-+  center[3] = 1;
-+  PointVector origin = final*center;
-+  origin = -origin;
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Origin before offset = " << origin << std::endl;
-+#endif
-+  PointVector offset;
-+  offset[0] = par.offRL;
-+  offset[1] = par.offAP;
-+  offset[2] = par.offFH;
-+  offset[3] = 1;
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Offset = " << offset << std::endl;
-+#endif
-+  origin[0] = origin[0]+offset[0];
-+  origin[1] = origin[1]+offset[1];
-+  origin[2] = origin[2]+offset[2];
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Origin after offset = " << origin << std::endl;
-+#endif
-+
-+  this->SetOrigin(0, origin[0]);
-+  this->SetOrigin(1, origin[1]);
-+  this->SetOrigin(2, origin[2]);
-+
-+  // Find true direction cosines after taking rotations into account.
-+  direction = rtotal*direction;
-+#ifdef DEBUG_ORIENTATION
-+  std::cout << "Final direction cosines after rotation = " << direction << std::endl;
-+#endif
-+
-+  std::vector<double> dirx(numberOfDimensions,0),
-+  diry(numberOfDimensions,0),dirz(numberOfDimensions,0),
-+  dirBlock(numberOfDimensions,0);
-+  dirBlock[numberOfDimensions-1] = 1;
-+  dirx[0] = direction[0][0];
-+  dirx[1] = direction[1][0];
-+  dirx[2] = direction[2][0];
-+  diry[0] = direction[0][1];
-+  diry[1] = direction[1][1];
-+  diry[2] = direction[2][1];
-+  dirz[0] = direction[0][2];
-+  dirz[1] = direction[1][2];
-+  dirz[2] = direction[2][2];
-+
-+  this->SetDirection(0,dirx);
-+  this->SetDirection(1,diry);
-+  this->SetDirection(2,dirz);
-+  if ( numberOfDimensions > 3 )
-+    {
-+    this->SetDirection(3,dirBlock);
-+    }
-+
+-  typedef Matrix< double, 4, 4 > AffineMatrix;
+-  AffineMatrix spacing;
+-  spacing.SetIdentity();
+-
+-  SpatialOrientation::ValidCoordinateOrientationFlags coord_orient;
+-
+-  switch ( par.sliceorient )
+-    {
+-    case PAR_SLICE_ORIENTATION_TRANSVERSAL:
+-      // Transverse - the REC data appears to be stored as right-left,
+-      // anterior-posterior, and inferior-superior.
+-      // Verified using a marker on right side of brain.
+-      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
+-      spacing[0][0] = par.vox[0];
+-      spacing[1][1] = par.vox[1];
+-      spacing[2][2] = par.vox[2];
+-      break;
+-    case PAR_SLICE_ORIENTATION_SAGITTAL:
+-      // Sagittal - the REC data appears to be stored as anterior-posterior,
+-      // superior-inferior, and right-left.
+-      // Verified using marker on right side of brain.
+-      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
+-      spacing[0][0] = par.vox[2];
+-      spacing[1][1] = par.vox[0];
+-      spacing[2][2] = par.vox[1];
+-      break;
+-    case PAR_SLICE_ORIENTATION_CORONAL:
+-    // Coronal - the REC data appears to be stored as right-left,
+-    // superior-inferior, and anterior-posterior.
+-    // Verified using marker on right side of brain.
+-    // fall thru
+-    default:
+-      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
+-      spacing[0][0] = par.vox[0];
+-      spacing[1][1] = par.vox[2];
+-      spacing[2][2] = par.vox[1];
+-    }
+-
+-  typedef SpatialOrientationAdapter OrientAdapterType;
+-  SpatialOrientationAdapter::DirectionType dir =
+-    OrientAdapterType().ToDirectionCosines(coord_orient);
+-
+-  AffineMatrix direction;
+-  direction.SetIdentity();
+-  int rows, columns;
+-  for(rows=0; rows<3; rows++)
+-    {
+-    for(columns=0; columns<3; columns++)
+-      {
+-      direction[columns][rows] = dir[columns][rows];
+-      }
+-    }
+-//#define DEBUG_ORIENTATION
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Direction cosines = " << direction << std::endl;
+-  std::cout << "Spacing = " << spacing << std::endl;
+-#endif
+-  // Create right/left rotation matrix (about x axis).
+-  AffineMatrix r1;
+-  r1.SetIdentity();
+-  r1[1][1] = std::cos(par.angRL*Math::pi/180.0);
+-  r1[2][1] = -std::sin(par.angRL*Math::pi/180.0);
+-  r1[1][2] = std::sin(par.angRL*Math::pi/180.0);
+-  r1[2][2] = std::cos(par.angRL*Math::pi/180.0);
+-  // Create anterior/posterior rotation matrix (about y axis).
+-  AffineMatrix r2;
+-  r2.SetIdentity();
+-  r2[0][0] = std::cos(par.angAP*Math::pi/180.0);
+-  r2[2][0] = std::sin(par.angAP*Math::pi/180.0);
+-  r2[0][2] = -std::sin(par.angAP*Math::pi/180.0);
+-  r2[2][2] = std::cos(par.angAP*Math::pi/180.0);
+-  // Create foot/head rotation matrix (about z axis).
+-  AffineMatrix r3;
+-  r3.SetIdentity();
+-  r3[0][0] = std::cos(par.angFH*Math::pi/180.0);
+-  r3[1][0] = -std::sin(par.angFH*Math::pi/180.0);
+-  r3[0][1] = std::sin(par.angFH*Math::pi/180.0);
+-  r3[1][1] = std::cos(par.angFH*Math::pi/180.0);
+-  // Total rotation matrix.
+-  AffineMatrix rtotal = r1*r2*r3;
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Right-Left rotation = " << r1 << std::endl;
+-  std::cout << "Anterior-Posterior rotation = " << r2 << std::endl;
+-  std::cout << "Foot-Head rotation = " << r3 << std::endl;
+-  std::cout << "Total = " << rtotal << std::endl;
+-#endif
+-
+-  // Find and set origin
+-  AffineMatrix final = rtotal*spacing*direction;
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Final transformation = " << final << std::endl;
+-#endif
+-  typedef Vector< double, 4 > PointVector;
+-  PointVector center;
+-  center[0] = (par.dim[0]-1)/2.0;
+-  center[1] = (par.dim[0]-1)/2.0;
+-  center[2] = (par.slice-1)/2.0;
+-  center[3] = 1;
+-  PointVector origin = final*center;
+-  origin = -origin;
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Origin before offset = " << origin << std::endl;
+-#endif
+-  PointVector offset;
+-  offset[0] = par.offRL;
+-  offset[1] = par.offAP;
+-  offset[2] = par.offFH;
+-  offset[3] = 1;
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Offset = " << offset << std::endl;
+-#endif
+-  origin[0] = origin[0]+offset[0];
+-  origin[1] = origin[1]+offset[1];
+-  origin[2] = origin[2]+offset[2];
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Origin after offset = " << origin << std::endl;
+-#endif
+-
+-  this->SetOrigin(0, origin[0]);
+-  this->SetOrigin(1, origin[1]);
+-  this->SetOrigin(2, origin[2]);
+-
+-  // Find true direction cosines after taking rotations into account.
+-  direction = rtotal*direction;
+-#ifdef DEBUG_ORIENTATION
+-  std::cout << "Final direction cosines after rotation = " << direction << std::endl;
+-#endif
+-
+-  std::vector<double> dirx(numberOfDimensions,0),
+-  diry(numberOfDimensions,0),dirz(numberOfDimensions,0),
+-  dirBlock(numberOfDimensions,0);
+-  dirBlock[numberOfDimensions-1] = 1;
+-  dirx[0] = direction[0][0];
+-  dirx[1] = direction[1][0];
+-  dirx[2] = direction[2][0];
+-  diry[0] = direction[0][1];
+-  diry[1] = direction[1][1];
+-  diry[2] = direction[2][1];
+-  dirz[0] = direction[0][2];
+-  dirz[1] = direction[1][2];
+-  dirz[2] = direction[2][2];
+-
+-  this->SetDirection(0,dirx);
+-  this->SetDirection(1,diry);
+-  this->SetDirection(2,dirz);
+-  if ( numberOfDimensions > 3 )
+-    {
+-    this->SetDirection(3,dirBlock);
+-    }
+-
++//  typedef Matrix< double, 4, 4 > AffineMatrix;
++//  AffineMatrix spacing;
++//  spacing.SetIdentity();
++//
++//  SpatialOrientation::ValidCoordinateOrientationFlags coord_orient;
++//
++//  switch ( par.sliceorient )
++//    {
++//    case PAR_SLICE_ORIENTATION_TRANSVERSAL:
++//      // Transverse - the REC data appears to be stored as right-left,
++//      // anterior-posterior, and inferior-superior.
++//      // Verified using a marker on right side of brain.
++//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RAI;
++//      spacing[0][0] = par.vox[0];
++//      spacing[1][1] = par.vox[1];
++//      spacing[2][2] = par.vox[2];
++//      break;
++//    case PAR_SLICE_ORIENTATION_SAGITTAL:
++//      // Sagittal - the REC data appears to be stored as anterior-posterior,
++//      // superior-inferior, and right-left.
++//      // Verified using marker on right side of brain.
++//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_ASL;
++//      spacing[0][0] = par.vox[2];
++//      spacing[1][1] = par.vox[0];
++//      spacing[2][2] = par.vox[1];
++//      break;
++//    case PAR_SLICE_ORIENTATION_CORONAL:
++//    // Coronal - the REC data appears to be stored as right-left,
++//    // superior-inferior, and anterior-posterior.
++//    // Verified using marker on right side of brain.
++//    // fall thru
++//    default:
++//      coord_orient = SpatialOrientation::ITK_COORDINATE_ORIENTATION_RSA;
++//      spacing[0][0] = par.vox[0];
++//      spacing[1][1] = par.vox[2];
++//      spacing[2][2] = par.vox[1];
++//    }
++//
++//  typedef SpatialOrientationAdapter OrientAdapterType;
++//  SpatialOrientationAdapter::DirectionType dir =
++//    OrientAdapterType().ToDirectionCosines(coord_orient);
++//
++//  AffineMatrix direction;
++//  direction.SetIdentity();
++//  int rows, columns;
++//  for(rows=0; rows<3; rows++)
++//    {
++//    for(columns=0; columns<3; columns++)
++//      {
++//      direction[columns][rows] = dir[columns][rows];
++//      }
++//    }
++////#define DEBUG_ORIENTATION
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Direction cosines = " << direction << std::endl;
++//  std::cout << "Spacing = " << spacing << std::endl;
++//#endif
++//  // Create right/left rotation matrix (about x axis).
++//  AffineMatrix r1;
++//  r1.SetIdentity();
++//  r1[1][1] = std::cos(par.angRL*Math::pi/180.0);
++//  r1[2][1] = -std::sin(par.angRL*Math::pi/180.0);
++//  r1[1][2] = std::sin(par.angRL*Math::pi/180.0);
++//  r1[2][2] = std::cos(par.angRL*Math::pi/180.0);
++//  // Create anterior/posterior rotation matrix (about y axis).
++//  AffineMatrix r2;
++//  r2.SetIdentity();
++//  r2[0][0] = std::cos(par.angAP*Math::pi/180.0);
++//  r2[2][0] = std::sin(par.angAP*Math::pi/180.0);
++//  r2[0][2] = -std::sin(par.angAP*Math::pi/180.0);
++//  r2[2][2] = std::cos(par.angAP*Math::pi/180.0);
++//  // Create foot/head rotation matrix (about z axis).
++//  AffineMatrix r3;
++//  r3.SetIdentity();
++//  r3[0][0] = std::cos(par.angFH*Math::pi/180.0);
++//  r3[1][0] = -std::sin(par.angFH*Math::pi/180.0);
++//  r3[0][1] = std::sin(par.angFH*Math::pi/180.0);
++//  r3[1][1] = std::cos(par.angFH*Math::pi/180.0);
++//  // Total rotation matrix.
++//  AffineMatrix rtotal = r1*r2*r3;
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Right-Left rotation = " << r1 << std::endl;
++//  std::cout << "Anterior-Posterior rotation = " << r2 << std::endl;
++//  std::cout << "Foot-Head rotation = " << r3 << std::endl;
++//  std::cout << "Total = " << rtotal << std::endl;
++//#endif
++//
++//  // Find and set origin
++//  AffineMatrix final = rtotal*spacing*direction;
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Final transformation = " << final << std::endl;
++//#endif
++//  typedef Vector< double, 4 > PointVector;
++//  PointVector center;
++//  center[0] = (par.dim[0]-1)/2.0;
++//  center[1] = (par.dim[0]-1)/2.0;
++//  center[2] = (par.slice-1)/2.0;
++//  center[3] = 1;
++//  PointVector origin = final*center;
++//  origin = -origin;
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Origin before offset = " << origin << std::endl;
++//#endif
++//  PointVector offset;
++//  offset[0] = par.offRL;
++//  offset[1] = par.offAP;
++//  offset[2] = par.offFH;
++//  offset[3] = 1;
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Offset = " << offset << std::endl;
++//#endif
++//  origin[0] = origin[0]+offset[0];
++//  origin[1] = origin[1]+offset[1];
++//  origin[2] = origin[2]+offset[2];
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Origin after offset = " << origin << std::endl;
++//#endif
++//
++//  this->SetOrigin(0, origin[0]);
++//  this->SetOrigin(1, origin[1]);
++//  this->SetOrigin(2, origin[2]);
++//
++//  // Find true direction cosines after taking rotations into account.
++//  direction = rtotal*direction;
++//#ifdef DEBUG_ORIENTATION
++//  std::cout << "Final direction cosines after rotation = " << direction << std::endl;
++//#endif
++//
++//  std::vector<double> dirx(numberOfDimensions,0),
++//  diry(numberOfDimensions,0),dirz(numberOfDimensions,0),
++//  dirBlock(numberOfDimensions,0);
++//  dirBlock[numberOfDimensions-1] = 1;
++//  dirx[0] = direction[0][0];
++//  dirx[1] = direction[1][0];
++//  dirx[2] = direction[2][0];
++//  diry[0] = direction[0][1];
++//  diry[1] = direction[1][1];
++//  diry[2] = direction[2][1];
++//  dirz[0] = direction[0][2];
++//  dirz[1] = direction[1][2];
++//  dirz[2] = direction[2][2];
++//
++//  this->SetDirection(0,dirx);
++//  this->SetDirection(1,diry);
++//  this->SetDirection(2,dirz);
++//  if ( numberOfDimensions > 3 )
++//    {
++//    this->SetDirection(3,dirBlock);
++//    }
++//
    EncapsulateMetaData< std::string >( thisDic, ITK_PatientID,
                                        std::string(par.patient_name, 32) );
    EncapsulateMetaData< std::string >( thisDic, ITK_ExperimentDate,
+diff --git a/Modules/IO/PhilipsREC/itk-module.cmake b/Modules/IO/PhilipsREC/itk-module.cmake
+index 68b09ea..4cdb36b 100644
+--- a/Modules/IO/PhilipsREC/itk-module.cmake
++++ b/Modules/IO/PhilipsREC/itk-module.cmake
+@@ -11,7 +11,7 @@ itk_module(ITKIOPhilipsREC
+     ITKTransform
+     ITKImageGrid
+     ITKImageIntensity
+-  EXCLUDE_FROM_DEFAULT
++  #EXCLUDE_FROM_DEFAULT
+   DESCRIPTION
+     "${DOCUMENTATION}")
+ # Extra dependency of ITKTransform is introduced by itkPhilipsRECImageIOOrientationTest.
+ 
