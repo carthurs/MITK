@@ -59,7 +59,15 @@ diff --git a/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx b/Modules/IO/PhilipsREC
 index 68b09ea..4cdb36b 100644
 --- a/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx
 +++ b/Modules/IO/PhilipsREC/src/itkPhilipsPAR.cxx
-@@ -1560,6 +1560,7 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
+@@ -1223,6 +1223,7 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
+       pPar->vox[0] = tempInfo.spacingx;
+       pPar->vox[1] = tempInfo.spacingy;
+       pPar->vox[2] = tempInfo.slice_thick + tempInfo.slice_gap;
++	  pPar->cardiac_freq = tempInfo.cardiac_freq;
+       inString.str( this->GetGeneralInfoString(parFile, 31) );
+       inString >> fovAP >> fovFH >> fovRL;
+       inString.clear();
+@@ -1560,6 +1561,7 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
        // Only 1 slice, but how many repetitions of that slice?
        else
          {
@@ -67,7 +75,7 @@ index 68b09ea..4cdb36b 100644
          int lineIncrement = 92;
          int echoIndex = 0;
          int cardiacIndex = 0;
-@@ -1736,8 +1737,8 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
+@@ -1736,8 +1738,8 @@ void PhilipsPAR::ReadPAR(std::string parFile, struct par_parameter *pPar)
  
    // This is a final fixup that will report the total z dimension
    // as the product of the #of slices and the number of image blocks.
