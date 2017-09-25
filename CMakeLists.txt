@@ -365,6 +365,14 @@ endif()
   set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
 # endif()
 
+  # MeshSim requires boost filesystem library
+  list(FIND MITK_USE_Boost_LIBRARIES filesystem _result)
+  if(_result LESS 0)
+    message("> Adding 'filesystem' to MITK_USE_Boost_LIBRARIES.")
+    list(APPEND MITK_USE_Boost_LIBRARIES filesystem)
+  endif()
+  set(MITK_USE_Boost_LIBRARIES ${MITK_USE_Boost_LIBRARIES} CACHE STRING "" FORCE)
+
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
 if(MITK_USE_QT AND MITK_USE_Python)
   set(minimum_required_python_qt5_version "5.3.0")
