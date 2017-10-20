@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyPersistence.h>
 #include <mitkArbitraryTimeGeometry.h>
 
+#include <mitkProperties.h>
+
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
 #include <itkImageFileReader.h>
@@ -388,6 +390,83 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();
        iter != iterEnd; ++iter)
   {
+	  //TODO:: this is a bad temporary hack to get all props of PAR/REC image. Make PAR/REC a subclass instead!
+	  if (iter->first == "PAR_CardiacFrequency" || iter->first == "PAR_MaxNumberOfCardiacPhases" )
+	  {
+		  std::string key = iter->first;
+		  int value = 0;
+
+		  if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
+			  value = std::atoi((dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue()).c_str());
+		  else
+			  value = dynamic_cast<itk::MetaDataObject<int>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
+
+
+		  std::replace(key.begin(), key.end(), '_', '.');
+
+		  image->SetProperty(key.c_str(), mitk::IntProperty::New(value));
+
+		  // Read properties should be persisted unless they are default properties
+		  // which are written anyway
+		  bool isDefaultKey(false);
+
+		  for (const auto &defaultKey : m_DefaultMetaDataKeys)
+		  {
+			  if (defaultKey.length() <= key.length())
+			  {
+				  // does the start match the default key
+				  if (key.substr(0, defaultKey.length()).find(defaultKey) != std::string::npos)
+				  {
+					  isDefaultKey = true;
+				  }
+			  }
+		  }
+
+		  if (isDefaultKey == true)
+		  {
+			  continue;
+		  }
+
+		  mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
+	  }
+	  if (iter->first == "PAR_PhaseEncodingVelocity" )
+	  {
+		  std::string key = iter->first;
+		  float value = 0;
+
+		  if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
+			  value = std::atof((dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue()).c_str());
+		  else
+			  value = (dynamic_cast<itk::MetaDataObject<vnl_vector_fixed<float,3>>*>(iter->second.GetPointer())->GetMetaDataObjectValue())[2];
+
+
+		  std::replace(key.begin(), key.end(), '_', '.');
+
+		  image->SetProperty(key.c_str(), mitk::FloatProperty::New(value));
+
+		  // Read properties should be persisted unless they are default properties
+		  // which are written anyway
+		  bool isDefaultKey(false);
+
+		  for (const auto &defaultKey : m_DefaultMetaDataKeys)
+		  {
+			  if (defaultKey.length() <= key.length())
+			  {
+				  // does the start match the default key
+				  if (key.substr(0, defaultKey.length()).find(defaultKey) != std::string::npos)
+				  {
+					  isDefaultKey = true;
+				  }
+			  }
+		  }
+
+		  if (isDefaultKey == true)
+		  {
+			  continue;
+		  }
+
+		  mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
+	  }
     if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
     {
       std::string key = iter->first;
