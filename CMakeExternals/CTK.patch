@@ -3,44 +3,19 @@ index 806797b..b70005d 100644
 --- a/CMakeExternals/PythonQt.cmake
 +++ b/CMakeExternals/PythonQt.cmake
 @@ -33,7 +33,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
-   endif()
  
    # Enable Qt libraries PythonQt wrapping if required
--  if (CTK_QT_VERSION VERSION_GREATER "4")
+   if (CTK_QT_VERSION VERSION_GREATER "4")
 -    set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools WebKit WebKitWidgets Xml)
--  else()
-+  if (CTK_QT_VERSION VERSION_LESS "5")
++    set(qtlibs Core Gui Widgets Network OpenGL PrintSupport Sql Svg UiTools Xml)
+   else()
      list(APPEND ep_PythonQt_args
        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-       )
--    set(qtlibs core gui network opengl sql svg uitools webkit xml)
-   endif()
-+  set(qtlibs Core Gui Multimedia Network OpenGL Sql Svg UiTools WebKit Xml XmlPatterns)
- 
-   # Set desired qt version for PythonQt
-   list(APPEND ep_PythonQt_args -DPythonQt_QT_VERSION:STRING=${CTK_QT_VERSION})
- 
--  foreach(qtlib All ${qtlibs})
--    string(TOUPPER ${qtlib} qtlib_uppercase)
--    list(APPEND ep_PythonQt_args -DPythonQt_Wrap_Qt${qtlib}:BOOL=${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QT${qtlib_uppercase}})
--  endforeach()
--
-   # Force wrap option to ON if WRAP_QTALL was set to ON
-   if(${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QTALL})
-     foreach(qtlib ${qtlibs})
-@@ -57,6 +50,11 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
-     endforeach()
-   endif()
- 
-+  foreach(qtlib All ${qtlibs})
-+    string(TOUPPER ${qtlib} qtlib_uppercase)
-+    list(APPEND ep_PythonQt_args -DPythonQt_Wrap_Qt${qtlib}:BOOL=${CTK_LIB_Scripting/Python/Core_PYTHONQT_WRAP_QT${qtlib_uppercase}})
-+  endforeach()
-+
-   # Python is required
-   find_package(PythonLibs)
-   if(NOT PYTHONLIBS_FOUND)
-@@ -92,6 +90,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+@@ -88,10 +88,10 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+     BUILD_COMMAND ""
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
        -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
        -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
        -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
@@ -48,11 +23,11 @@ index 806797b..b70005d 100644
        ${ep_PythonQt_args}
      DEPENDS
        ${${proj}_DEPENDENCIES}
-@@ -111,6 +110,7 @@ mark_as_superbuild(
+@@ -111,6 +111,7 @@ mark_as_superbuild(
      PYTHON_INCLUDE_DIR:PATH # FindPythonQt expects PYTHON_INCLUDE_DIR variable to be defined
      PYTHON_INCLUDE_DIR2:PATH
      PYTHON_LIBRARY:FILEPATH # FindPythonQt expects PYTHON_LIBRARY variable to be defined
-+    PYTHONQT_DEBUG_POSTFIX:STRING
++	PYTHONQT_DEBUG_POSTFIX:STRING
    LABELS "FIND_PACKAGE_VARS"
    )
  mark_as_superbuild(
