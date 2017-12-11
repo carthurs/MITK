@@ -1,8 +1,8 @@
 diff --git a/CMakeExternals/PythonQt.cmake b/CMakeExternals/PythonQt.cmake
-index 81764e8..c07722e 100644
+index 806797b..b70005d 100644
 --- a/CMakeExternals/PythonQt.cmake
 +++ b/CMakeExternals/PythonQt.cmake
-@@ -32,23 +32,16 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
+@@ -33,7 +33,7 @@ if(NOT DEFINED PYTHONQT_INSTALL_DIR)
    endif()
  
    # Enable Qt libraries PythonQt wrapping if required

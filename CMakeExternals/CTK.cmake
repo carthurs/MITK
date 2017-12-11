@@ -10,7 +10,7 @@ if(MITK_USE_CTK)
   endif()
 
   set(proj CTK)
-  set(proj_DEPENDENCIES )
+  set(proj_DEPENDENCIES DCMTK)
   set(CTK_DEPENDS ${proj})
 
   if(NOT DEFINED CTK_DIR)
@@ -45,21 +45,11 @@ if(MITK_USE_CTK)
       )
     endif()
 
-     if(MITK_USE_DCMTK)
-      list(APPEND ctk_optional_cache_args
-           -DDCMTK_DIR:PATH=${DCMTK_DIR}
-          )
       if(NOT MITK_USE_Python)
         list(APPEND ctk_optional_cache_args
             -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
             )
       endif()
-      list(APPEND proj_DEPENDENCIES DCMTK)
-    else()
-      list(APPEND ctk_optional_cache_args
-           -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-          )
-    endif()
 
     if(CTEST_USE_LAUNCHERS)
       list(APPEND ctk_optional_cache_args
@@ -74,7 +64,7 @@ if(MITK_USE_CTK)
       ENDIF()
     ENDFOREACH()
 
-   set(ctk_patch_command ${PATCH_COMMAND} --unified -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
+   #set(ctk_patch_command ${PATCH_COMMAND} --unified -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch)
 
    set(ctk_additional_c_flags)
    set(ctk_additional_cxx_flags)
@@ -88,10 +78,11 @@ if(MITK_USE_CTK)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
-      URL_MD5 3b677395c36be4d00b40b569b76906b5
+      URL_MD5 2c04925496e6818706ccffa8a71afaae
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
-      PATCH_COMMAND ${ctk_patch_command}
+      #PATCH_COMMAND ${ctk_patch_command}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -115,11 +106,12 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
-        -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
+        -DDCMTK_DIR:PATH=${DCMTK_DIR}
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_c5e4c2a7.tar.gz
+        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_cb38ae51.tar.gz
         # See bug 19073
-        -DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
-        -DPythonQt_REVISION_TAG:STRING=origin/patched-5
+        #-DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
+        #-DPythonQt_REVISION_TAG:STRING=origin/patched-5
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS
