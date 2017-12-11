@@ -45,9 +45,7 @@ if(MITK_USE_VMTK)
   
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/vtkVmtk-vtk6-CRIMSON.tar.bz2
-      #URL_MD5 c961f891868b7f91676509a9988ad76f
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
+      URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/vtkVmtk-vtk6-CRIMSON.tar.bz2      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
 	  INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
