@@ -16,20 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageVtkLegacyIO.h"
 
-#include "mitkImage.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkImage.h"
 #include "mitkImageVtkReadAccessor.h"
 
-#include <vtkStructuredPointsReader.h>
-#include <vtkStructuredPointsWriter.h>
-#include <vtkStructuredPoints.h>
 #include <vtkErrorCode.h>
 #include <vtkSmartPointer.h>
+#include <vtkStructuredPoints.h>
+#include <vtkStructuredPointsReader.h>
+#include <vtkStructuredPointsWriter.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
 
-namespace mitk {
-
+namespace mitk
+{
 ImageVtkLegacyIO::ImageVtkLegacyIO()
   : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_LEGACY_MIMETYPE(), "VTK Legacy Image")
 {
@@ -77,13 +77,15 @@ std::vector<BaseData::Pointer> ImageVtkLegacyIO::Read()
   }
   else
   {
-    mitkThrow() << "vtkStructuredPointsReader error: " << vtkErrorCode::GetStringFromErrorCode(reader->GetErrorCode());
+      mitkThrow() << "vtkStructuredPointsReader error: "
+                  << vtkErrorCode::GetStringFromErrorCode(reader->GetErrorCode());
   }
 }
 
 IFileIO::ConfidenceLevel ImageVtkLegacyIO::GetReaderConfidenceLevel() const
 {
-  if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported) return Unsupported;
+    if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
+      return Unsupported;
   vtkSmartPointer<vtkStructuredPointsReader> reader = vtkSmartPointer<vtkStructuredPointsReader>::New();
   reader->SetFileName(this->GetLocalFileName().c_str());
   if (reader->IsFileStructuredPoints())
@@ -115,22 +117,22 @@ void ImageVtkLegacyIO::Write()
 
   if (writer->Write() == 0 || writer->GetErrorCode() != 0 )
   {
-    mitkThrow() << "vtkStructuredPointesWriter error: " << vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode());
+      mitkThrow() << "vtkStructuredPointesWriter error: "
+                  << vtkErrorCode::GetStringFromErrorCode(writer->GetErrorCode());
   }
 }
 
 IFileIO::ConfidenceLevel ImageVtkLegacyIO::GetWriterConfidenceLevel() const
 {
-  if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported) return Unsupported;
+    if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
+      return Unsupported;
   const Image* input = static_cast<const Image*>(this->GetInput());
-  if (input->GetDimension() == 3) return Supported;
-  else if (input->GetDimension() < 3) return PartiallySupported;
+    if (input->GetDimension() == 3)
+      return Supported;
+    else if (input->GetDimension() < 3)
+      return PartiallySupported;
   return Unsupported;
 }
 
-ImageVtkLegacyIO* ImageVtkLegacyIO::IOClone() const
-{
-  return new ImageVtkLegacyIO(*this);
-}
-
+  ImageVtkLegacyIO *ImageVtkLegacyIO::IOClone() const { return new ImageVtkLegacyIO(*this); }
 }

@@ -15,31 +15,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceVtkMapper3D.h"
-#include <mitkDataNode.h>
-#include <mitkProperties.h>
-#include <mitkColorProperty.h>
-#include <mitkLookupTableProperty.h>
-#include <mitkVtkRepresentationProperty.h>
-#include <mitkVtkInterpolationProperty.h>
-#include <mitkVtkScalarModeProperty.h>
 #include <mitkClippingProperty.h>
-#include <mitkSmartPointerProperty.h>
-#include <mitkIShaderRepository.h>
-#include <mitkExtractSliceFilter.h>
-#include <mitkImageSliceSelector.h>
+#include <mitkColorProperty.h>
 #include <mitkCoreServices.h>
-#include <mitkTransferFunctionProperty.h>
-#include <mitkIPropertyDescriptions.h>
+#include <mitkDataNode.h>
+#include <mitkExtractSliceFilter.h>
 #include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIShaderRepository.h>
+#include <mitkImageSliceSelector.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkProperties.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
 
 //VTK
 #include <vtkActor.h>
-#include <vtkProperty.h>
+#include <vtkPlaneCollection.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
-#include <vtkPointData.h>
-#include <vtkPlaneCollection.h>
+#include <vtkProperty.h>
 #include <vtkSmartPointer.h>
 
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
@@ -118,7 +118,9 @@ void mitk::SurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
   ls->m_Actor->VisibilityOff();
 }
 
-void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node,
+                                                                vtkProperty *property,
+                                                                mitk::BaseRenderer *renderer)
 {
   // Backface culling
   {
@@ -155,10 +157,17 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       if(colorProperty.IsNotNull())
       {
         mitk::Color c = colorProperty->GetColor();
-        ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
-        diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
-        // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
-        specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
+        ambient[0] = c.GetRed();
+        ambient[1] = c.GetGreen();
+        ambient[2] = c.GetBlue();
+        diffuse[0] = c.GetRed();
+        diffuse[1] = c.GetGreen();
+        diffuse[2] = c.GetBlue();
+        // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these
+        // colors are different.
+        specular[0] = c.GetRed();
+        specular[1] = c.GetGreen();
+        specular[2] = c.GetBlue();
       }
     }
 
@@ -169,7 +178,9 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       if(p.IsNotNull())
       {
         mitk::Color c = p->GetColor();
-        ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
+        ambient[0] = c.GetRed();
+        ambient[1] = c.GetGreen();
+        ambient[2] = c.GetBlue();
       }
     }
 
@@ -180,7 +191,9 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       if(p.IsNotNull())
       {
         mitk::Color c = p->GetColor();
-        diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
+        diffuse[0] = c.GetRed();
+        diffuse[1] = c.GetGreen();
+        diffuse[2] = c.GetBlue();
       }
     }
 
@@ -191,7 +204,9 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       if(p.IsNotNull())
       {
         mitk::Color c = p->GetColor();
-        specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
+        specular[0] = c.GetRed();
+        specular[1] = c.GetGreen();
+        specular[2] = c.GetBlue();
       }
     }
 
@@ -317,26 +332,26 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
   }
   else if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
     {
-      ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+    ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
     }
 
     bool scalarVisibility = false;
     this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
-    ls->m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
+  ls->m_VtkPolyDataMapper->SetScalarVisibility((scalarVisibility ? 1 : 0));
 
-    if(scalarVisibility)
+  if (scalarVisibility)
     {
       ls->m_VtkPolyDataMapper->ColorByArrayComponent(-1, -1); // To allow vtkScalarsToColors to handle multi-component data
         
-      mitk::VtkScalarModeProperty* scalarMode;
-      if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
+    mitk::VtkScalarModeProperty *scalarMode;
+    if (this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
         ls->m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
       else
         ls->m_VtkPolyDataMapper->SetScalarModeToDefault();
 
       bool colorMode = false;
       this->GetDataNode()->GetBoolProperty("color mode", colorMode);
-      ls->m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
+    ls->m_VtkPolyDataMapper->SetColorMode((colorMode ? 1 : 0));
 
       double scalarsMin = 0;
       this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
@@ -344,18 +359,18 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
       double scalarsMax = 1.0;
       this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
-      ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin, scalarsMax);
     }
 
     mitk::SmartPointerProperty::Pointer imagetextureProp =
       dynamic_cast< mitk::SmartPointerProperty * >(GetDataNode()->GetProperty("Surface.Texture", renderer));
 
-    if(imagetextureProp.IsNotNull())
+  if (imagetextureProp.IsNotNull())
     {
-      mitk::Image* miktTexture = dynamic_cast< mitk::Image* >( imagetextureProp->GetSmartPointer().GetPointer() );
+    mitk::Image *miktTexture = dynamic_cast<mitk::Image *>(imagetextureProp->GetSmartPointer().GetPointer());
       vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
-      //Either select the first slice of a volume
-      if(miktTexture->GetDimension(2) > 1)
+    // Either select the first slice of a volume
+    if (miktTexture->GetDimension(2) > 1)
       {
         MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
         mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
@@ -366,19 +381,22 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
         sliceselector->Update();
         vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
       }
-      else //or just use the 2D image
+    else // or just use the 2D image
       {
         vtkTxture->SetInputData(miktTexture->GetVtkImageData());
       }
-      //pass the texture to the actor
+    // pass the texture to the actor
       ls->m_Actor->SetTexture(vtkTxture);
-      if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
+    if (ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
       {
-        MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
+      MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture "
+                    "coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
       }
       // if no texture is set, this will also remove a previously used texture
       // and reset the actor to it's default behaviour
-    } else {
+  }
+  else
+  {
       ls->m_Actor->SetTexture(0);
     }
 
@@ -392,63 +410,65 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     if (deprecatedUseCellData)
     {
       ls->m_VtkPolyDataMapper->SetColorModeToDefault();
-      ls->m_VtkPolyDataMapper->SetScalarRange(0,255);
+    ls->m_VtkPolyDataMapper->SetScalarRange(0, 255);
       ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
       ls->m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetSpecular(1);
+    ls->m_Actor->GetProperty()->SetSpecularPower(50);
       ls->m_Actor->GetProperty()->SetInterpolationToPhong();
     }
     else if (deprecatedUsePointData)
     {
       float scalarsMin = 0;
       if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
-        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
+      scalarsMin =
+        dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
 
       float scalarsMax = 0.1;
       if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
-        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
+      scalarsMax =
+        dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
-      ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin, scalarsMax);
       ls->m_VtkPolyDataMapper->SetColorModeToMapScalars();
       ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetSpecular(1);
+    ls->m_Actor->GetProperty()->SetSpecularPower(50);
       ls->m_Actor->GetProperty()->SetInterpolationToPhong();
     }
 
     int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
-    if(this->GetDataNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
+  if (this->GetDataNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
     {
       ls->m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
       ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetSpecular(1);
+    ls->m_Actor->GetProperty()->SetSpecularPower(50);
     }
 
     // Check whether one or more ClippingProperty objects have been defined for
     // this node. Check both renderer specific and global property lists, since
     // properties in both should be considered.
-    const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList( renderer )->GetMap();
-    const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList( NULL )->GetMap();
+  const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList(renderer)->GetMap();
+  const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList(NULL)->GetMap();
 
     // Add clipping planes (if any)
     ls->m_ClippingPlaneCollection->RemoveAllItems();
 
     PropertyList::PropertyMap::const_iterator it;
-    for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
+  for (it = rendererProperties->begin(); it != rendererProperties->end(); ++it)
     {
-      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
+    this->CheckForClippingProperty(renderer, (*it).second.GetPointer());
     }
 
-    for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
+  for (it = globalProperties->begin(); it != globalProperties->end(); ++it)
     {
-      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
+    this->CheckForClippingProperty(renderer, (*it).second.GetPointer());
     }
 
-    if ( ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
+  if (ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0)
     {
-      ls->m_VtkPolyDataMapper->SetClippingPlanes( ls->m_ClippingPlaneCollection );
+    ls->m_VtkPolyDataMapper->SetClippingPlanes(ls->m_ClippingPlaneCollection);
     }
     else
     {
@@ -468,8 +488,7 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
 
   ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >( property );
 
-  if ( (clippingProperty != NULL)
-    && (clippingProperty->GetClippingEnabled()) )
+  if ((clippingProperty != NULL) && (clippingProperty->GetClippingEnabled()))
   {
     const Point3D &origin = clippingProperty->GetOrigin();
     const Vector3D &normal = clippingProperty->GetNormal();
@@ -482,7 +501,9 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
   }
 }
 
-void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode *node,
+                                                                  mitk::BaseRenderer *renderer,
+                                                                  bool overwrite)
 {
   // Shading
   {
@@ -510,7 +531,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty("color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+  node->AddProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f), renderer, overwrite);
   node->AddProperty("color.selected", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);
   node->AddProperty("opacity", mitk::FloatProperty::New(1.0), renderer, overwrite);
 
@@ -522,7 +543,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
-    if((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != NULL) && (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
+    if ((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != NULL) &&
+        (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
     {
       node->AddProperty( "scalar visibility", mitk::BoolProperty::New(true), renderer, overwrite );
       node->AddProperty( "color mode", mitk::BoolProperty::New(true), renderer, overwrite );
@@ -533,6 +555,10 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::
   node->AddProperty( "Backface Culling", mitk::BoolProperty::New(false), renderer, overwrite );
 
   node->AddProperty( "Depth Sorting", mitk::BoolProperty::New(false), renderer, overwrite );
-  mitk::CoreServices::GetPropertyDescriptions()->AddDescription( "Depth Sorting", "Enables correct rendering for transparent objects by ordering polygons according to the distance to the camera. It is not recommended to enable this property for large surfaces (rendering might be slow).");
+  mitk::CoreServices::GetPropertyDescriptions()->AddDescription(
+    "Depth Sorting",
+    "Enables correct rendering for transparent objects by ordering polygons according to the distance "
+    "to the camera. It is not recommended to enable this property for large surfaces (rendering might "
+    "be slow).");
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

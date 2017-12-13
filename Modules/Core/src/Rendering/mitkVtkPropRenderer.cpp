@@ -17,48 +17,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 // MAPPERS
-#include "mitkMapper.h"
-#include "mitkImageVtkMapper2D.h"
-#include "mitkVtkMapper.h"
-#include "mitkPlaneGeometryDataVtkMapper3D.h"
 #include "mitkCameraController.h"
+#include "mitkImageVtkMapper2D.h"
+#include "mitkMapper.h"
+#include "mitkPlaneGeometryDataVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 
-#include <mitkImageSliceSelector.h>
-#include <mitkRenderingManager.h>
+#include <mitkAbstractTransformGeometry.h>
 #include <mitkGeometry3D.h>
+#include <mitkImageSliceSelector.h>
 #include <mitkLevelWindow.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
 #include <mitkSurface.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkVtkInteractorStyle.h>
-#include <mitkAbstractTransformGeometry.h>
 
 // VTK
-#include <vtkRenderer.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderWindowInteractor.h>
+#include <vtkAssemblyNode.h>
+#include <vtkAssemblyPath.h>
+#include <vtkCamera.h>
+#include <vtkCellPicker.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkLight.h>
 #include <vtkLightKit.h>
-#include <vtkRenderWindow.h>
 #include <vtkLinearTransform.h>
-#include <vtkCamera.h>
-#include <vtkWorldPointPicker.h>
+#include <vtkMapper.h>
 #include <vtkPointPicker.h>
-#include <vtkCellPicker.h>
+#include <vtkProp.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
-#include <vtkProp.h>
-#include <vtkAssemblyPath.h>
-#include <vtkAssemblyNode.h>
-#include <vtkMapper.h>
-#include <vtkSmartPointer.h>
 #include <vtkTransform.h>
-#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkWorldPointPicker.h>
 
-mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode )
-  : BaseRenderer(name,renWin, rm, renderingMode ),
-    m_CameraInitializedForMapperID(0)
+mitk::VtkPropRenderer::VtkPropRenderer(const char *name,
+                                       vtkRenderWindow *renWin,
+                                       mitk::RenderingManager *rm,
+                                       mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  : BaseRenderer(name, renWin, rm, renderingMode), m_CameraInitializedForMapperID(0)
 {
   didCount=false;
 
@@ -119,14 +121,15 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_TextRenderer->Delete();
 }
 
-void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
+void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage *storage)
 {
   if ( storage == NULL )
     return;
 
   BaseRenderer::SetDataStorage(storage);
 
-  static_cast<mitk::PlaneGeometryDataVtkMapper3D*>(m_CurrentWorldPlaneGeometryMapper.GetPointer())->SetDataStorageForTexture( m_DataStorage.GetPointer() );
+  static_cast<mitk::PlaneGeometryDataVtkMapper3D *>(m_CurrentWorldPlaneGeometryMapper.GetPointer())
+    ->SetDataStorageForTexture(m_DataStorage.GetPointer());
 
   // Compute the geometry from the current data tree bounds and set it as world geometry
   this->SetWorldGeometryToDataStorageBounds();
@@ -197,7 +200,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 /*!
 \brief PrepareMapperQueue iterates the datatree
 
-PrepareMapperQueue iterates the datatree in order to find mappers which shall be rendered. Also, it sortes the mappers wrt to their layer.
+PrepareMapperQueue iterates the datatree in order to find mappers which shall be rendered. Also, it sortes the mappers
+wrt to their layer.
 */
 void mitk::VtkPropRenderer::PrepareMapperQueue()
 {
@@ -205,7 +209,8 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   m_NumberOfVisibleLODEnabledMappers = 0;
 
   // Do we have to update the mappers ?
-  if (m_LastUpdateTime < GetMTime() || m_LastUpdateTime < this->GetCurrentWorldPlaneGeometry()->GetMTime()) {
+  if (m_LastUpdateTime < GetMTime() || m_LastUpdateTime < this->GetCurrentWorldPlaneGeometry()->GetMTime())
+  {
     Update();
   }
   else if (m_MapperID>=1 && m_MapperID < 6)
@@ -253,7 +258,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int layer = 1;
     node->GetIntProperty("layer", layer, this);
     int nr = (layer<<16) + mapperNo;
-    m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
+    m_MappersMap.insert(std::pair<int, Mapper *>(nr, mapper));
     mapperNo++;
   }
 }
@@ -269,7 +274,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
       {
         mapper->Update(this);
         {
-          VtkMapper* vtkmapper=dynamic_cast<VtkMapper*>(mapper.GetPointer());
+          VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper.GetPointer());
           if(vtkmapper != NULL)
           {
             vtkmapper->UpdateVtkTransform(this);
@@ -303,8 +308,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
   BaseRenderer::InitRenderer(renderWindow);
 
   vtkCallbackCommand *renderCallbackCommand = vtkCallbackCommand::New();
-  renderCallbackCommand->SetCallback(
-    VtkPropRenderer::RenderingCallback );
+  renderCallbackCommand->SetCallback(VtkPropRenderer::RenderingCallback);
   renderWindow->GetInteractor()->AddObserver( vtkCommand::RenderEvent, renderCallbackCommand );
   renderCallbackCommand->Delete();
 
@@ -323,11 +327,12 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 
 void mitk::VtkPropRenderer::RenderingCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  vtkRenderWindowInteractor *renderWindowInteractor
-      = dynamic_cast< vtkRenderWindowInteractor * >( caller );
-  if(!renderWindowInteractor) return;
+  vtkRenderWindowInteractor *renderWindowInteractor = dynamic_cast<vtkRenderWindowInteractor *>(caller);
+  if (!renderWindowInteractor)
+    return;
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindowInteractor->GetRenderWindow());
-  if(renderer) renderer->RequestUpdate();
+  if (renderer)
+    renderer->RequestUpdate();
 }
 
 /*!
@@ -355,7 +360,8 @@ void mitk::VtkPropRenderer::InitSize(int w, int h)
   this->GetCameraController()->Fit();
 }
 
-int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
+int mitk::VtkPropRenderer::WriteSimpleText(
+  std::string text, double posX, double posY, double color1, double color2, double color3, float opacity)
 {
   this->GetVtkRenderer()->ViewToDisplay();
   if (!text.empty())
@@ -426,17 +432,14 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
   //    Superclass::PickWorldPoint(displayPoint, worldPoint);
 }
 
-mitk::DataNode *
-mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const
+mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition, Point3D &worldPosition) const
 {
   m_CellPicker->InitializePickList();
 
   // Iterate over all DataStorage objects to determine all vtkProps intended
   // for picking
   DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
-  for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-        it != allObjects->End();
-        ++it )
+  for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin(); it != allObjects->End(); ++it)
   {
     const DataNode *node = it->Value();
     if ( node == NULL )
@@ -450,7 +453,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
     if ( !node->IsVisible(this) )
       continue;
   
-    VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
+    VtkMapper *mapper = dynamic_cast<VtkMapper *>(node->GetMapper(m_MapperID));
     if ( mapper == NULL )
       continue;
 
@@ -476,21 +479,20 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
 
   // Iterate over all DataStorage objects to determine if the retrieved
   // vtkProp is owned by any associated mapper.
-  for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
-        it != allObjects->End();
-        ++it)
+  for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin(); it != allObjects->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
     if ( node.IsNull() )
       continue;
 
-    mitk::Mapper * mapper = node->GetMapper( m_MapperID );
+    mitk::Mapper *mapper = node->GetMapper(m_MapperID);
     if ( mapper == NULL)
       continue;
 
-    mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
+    mitk::VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
 
-    if(vtkmapper){
+    if (vtkmapper)
+    {
       //if vtk-based, then ...
       if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
       {
@@ -502,7 +504,6 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
 }
 //todo: is this 2D renderwindow picking?
 //    return Superclass::PickObject( displayPosition, worldPosition );
-
 
 vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
@@ -520,26 +521,24 @@ void mitk::VtkPropRenderer::InitPathTraversal()
 
 void mitk::VtkPropRenderer::UpdatePaths()
 {
-  if (m_DataStorage.IsNull()) {
+  if (m_DataStorage.IsNull())
+  {
     return;
   }
 
-  if (GetMTime() > m_PathTime ||
-      (m_Paths != nullptr && m_Paths->GetMTime() > m_PathTime))
+  if (GetMTime() > m_PathTime || (m_Paths != nullptr && m_Paths->GetMTime() > m_PathTime))
     {
 
     m_Paths = vtkSmartPointer<vtkAssemblyPaths>::New();
 
     DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
-    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin();
-         iter != objects->end();
-         ++iter)
+    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter)
 {
       vtkSmartPointer<vtkAssemblyPath> onePath = vtkSmartPointer<vtkAssemblyPath>::New();
       Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
       if (mapper)
       {
-        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
+        VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);
           if ( prop && prop->GetVisibility() )
@@ -583,7 +582,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)
 
     if (mapper)
     {
-      VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
+      VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
 
       if(vtkmapper)
         vtkmapper->ReleaseGraphicsResources(this);
@@ -666,7 +665,8 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
   {
     //activate parallel projection for 2D
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
-    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    vtkSmartPointer<vtkInteractorStyleTrackballCamera> style =
+      vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
     this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
     m_CameraInitializedForMapperID = Standard3D;

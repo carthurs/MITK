@@ -18,40 +18,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // File IO
 #include <mitkSurfaceCutterFactoryPerformanceSelector.h>
-#include <mitkIOUtil.h>
+#include <mitkGeometryDataReaderService.h>
+#include <mitkGeometryDataWriterService.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkIOUtil.h>
+#include <mitkImageVtkLegacyIO.h>
+#include <mitkImageVtkXmlIO.h>
 #include <mitkItkImageIO.h>
 #include <mitkMimeTypeProvider.h>
 #include <mitkPointSetReaderService.h>
 #include <mitkPointSetWriterService.h>
-#include <mitkGeometryDataReaderService.h>
-#include <mitkGeometryDataWriterService.h>
 #include <mitkRawImageFileReader.h>
 #include <mitkSurfaceStlIO.h>
 #include <mitkSurfaceVtkLegacyIO.h>
 #include <mitkSurfaceVtkXmlIO.h>
-#include <mitkImageVtkXmlIO.h>
-#include <mitkImageVtkLegacyIO.h>
 
-#include <mitkFileWriter.h>
-#include "mitkLegacyFileWriterService.h"
 #include "mitkDicomSeriesReaderService.h"
+#include "mitkLegacyFileWriterService.h"
+#include <mitkFileWriter.h>
 
-#include <itkNiftiImageIO.h>
 #include <itkGDCMImageIO.h>
+#include <itkNiftiImageIO.h>
 #include <itkPhilipsRECImageIO.h>
 #include <itkPhilipsRECImageIOFactory.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
-#include <usModuleInitialization.h>
+#include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usModuleSettings.h>
 #include <usModuleEvent.h>
-#include <usModule.h>
+#include <usModuleInitialization.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
+#include <usModuleSettings.h>
 #include <usServiceTracker.h>
 
 // ITK "injects" static initialization code for IO factories
@@ -111,14 +111,8 @@ void AddMitkAutoLoadPaths(const std::string& programPath)
 
 class ShaderRepositoryTracker : public us::ServiceTracker<mitk::IShaderRepository>
 {
-
 public:
-
-  ShaderRepositoryTracker()
-    : Superclass(us::GetModuleContext())
-  {
-  }
-
+  ShaderRepositoryTracker() : Superclass(us::GetModuleContext()) {}
   virtual void Close() override
   {
     us::GetModuleContext()->RemoveModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
@@ -132,7 +126,6 @@ public:
   }
 
 private:
-
   typedef us::ServiceTracker<mitk::IShaderRepository> Superclass;
 
   TrackedType AddingService(const ServiceReferenceType &reference) override
@@ -147,8 +140,8 @@ private:
       // method contains code to avoid double registrations due to a fired
       // ModuleEvent::LOADED event after the activators Load() method finished.
       std::vector<us::Module*> modules = us::ModuleRegistry::GetLoadedModules();
-      for (std::vector<us::Module*>::const_iterator iter = modules.begin(),
-           endIter = modules.end(); iter != endIter; ++iter)
+      for (std::vector<us::Module *>::const_iterator iter = modules.begin(), endIter = modules.end(); iter != endIter;
+           ++iter)
       {
         this->AddModuleShaderToRepository(*iter, shaderRepo);
       }
@@ -169,8 +162,11 @@ private:
     if (moduleEvent.GetType() == us::ModuleEvent::LOADED)
     {
       std::vector<mitk::IShaderRepository*> shaderRepos;
-      for (std::map<mitk::IShaderRepository*, std::map<long, std::vector<int> > >::const_iterator shaderMapIter = m_ModuleIdToShaderIds.begin(),
-           shaderMapEndIter = m_ModuleIdToShaderIds.end(); shaderMapIter != shaderMapEndIter; ++shaderMapIter)
+      for (std::map<mitk::IShaderRepository *, std::map<long, std::vector<int>>>::const_iterator
+             shaderMapIter = m_ModuleIdToShaderIds.begin(),
+             shaderMapEndIter = m_ModuleIdToShaderIds.end();
+           shaderMapIter != shaderMapEndIter;
+           ++shaderMapIter)
       {
         if (shaderMapIter->second.find(moduleEvent.GetModule()->GetModuleId()) == shaderMapIter->second.end())
         {
@@ -189,8 +185,7 @@ private:
   {
     // search and load shader files
     std::vector<us::ModuleResource> shaderResources = module->FindResources("Shaders", "*.xml", true);
-    for (std::vector<us::ModuleResource>::iterator i = shaderResources.begin();
-         i != shaderResources.end(); ++i)
+    for (std::vector<us::ModuleResource>::iterator i = shaderResources.begin(); i != shaderResources.end(); ++i)
     {
       if (*i)
       {
@@ -221,12 +216,11 @@ private:
     for (const auto & shaderRepo : shaderRepos)
     {
       std::map<long, std::vector<int> >& moduleIdToShaderIds = m_ModuleIdToShaderIds[shaderRepo];
-      std::map<long, std::vector<int> >::iterator shaderIdsIter =
-        moduleIdToShaderIds.find(module->GetModuleId());
+      std::map<long, std::vector<int>>::iterator shaderIdsIter = moduleIdToShaderIds.find(module->GetModuleId());
       if (shaderIdsIter != moduleIdToShaderIds.end())
       {
-        for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
-             idIter != shaderIdsIter->second.end(); ++idIter)
+        for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin(); idIter != shaderIdsIter->second.end();
+             ++idIter)
         {
           (shaderRepo)->UnloadShader(*idIter);
         }
@@ -236,7 +230,6 @@ private:
   }
 
 private:
-
   // Maps to each shader repository a map containing module ids and related
   // shader registration ids
   std::map<mitk::IShaderRepository*, std::map<long, std::vector<int> > > m_ModuleIdToShaderIds;
@@ -246,7 +239,6 @@ private:
 class FixedNiftiImageIO : public itk::NiftiImageIO
 {
 public:
-
   /** Standard class typedefs. */
   typedef FixedNiftiImageIO         Self;
   typedef itk::NiftiImageIO         Superclass;
@@ -262,7 +254,6 @@ public:
   {
     return dim > 1 && dim < 5;
   }
-
 };
 
 void MitkCoreActivator::Load(us::ModuleContext* context)
@@ -374,7 +365,9 @@ void MitkCoreActivator::Unload(us::ModuleContext* )
   m_MimeTypeProvider->Stop();
 
   for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_DefaultMimeTypes.begin(),
-       iterEnd = m_DefaultMimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+                                                           iterEnd = m_DefaultMimeTypes.end();
+       mimeTypeIter != iterEnd;
+       ++mimeTypeIter)
   {
     delete *mimeTypeIter;
   }
@@ -387,8 +380,9 @@ void MitkCoreActivator::RegisterDefaultMimeTypes()
   // Register some default mime-types
 
   std::vector<mitk::CustomMimeType*> mimeTypes = mitk::IOMimeTypes::Get();
-  for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = mimeTypes.begin(),
-       iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+  for (std::vector<mitk::CustomMimeType *>::const_iterator mimeTypeIter = mimeTypes.begin(), iterEnd = mimeTypes.end();
+       mimeTypeIter != iterEnd;
+       ++mimeTypeIter)
   {
     m_DefaultMimeTypes.push_back(*mimeTypeIter);
     m_Context->RegisterService(m_DefaultMimeTypes.back());
@@ -397,7 +391,7 @@ void MitkCoreActivator::RegisterDefaultMimeTypes()
 
 void MitkCoreActivator::RegisterItkReaderWriter()
 {
-	itk::PhilipsRECImageIOFactory::RegisterOneFactory();
+  itk::PhilipsRECImageIOFactory::RegisterOneFactory();
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
 
@@ -407,7 +401,8 @@ void MitkCoreActivator::RegisterItkReaderWriter()
 
     // NiftiImageIO does not provide a correct "SupportsDimension()" methods
     // and the supported read/write extensions are not ordered correctly
-    if (dynamic_cast<itk::NiftiImageIO*>(io)) continue;
+    if (dynamic_cast<itk::NiftiImageIO *>(io))
+      continue;
 
     // Use a custom mime-type for GDCMImageIO below
     if (dynamic_cast<itk::GDCMImageIO*>(allobject.GetPointer()))
@@ -422,14 +417,12 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     }
     else
     {
-      MITK_WARN << "Error ImageIO factory did not return an ImageIOBase: "
-                << ( allobject )->GetNameOfClass();
+      MITK_WARN << "Error ImageIO factory did not return an ImageIOBase: " << (allobject)->GetNameOfClass();
     }
   }
 
   FixedNiftiImageIO::Pointer itkNiftiIO = FixedNiftiImageIO::New();
-  mitk::ItkImageIO* niftiIO = new mitk::ItkImageIO(mitk::IOMimeTypes::NIFTI_MIMETYPE(),
-                                                   itkNiftiIO.GetPointer(), 0);
+  mitk::ItkImageIO *niftiIO = new mitk::ItkImageIO(mitk::IOMimeTypes::NIFTI_MIMETYPE(), itkNiftiIO.GetPointer(), 0);
   m_FileIOs.push_back(niftiIO);
 }
 
@@ -447,8 +440,7 @@ void MitkCoreActivator::RegisterLegacyWriter()
 {
   std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("IOWriter");
 
-  for( std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin();
-       i != allobjects.end(); ++i)
+  for (std::list<itk::LightObject::Pointer>::iterator i = allobjects.begin(); i != allobjects.end(); ++i)
   {
     mitk::FileWriter::Pointer io = dynamic_cast<mitk::FileWriter*>(i->GetPointer());
     if(io)
@@ -459,9 +451,7 @@ void MitkCoreActivator::RegisterLegacyWriter()
     }
     else
     {
-      MITK_ERROR << "Error IOWriter override is not of type mitk::FileWriter: "
-                 << (*i)->GetNameOfClass()
-                 << std::endl;
+      MITK_ERROR << "Error IOWriter override is not of type mitk::FileWriter: " << (*i)->GetNameOfClass() << std::endl;
     }
   }
 }

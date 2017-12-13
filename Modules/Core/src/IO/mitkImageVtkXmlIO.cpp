@@ -16,21 +16,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageVtkXmlIO.h"
 
-#include "mitkImage.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkImage.h"
 #include "mitkImageVtkReadAccessor.h"
 
+#include <vtkErrorCode.h>
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
 #include <vtkXMLImageDataReader.h>
 #include <vtkXMLImageDataWriter.h>
-#include <vtkImageData.h>
-#include <vtkErrorCode.h>
-#include <vtkSmartPointer.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
 
 #include <itkEuler3DTransform.h>
 
-namespace mitk {
+namespace mitk 
+{
 
 class VtkXMLImageDataReader : public ::vtkXMLImageDataReader
 {
@@ -38,7 +39,10 @@ public:
   static VtkXMLImageDataReader *New() { return new VtkXMLImageDataReader(); }
   vtkTypeMacro(VtkXMLImageDataReader,vtkXMLImageDataReader)
 
-  void SetStream(std::istream* is) { this->Stream = is; }
+      void SetStream(std::istream *is)
+    {
+      this->Stream = is;
+    }
   std::istream* GetStream() const { return this->Stream; }
 };
 
@@ -48,7 +52,10 @@ public:
   static VtkXMLImageDataWriter *New() { return new VtkXMLImageDataWriter(); }
   vtkTypeMacro(VtkXMLImageDataWriter,vtkXMLImageDataWriter)
 
-  void SetStream(std::ostream* os) { this->Stream = os; }
+      void SetStream(std::ostream *os)
+    {
+      this->Stream = os;
+    }
   std::ostream* GetStream() const { return this->Stream; }
 };
 
@@ -121,7 +128,8 @@ std::vector<BaseData::Pointer> ImageVtkXmlIO::Read()
 
 IFileIO::ConfidenceLevel ImageVtkXmlIO::GetReaderConfidenceLevel() const
 {
-  if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported) return Unsupported;
+    if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
+      return Unsupported;
   if (this->GetInputStream() == NULL)
   {
     // check if the xml vtk reader can handle the file
@@ -205,16 +213,15 @@ void ImageVtkXmlIO::Write()
 
 IFileIO::ConfidenceLevel ImageVtkXmlIO::GetWriterConfidenceLevel() const
 {
-  if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported) return Unsupported;
+    if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
+      return Unsupported;
   const Image* input = static_cast<const Image*>(this->GetInput());
-  if (input->GetDimension() == 3) return Supported;
-  else if (input->GetDimension() < 3) return PartiallySupported;
+    if (input->GetDimension() == 3)
+      return Supported;
+    else if (input->GetDimension() < 3)
+      return PartiallySupported;
   return Unsupported;
 }
 
-ImageVtkXmlIO* ImageVtkXmlIO::IOClone() const
-{
-  return new ImageVtkXmlIO(*this);
-}
-
+  ImageVtkXmlIO *ImageVtkXmlIO::IOClone() const { return new ImageVtkXmlIO(*this); }
 }

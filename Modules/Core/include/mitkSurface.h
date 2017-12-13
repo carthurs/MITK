@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <memory>
 #include <vector>
 
-#include "mitkBaseData.h"
 #include "itkImageRegion.h"
+#include "mitkBaseData.h"
 #include "mitkISurfaceCutter.h"
 
 #include <vtkSmartPointer.h>
@@ -40,8 +40,7 @@ namespace mitk
     typedef itk::ImageRegion<5> RegionType;
 
     mitkClassMacro(Surface, BaseData);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
     void CalculateBoundingBox();
     virtual void CopyInformation(const itk::DataObject *data) override;
@@ -64,7 +63,6 @@ namespace mitk
     virtual void Update() override;
     virtual void UpdateOutputInformation() override;
     virtual bool VerifyRequestedRegion() override;
-
 
   protected:
     mitkCloneMacro(Self);
@@ -89,7 +87,8 @@ namespace mitk
 
   /**
   * @brief Equal Compare two surfaces for equality, returns true if found equal.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::Surface& s1, const mitk::Surface& s2) instead
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
+  * mitk::Surface& s1, const mitk::Surface& s2) instead
   * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
@@ -97,7 +96,8 @@ namespace mitk
   * @param verbose Flag indicating if the method should give a detailed console output.
   * @return True if every comparison is true, false in any other case.
   */
-DEPRECATED( MITKCORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool verbose));
+  DEPRECATED(MITKCORE_EXPORT bool Equal(
+    mitk::Surface *leftHandSide, mitk::Surface *rightHandSide, mitk::ScalarType eps, bool verbose));
 
 /**
 * @brief Equal Compare two surfaces for equality, returns true if found equal.
@@ -108,11 +108,15 @@ DEPRECATED( MITKCORE_EXPORT bool Equal( mitk::Surface* leftHandSide, mitk::Surfa
 * @param verbose Flag indicating if the method should give a detailed console output.
 * @return True if every comparison is true, false in any other case.
 */
-MITKCORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHandSide, mitk::ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(mitk::Surface &leftHandSide,
+                             mitk::Surface &rightHandSide,
+                             mitk::ScalarType eps,
+                             bool verbose);
 
   /**
   * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const vtkPolyData& p1, const vtkPolyData& p2) instead
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
+  * vtkPolyData& p1, const vtkPolyData& p2) instead
   * @ingroup MITKTestingAPI
   * @param rightHandSide Surface to compare.
   * @param leftHandSide Surface to compare.
@@ -124,7 +128,8 @@ MITKCORE_EXPORT bool Equal( mitk::Surface& leftHandSide, mitk::Surface& rightHan
   * all the two poly datas have the same number of points with the same coordinates. It is not checked whether
   * all points are correctly connected.
   */
-DEPRECATED( MITKCORE_EXPORT bool Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool verbose));
+  DEPRECATED(MITKCORE_EXPORT bool Equal(
+    vtkPolyData *leftHandSide, vtkPolyData *rightHandSide, mitk::ScalarType eps, bool verbose));
 
 /**
 * @brief Equal Compare two vtk PolyDatas for equality, returns true if found equal.

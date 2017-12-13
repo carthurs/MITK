@@ -19,18 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkCoreExports.h"
 
-#include <mitkLogMacros.h>
 #include <mitkCommon.h>
+#include <mitkLogMacros.h>
 
+#include <mitkServiceInterface.h>
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
-#include <mitkServiceInterface.h>
 #include <usServiceReference.h>
 
 #include <cassert>
 
-namespace mitk {
-
+namespace mitk
+{
 struct IMimeTypeProvider;
 struct IShaderRepository;
 class IPropertyAliases;
@@ -61,7 +61,6 @@ class IPropertyPersistence;
 class MITKCORE_EXPORT CoreServices
 {
 public:
-
   /**
    * @brief Get an IShaderRepository instance.
    * @param context The module context of the module getting the service.
@@ -124,7 +123,6 @@ public:
   }
 
 private:
-
   static bool Unget(us::ModuleContext* context, const std::string& interfaceId, void* service);
 
   // purposely not implemented
@@ -147,13 +145,7 @@ template<class S>
 class MITK_LOCAL CoreServicePointer
 {
 public:
-
-  explicit CoreServicePointer(S* service)
-    : m_service(service)
-  {
-    assert(m_service);
-  }
-
+    explicit CoreServicePointer(S *service) : m_service(service) { assert(m_service); }
   ~CoreServicePointer()
   {
     try
@@ -170,20 +162,14 @@ public:
     }
   }
 
-  S* operator->() const
-  {
-    return m_service;
-  }
-
+    S *operator->() const { return m_service; }
 private:
-
   // purposely not implemented
   CoreServicePointer(const CoreServicePointer&);
   CoreServicePointer& operator=(const CoreServicePointer&);
 
   S* const m_service;
 };
-
 }
 
 #endif // MITKCORESERVICES_H

@@ -30,11 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <usServiceTracker.h>
 
-#include <itkSimpleFastMutexLock.h>
 #include <itkMutexLockHolder.h>
+#include <itkSimpleFastMutexLock.h>
 
-namespace mitk {
-
+namespace mitk
+{
 itk::SimpleFastMutexLock& s_ContextToServicesMapMutex()
 {
   static itk::SimpleFastMutexLock mutex;
@@ -50,7 +50,8 @@ std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& s_ContextT
 template<class S>
 static S* GetCoreService(us::ModuleContext* context)
 {
-  if (context == NULL) context = us::GetModuleContext();
+    if (context == NULL)
+      context = us::GetModuleContext();
 
   S* coreService = NULL;
   us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
@@ -115,7 +116,8 @@ bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interf
   bool success = false;
 
   itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
-  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap().find(context);
+    std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>>::iterator iter =
+      s_ContextToServicesMap().find(context);
   if (iter != s_ContextToServicesMap().end())
   {
     std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
@@ -135,5 +137,4 @@ bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interf
 
   return success;
 }
-
 }

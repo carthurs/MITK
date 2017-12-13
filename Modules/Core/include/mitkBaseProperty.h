@@ -14,17 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 #define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 
-#include <string>
-#include <itkObjectFactory.h>
 #include <MitkCoreExports.h>
+#include <itkObjectFactory.h>
 #include <mitkCommon.h>
+#include <string>
 
-namespace mitk {
-
+namespace mitk
+{
 /*! \brief Abstract base class for properties
 
   \ingroup DataManagement
@@ -40,15 +39,14 @@ namespace mitk {
 class MITKCORE_EXPORT BaseProperty : public itk::Object
 {
   public:
-
-    mitkClassMacroItkParent(BaseProperty,itk::Object)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(BaseProperty, itk::Object) itkCloneMacro(Self)
 
     /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
 
         operator== which is used by PropertyList to check whether a property has been changed.
     */
-    bool operator==(const BaseProperty& property) const;
+      bool
+      operator==(const BaseProperty &property) const;
 
     /*! @brief Assigns property to this BaseProperty instance.
 
@@ -83,7 +81,6 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
     virtual ~BaseProperty();
 
   private:
-
     /*!
       Override this method in subclasses to implement a meaningful comparison. The property
       argument is guaranteed to be castable to the type of the implementing subclass.
@@ -106,8 +103,4 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
 
 } // namespace mitk
 
-
-
 #endif /* BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */
-
-
