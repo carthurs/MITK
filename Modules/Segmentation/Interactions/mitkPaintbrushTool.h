@@ -106,6 +106,7 @@ protected:
     Image::Pointer m_WorkingSlice;
     PlaneGeometry::Pointer m_CurrentPlane;
     DataNode::Pointer m_WorkingNode;
+    mitk::Point3D m_LastPosition;
 };
 
 } // namespace
