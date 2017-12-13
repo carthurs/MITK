@@ -17,13 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyItemDelegate_h
 #define QmitkPropertyItemDelegate_h
 
+#include <MitkQtWidgetsExports.h>
 #include <QListView>
 #include <QStyledItemDelegate>
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
-
-#include <org_mitk_gui_qt_properties_Export.h>
-
 
 class QComboBox;
 class QLineEdit;
@@ -54,7 +52,7 @@ private:
   QToolButton* m_Button;
 };
 
-class PROPERTIES_EXPORT QmitkComboBoxListView : public QListView
+class QmitkComboBoxListView : public QListView
 {
   Q_OBJECT
 
@@ -71,7 +69,7 @@ private:
   QComboBox* m_ComboBox;
 };
 
-class PROPERTIES_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegate
+class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

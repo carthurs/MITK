@@ -315,8 +315,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
   {
     ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
-  else
-    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+  else if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
     {
       ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
     }
