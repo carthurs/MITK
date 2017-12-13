@@ -14,12 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarEllipse.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 mitk::PlanarEllipse::PlanarEllipse()
     : FEATURE_ID_RADIUS1(this->AddFeature("Radius 1", "mm")),
