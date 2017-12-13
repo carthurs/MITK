@@ -146,15 +146,18 @@ surfaceFilter->UpdateLargestPossibleRegion();
 
   if (smooth || applyMedian || decimateMesh)
   {
-//    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
-// 
-//     normalsGen->SetInputData( polyData );
-//     normalsGen->Update();
-// 
-//     m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
-// 
-//     normalsGen->Delete();
-      m_Surface->SetVtkPolyData(polyData);
+    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
+
+    normalsGen->AutoOrientNormalsOn();
+    normalsGen->FlipNormalsOff();
+    normalsGen->SetInputData( polyData );
+    normalsGen->Update();
+
+    m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
+
+    normalsGen->Delete();
+
+	//m_Surface->SetVtkPolyData(polyData);
   }
   else
   {
