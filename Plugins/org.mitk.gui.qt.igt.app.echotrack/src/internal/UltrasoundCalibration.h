@@ -184,6 +184,13 @@ public:
 
   void OnCalculateSpacing();
 
+signals:
+  /**
+  * \brief used for thread seperation, the worker thread must not call OnNewConnection directly.
+  * QT signals are thread safe and separate the threads
+  */
+  void NewConnectionSignal();
+
 protected:
 
   virtual void SetFocus();
@@ -203,6 +210,8 @@ protected:
    * \brief Clears all member attributes which are holding intermediate results for the calibration.
    */
   void ClearTemporaryMembers();
+
+  void OnPlusConnected();
 
   /**
   * \brief The combined modality used for imaging and tracking.
@@ -233,10 +242,9 @@ protected:
   mitk::IGTLClient::Pointer m_TransformClient;
   mitk::IGTLDeviceSource::Pointer m_TransformDeviceSource;
 
-  QTimer m_StreamingTimer;
+  QTimer *m_StreamingTimer;
 
   unsigned long m_NewConnectionObserverTag;
-  unsigned long m_LostConnectionObserverTag;
 
   // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
   mitk::Vector3D m_Spacing;
