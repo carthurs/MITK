@@ -140,6 +140,12 @@ class UltrasoundCalibration : public QmitkAbstractView
     */
     void OnStopCalibrationProcess();
 
+    void OnAddCurrentTipPositionToReferencePoints();
+
+    void OnStartVerification();
+
+    void OnAddCurrentTipPositionForVerification();
+
     void OnDeciveServiceEvent(const ctkServiceEvent event);
 
   protected:
@@ -208,6 +214,16 @@ class UltrasoundCalibration : public QmitkAbstractView
     * \brief Pointset containing tracked evaluation points.
     */
     mitk::PointSet::Pointer m_EvalPointsTool;
+
+    /**
+    * \brief Pointset containing tracked evaluation points.
+    */
+    mitk::PointSet::Pointer m_VerificationReferencePoints;
+    mitk::DataNode::Pointer m_VerificationReferencePointsDataNode;
+
+    int m_currentPoint;
+    std::vector<mitk::Point3D> m_allReferencePoints;
+    std::vector<double> m_allErrors;
 
     /**
     * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point is the needle tip.
