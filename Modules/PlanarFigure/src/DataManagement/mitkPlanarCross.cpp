@@ -52,6 +52,10 @@ bool mitk::PlanarCross::GetSingleLineMode() const
   return false;
 }
 
+bool mitk::PlanarCross::ResetOnPointSelectNeeded() const
+{
+  return this->GetSingleLineMode() == false || m_SelectedControlPoint >= 0 && m_SelectedControlPoint <= 3;
+}
 
 bool mitk::PlanarCross::ResetOnPointSelect()
 {
