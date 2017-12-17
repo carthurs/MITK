@@ -14,17 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlaneGeometry.h"
-
+#include "mitkTestingMacros.h"
 
 class mitkPlanarPolygonTestClass
 {
-
 public:
-
-
 static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolygon )
 {
   // Test for correct minimum number of control points in cross-mode
@@ -35,22 +31,26 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
 
   // Initial placement of PlanarPolygon
   mitk::Point2D p0;
-  p0[0] = 00.0; p0[1] = 0.0;
+    p0[0] = 00.0;
+    p0[1] = 0.0;
   planarPolygon->PlaceFigure( p0 );
 
   // Add second control point
   mitk::Point2D p1;
-  p1[0] = 50.0; p1[1] = 00.0;
+    p1[0] = 50.0;
+    p1[1] = 00.0;
   planarPolygon->SetControlPoint(1, p1 );
 
   // Add third control point
   mitk::Point2D p2;
-  p2[0] = 50.0; p2[1] = 50.0;
+    p2[0] = 50.0;
+    p2[1] = 50.0;
   planarPolygon->AddControlPoint( p2 );
 
   // Add fourth control point
   mitk::Point2D p3;
-  p3[0] = 0.0; p3[1] = 50.0;
+    p3[0] = 0.0;
+    p3[1] = 50.0;
   planarPolygon->AddControlPoint( p3 );
 
   // Test for number of control points
@@ -72,9 +72,7 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   const mitk::Point2D& pp0 = *iter;
   ++iter;
   const mitk::Point2D& pp1 = *iter;
-  MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
-    || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
-
+    MITK_TEST_CONDITION(((pp0 == p0) && (pp1 == p1)) || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1");
 
   // Test for number of measurement features
   MITK_TEST_CONDITION( planarPolygon->GetNumberOfFeatures() == 2, "Number of measurement features" );
@@ -92,30 +90,34 @@ static void TestPlanarPolygonEditing( mitk::PlanarPolygon::Pointer planarPolygon
   unsigned int initialNumberOfControlPoints = planarPolygon->GetNumberOfControlPoints();
 
   mitk::Point2D pnt;
-  pnt[0] = 75.0; pnt[1] = 25.0;
+    pnt[0] = 75.0;
+    pnt[1] = 25.0;
   planarPolygon->AddControlPoint( pnt);
 
-  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints+1, "A new control-point shall be added" );
-  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( planarPolygon->GetNumberOfControlPoints()-1 ) == pnt, "Control-point shall be added at the end." );
-
+    MITK_TEST_CONDITION(planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints + 1,
+                        "A new control-point shall be added");
+    MITK_TEST_CONDITION(planarPolygon->GetControlPoint(planarPolygon->GetNumberOfControlPoints() - 1) == pnt,
+                        "Control-point shall be added at the end.");
 
   planarPolygon->RemoveControlPoint( 3 );
-  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints, "A control-point has been removed" );
+    MITK_TEST_CONDITION(planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints,
+                        "A control-point has been removed");
   MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 3 ) == pnt, "It shall be possible to remove any control-point." );
 
   planarPolygon->RemoveControlPoint( 0 );
   planarPolygon->RemoveControlPoint( 0 );
   planarPolygon->RemoveControlPoint( 0 );
-  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 3, "Control-points cannot be removed if only three points remain." );
+    MITK_TEST_CONDITION(planarPolygon->GetNumberOfControlPoints() == 3,
+                        "Control-points cannot be removed if only three points remain.");
 
   mitk::Point2D pnt1;
-  pnt1[0] = 33.0; pnt1[1] = 33.0;
+    pnt1[0] = 33.0;
+    pnt1[1] = 33.0;
   planarPolygon->AddControlPoint( pnt1, 0 );
   MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 4, "A control-point has been added" );
-  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 0 ) == pnt1, "It shall be possible to insert a control-point at any position." );
-
+    MITK_TEST_CONDITION(planarPolygon->GetControlPoint(0) == pnt1,
+                        "It shall be possible to insert a control-point at any position.");
 }
-
 };
 /**
  * mitkplanarPolygonTest tests the methods and behavior of mitk::PlanarPolygon with sub-tests:

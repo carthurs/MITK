@@ -19,12 +19,13 @@
 
 #include "mitkRenderWindowBase.h"
 
+#include "QVTKWidget.h"
+#include "QmitkRenderWindowMenu.h"
 #include <MitkQtWidgetsExports.h>
 #include <vtkGenericOpenGLRenderWindow.h>
-#include "QmitkRenderWindowMenu.h"
 
-#include "mitkInteractionEventConst.h"
 #include "mitkBaseRenderer.h"
+#include "mitkInteractionEventConst.h"
 
 class QmitkStdMultiWidget;
 class QDragEnterEvent;
@@ -52,9 +53,12 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindow: public mitk::QVTKWidget, public mi
 Q_OBJECT
 
 public:
-
-  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL,
-    mitk::RenderingManager* renderingManager = NULL,mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+  QmitkRenderWindow(
+    QWidget *parent = 0,
+    QString name = "unnamed renderwindow",
+    mitk::VtkPropRenderer *renderer = NULL,
+    mitk::RenderingManager *renderingManager = NULL,
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
   virtual ~QmitkRenderWindow();
 
   /**
@@ -89,22 +93,10 @@ public:
   //Activate or Deactivate MenuWidget.
   void ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
 
-  bool GetActivateMenuWidgetFlag()
-  {
-    return m_MenuWidgetActivated;
-  }
-
+  bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
   // Get it from the QVTKWidget parent
-  virtual vtkRenderWindow* GetVtkRenderWindow() override
-  {
-    return GetRenderWindow();
-  }
-
-  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() override
-  {
-    return NULL;
-  }
-
+  virtual vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
+  virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return NULL; }
   void FullScreenMode(bool state);
 
   virtual void setVisible(bool visible);
@@ -134,7 +126,8 @@ protected:
   /// \brief Simply says we accept the event type.
   virtual void dragEnterEvent(QDragEnterEvent *event) override;
 
-  /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
+  /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode
+  /// pointers and emitting the NodesDropped signal.
   virtual void dropEvent(QDropEvent * event) override;
 
 #ifndef QT_NO_WHEELEVENT
@@ -166,7 +159,6 @@ protected slots:
   void DeferredHideMenu();
 
 private:
-
   // Helper Functions to Convert Qt-Events to Mitk-Events
 
   mitk::Point2D GetMousePosition(QMouseEvent* me) const;

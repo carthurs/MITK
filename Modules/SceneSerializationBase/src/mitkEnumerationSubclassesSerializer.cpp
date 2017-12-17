@@ -19,35 +19,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationPropertySerializer.h"
 
+#include "mitkModalityProperty.h"
 #include "mitkPlaneOrientationProperty.h"
+#include "mitkPointSetShapeProperty.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkShaderProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkVtkVolumeRenderingProperty.h"
-#include "mitkModalityProperty.h"
-#include "mitkRenderingModeProperty.h"
-#include "mitkPointSetShapeProperty.h"
 #include "mitkGridRepresentationProperty.h"
 #include "mitkGridVolumeMapperProperty.h"
 
 #define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname) \
  \
 namespace mitk \
-{ \
  \
-class classname ## Serializer : public EnumerationPropertySerializer \
 { \
-  public: \
      \
-    mitkClassMacro( classname ## Serializer, EnumerationPropertySerializer ) \
-    itkFactorylessNewMacro(Self) \
+class classname##Serializer                                                                                            \
+      : public EnumerationPropertySerializer\
+{public :                                                                                                              \
+                                                                                                                       \
+          mitkClassMacro(classname##Serializer, EnumerationPropertySerializer) itkFactorylessNewMacro(Self)            \
     itkCloneMacro(Self) \
  \
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override \
-    { \
-        if (!element) return NULL; \
+              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return NULL;    \
             const char* sa( element->Attribute("value") ); \
          \
         std::string s(sa?sa:""); \
@@ -58,13 +56,14 @@ class classname ## Serializer : public EnumerationPropertySerializer \
     } \
  \
   protected: \
- \
     classname ## Serializer () {} \
     virtual ~classname ## Serializer () {} \
-}; \
  \
 } \
+  ;                                                                                                                    \
  \
+}                                                                                                                 \
+  \
 MITK_REGISTER_SERIALIZER( classname ## Serializer );
 
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PlaneOrientationProperty);
@@ -80,6 +79,4 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(PointSetShapeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(GridRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(GridVolumeMapperProperty);
 
-
 #endif
-

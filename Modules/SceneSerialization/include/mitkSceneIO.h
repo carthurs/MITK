@@ -31,7 +31,6 @@ class TiXmlElement;
 
 namespace mitk
 {
-
 class BaseData;
 class PropertyList;
 class CompressorTask; 
@@ -39,23 +38,23 @@ class CompressorTask;
 class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 {
   public:
-
     mitkClassMacroItkParent( SceneIO, itk::Object );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
     typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
 
     /**
      * \brief Load a scene of objects from file
-     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and GetFailedProperties() for more detail.
+     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
+     * GetFailedProperties() for more detail.
      *
      * Attempts to read the provided file and create objects with
      * parent/child relations into a DataStorage.
      *
      * \param filename full filename of the scene file
      * \param storage If given, this DataStorage is used instead of a newly created one
-     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded objects
+     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
+     * objects
      */
     virtual DataStorage::Pointer LoadScene( const std::string& filename,
                                             DataStorage* storage = NULL,
@@ -63,8 +62,10 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 
     /**
      * \brief Save a scene of objects to file
-     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if false is returned,
-               it just will not contain every node/property. If writing failed, query GetFailedNodes() and GetFailedProperties() for more detail.
+     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if
+     false is returned,
+               it just will not contain every node/property. If writing failed, query GetFailedNodes() and
+     GetFailedProperties() for more detail.
      *
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
@@ -73,7 +74,8 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      * \param filename full filename of the scene file
      * \param predicate defining which items of the datastorage to use and which not
      */
-    virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
+    virtual bool SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes,
+                           const DataStorage *storage,
                             const std::string& filename);
 
     /**
@@ -102,7 +104,6 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
     void Clear();
 
   protected:
-
     SceneIO();
     virtual ~SceneIO();
 
@@ -132,8 +133,6 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
     void RecordLoadTimeStamp(const mitk::DataNode*);
 
 };
-
 }
 
 #endif
-

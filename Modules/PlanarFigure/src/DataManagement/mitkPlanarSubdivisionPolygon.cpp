@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
@@ -22,9 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // stl related includes
 #include <algorithm>
 
-mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon():
-  m_TensionParameter(0.0625),
-  m_SubdivisionRounds(5)
+mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon() : m_TensionParameter(0.0625), m_SubdivisionRounds(5)
 {
   // Polygon is subdivision (in contrast to parent class PlanarPolygon
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
@@ -32,7 +29,6 @@ mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon():
 
   // Other properties are inherited / already initialized by parent class PlanarPolygon
 }
-
 
 void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 {
@@ -44,7 +40,6 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 
   if( m_ControlPoints.size() >= GetMinimumNumberOfControlPoints() )
   {
-
     for( unsigned int i=0; i < GetSubdivisionRounds(); i++ )
     {
       // Indices
@@ -63,10 +58,12 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
         indexNext = (index + 1) % numberOfPoints;
         indexNextNext = (index + 2) % numberOfPoints;
 
-        newPoint[0] = (0.5 + GetTensionParameter()) * (double)( subdivisionPoints[index][0] + subdivisionPoints[indexNext][0] )
-            - GetTensionParameter() * (double)( subdivisionPoints[indexPrev][0] + subdivisionPoints[indexNextNext][0]);
-        newPoint[1] = (0.5 + GetTensionParameter()) * (double)( subdivisionPoints[index][1] + subdivisionPoints[indexNext][1] )
-            - GetTensionParameter() * (double)( subdivisionPoints[indexPrev][1] + subdivisionPoints[indexNextNext][1]);
+        newPoint[0] =
+          (0.5 + GetTensionParameter()) * (double)(subdivisionPoints[index][0] + subdivisionPoints[indexNext][0]) -
+          GetTensionParameter() * (double)(subdivisionPoints[indexPrev][0] + subdivisionPoints[indexNextNext][0]);
+        newPoint[1] =
+          (0.5 + GetTensionParameter()) * (double)(subdivisionPoints[index][1] + subdivisionPoints[indexNext][1]) -
+          GetTensionParameter() * (double)(subdivisionPoints[indexPrev][1] + subdivisionPoints[indexNextNext][1]);
 
         newSubdivisionPoints.push_back( newPoint );
       }
@@ -74,9 +71,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       ControlPointListType mergedSubdivisionPoints;
       ControlPointListType::const_iterator it, itNew;
 
-
-      for ( it = subdivisionPoints.cbegin() , itNew = newSubdivisionPoints.cbegin();
-            it != subdivisionPoints.cend();
+      for (it = subdivisionPoints.cbegin(), itNew = newSubdivisionPoints.cbegin(); it != subdivisionPoints.cend();
             ++it, ++itNew )
       {
         mergedSubdivisionPoints.push_back( *it );
@@ -95,9 +90,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   m_PolyLineSegmentInfo.clear();
   unsigned int i;
   ControlPointListType::const_iterator it;
-  for ( it = subdivisionPoints.cbegin(), i = 0;
-        it != subdivisionPoints.cend();
-        ++it, ++i )
+  for (it = subdivisionPoints.cbegin(), i = 0; it != subdivisionPoints.cend(); ++it, ++i)
   {
     unsigned int nextIndex;
     if ( i == 0 )
@@ -158,3 +151,29 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
    }
  }
 
+int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const
+{
+  const mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine(polyLineIndex);
+
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
+    return -1;
+
+  mitk::PlanarFigure::ControlPointListType::const_iterator elem;
+  mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
+  mitk::PlanarFigure::ControlPointListType::const_iterator end = m_ControlPoints.cend();
+
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter;
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.cend();
+  mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
+  polyLineStart += indexOfPolylinePoint;
+
+  for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)
+  {
+    elem = std::find(first, end, *polyLineIter);
+
+    if (elem != end)
+      return std::distance(first, elem);
+  }
+
+  return GetNumberOfControlPoints();
+}

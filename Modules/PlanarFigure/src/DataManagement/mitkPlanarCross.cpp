@@ -14,11 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarCross.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
-
 
 mitk::PlanarCross::PlanarCross()
 : FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Axis", "mm" ) ),
@@ -32,18 +30,16 @@ mitk::PlanarCross::PlanarCross()
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
 
-
 void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
 {
   this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( singleLineMode ) );
   this->Modified();
 }
 
-
 bool mitk::PlanarCross::GetSingleLineMode() const
 {
-  const mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
-    this->GetProperty( "SingleLineMode" ).GetPointer() );
+  const mitk::BoolProperty *singleLineMode =
+    dynamic_cast<mitk::BoolProperty *>(this->GetProperty("SingleLineMode").GetPointer());
 
   if ( singleLineMode != nullptr )
   {
@@ -115,7 +111,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
   }
 }
 
-
 unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
 {
   if ( this->GetSingleLineMode() || (this->GetNumberOfControlPoints() < 4) )
@@ -127,7 +122,6 @@ unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
     return 2;
   }
 }
-
 
 mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
@@ -145,12 +139,10 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
     superclassConfinedPoint = Superclass::ApplyControlPointConstraints( index, confinedPoint );
     confinedPoint = this->InternalApplyControlPointConstraints( index, superclassConfinedPoint );
     ++count;
-  } while ( (confinedPoint.EuclideanDistanceTo( superclassConfinedPoint ) > mitk::eps)
-         && (count < 32) );
+  } while ((confinedPoint.EuclideanDistanceTo(superclassConfinedPoint) > mitk::eps) && (count < 32));
 
   return confinedPoint;
 }
-
 
 mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
@@ -169,7 +161,8 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
 
       const Vector2D v1 = point - p1;
       const double dotProduct = n1 * v1;
-      const Point2D crossPoint = p1 + n1 * dotProduct;;
+      const Point2D crossPoint = p1 + n1 * dotProduct;
+      ;
       const Vector2D crossVector = point - crossPoint;
 
       if ( dotProduct < 0.0 )
@@ -217,8 +210,8 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
 
       // Determine whether the projected point on the line, or the crossing point should be
       // used (according to the second constraint in the comment above)
-      if ( (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > crossingPoint.SquaredEuclideanDistanceTo( p3 ))
-        && (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > pointOnLine.SquaredEuclideanDistanceTo( crossingPoint )) )
+      if ((pointOnLine.SquaredEuclideanDistanceTo(p3) > crossingPoint.SquaredEuclideanDistanceTo(p3)) &&
+          (pointOnLine.SquaredEuclideanDistanceTo(p3) > pointOnLine.SquaredEuclideanDistanceTo(crossingPoint)))
       {
         return pointOnLine;
       }
@@ -232,7 +225,6 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
     return point;
   }
 }
-
 
 void mitk::PlanarCross::GeneratePolyLine()
 {
@@ -298,7 +290,6 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   }
 }
 
-
 void mitk::PlanarCross::EvaluateFeaturesInternal()
 {
   // Calculate length of first line
@@ -327,7 +318,6 @@ void mitk::PlanarCross::EvaluateFeaturesInternal()
     longestDiameter = l2;
     shortAxisDiameter = l1;
   }
-
 
   this->SetQuantity( FEATURE_ID_LONGESTDIAMETER, longestDiameter );
   this->SetQuantity( FEATURE_ID_SHORTAXISDIAMETER, shortAxisDiameter );

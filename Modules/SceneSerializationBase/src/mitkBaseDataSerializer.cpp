@@ -32,10 +32,8 @@ mitk::BaseDataSerializer::~BaseDataSerializer()
 
 std::string mitk::BaseDataSerializer::Serialize()
 {
-    MITK_INFO << this->GetNameOfClass()
-        << " is asked to serialize an object " << (const void*) this->m_Data
-        << " into a directory " << m_WorkingDirectory
-        << " using a filename hint " << m_FilenameHint;
+  MITK_INFO << this->GetNameOfClass() << " is asked to serialize an object " << (const void *)this->m_Data
+            << " into a directory " << m_WorkingDirectory << " using a filename hint " << m_FilenameHint;
 
     return "";
 }
@@ -55,4 +53,3 @@ std::string mitk::BaseDataSerializer::GetUniqueFilenameInWorkingDirectory()
     myname.append(name.str());
     return myname;
 }
-

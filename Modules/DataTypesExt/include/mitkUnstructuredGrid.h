@@ -14,32 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_UNSTRUCTURED_GRID_H_
 #define _MITK_UNSTRUCTURED_GRID_H_
 
-#include "mitkBaseData.h"
 #include "MitkDataTypesExtExports.h"
 #include "itkImageRegion.h"
+#include "mitkBaseData.h"
 
 class vtkUnstructuredGridBase;
 
-namespace mitk {
-
+namespace mitk
+{
 //##Documentation
 //## @brief Class for storing unstructured grids (vtkUnstructuredGrid)
 //## @ingroup Data
 class MITKDATATYPESEXT_EXPORT UnstructuredGrid : public BaseData
 {
-
 public:
   // not yet the best choice of a region-type for surfaces, but it works for the time being
   typedef itk::ImageRegion< 5 >  RegionType;
 
   mitkClassMacro(UnstructuredGrid, BaseData);
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   virtual void SetVtkUnstructuredGrid(vtkUnstructuredGridBase* grid, unsigned int t = 0);
 
@@ -78,11 +75,7 @@ public:
   //## Get the region object that defines the size and starting index
   //## for the region of the image requested (i.e., the region of the
   //## image to be operated on by a filter).
-  virtual const RegionType& GetRequestedRegion() const
-  {
-    return m_RequestedRegion;
-  }
-
+    virtual const RegionType &GetRequestedRegion() const { return m_RequestedRegion; }
   void CalculateBoundingBox();
 
 protected:

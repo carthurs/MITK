@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_CIRCLE_H_
 #define _MITK_PLANAR_CIRCLE_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,9 +33,7 @@ class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -55,51 +50,22 @@ public:
   }
 
   /** \brief Circle has 2 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 2;
-  }
-
-
+    unsigned int GetMinimumNumberOfControlPoints() const override { return 2; }
   /** \brief Circle has 2 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 2;
-  }
-
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
   /** \brief Sets the minimum radius
   */
-  void SetMinimumRadius( double radius )
-  {
-      m_MinRadius = radius;
-  }
-
+    void SetMinimumRadius(double radius) { m_MinRadius = radius; }
   /** \brief Gets the minimum radius
   */
-  double GetMinimumRadius()
-  {
-      return m_MinRadius;
-  }
-
+    double GetMinimumRadius() { return m_MinRadius; }
   /** \brief Sets the maximum radius
   */
-  void SetMaximumRadius( double radius )
-  {
-      m_MaxRadius = radius;
-  }
-
+    void SetMaximumRadius(double radius) { m_MaxRadius = radius; }
   /** \brief Gets the minimum radius
   */
-  double GetMaximumRadius()
-  {
-      return m_MaxRadius;
-  }
-
-  void ActivateMinMaxRadiusContstraints( bool active )
-  {
-      m_MinMaxRadiusContraintsActive = active;
-  }
-
+    double GetMaximumRadius() { return m_MaxRadius; }
+    void ActivateMinMaxRadiusContstraints(bool active) { m_MinMaxRadiusContraintsActive = active; }
   virtual bool SetCurrentControlPoint( const Point2D& point ) override;
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
@@ -128,7 +94,6 @@ protected:
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
 
-
   // Feature identifiers
   const unsigned int FEATURE_ID_RADIUS;
   const unsigned int FEATURE_ID_DIAMETER;
@@ -141,7 +106,6 @@ protected:
   bool m_MinMaxRadiusContraintsActive;
 
 private:
-
 };
 
 } // namespace mitk

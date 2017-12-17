@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_ANGLE_H_
 #define _MITK_PLANAR_ANGLE_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,9 +33,7 @@ class MITKPLANARFIGURE_EXPORT PlanarAngle : public PlanarFigure
 public:
   mitkClassMacro( PlanarAngle, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-public:
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) public :
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
 
@@ -55,18 +50,9 @@ public:
   }
 
   /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
-
+    unsigned int GetMinimumNumberOfControlPoints() const override { return 3; }
   /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 3; }
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 protected:
@@ -86,7 +72,6 @@ protected:
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
 private:
-
 };
 
 } // namespace mitk

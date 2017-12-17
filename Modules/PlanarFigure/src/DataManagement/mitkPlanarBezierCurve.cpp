@@ -20,13 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits>
 
 mitk::PlanarBezierCurve::PlanarBezierCurve()
-  : FEATURE_ID_LENGTH(Superclass::AddFeature("Length", "mm")),
-    m_NumberOfSegments(100)
+  : FEATURE_ID_LENGTH(Superclass::AddFeature("Length", "mm")), m_NumberOfSegments(100)
 {
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
 }
-
 
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {

@@ -15,19 +15,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSceneReaderV1.h"
-#include "mitkSerializerMacros.h"
-#include "mitkBaseRenderer.h"
-#include "mitkPropertyListDeserializer.h"
-#include "mitkProgressBar.h"
-#include "mitkIOUtil.h"
 #include "Poco/Path.h"
+#include "mitkBaseRenderer.h"
+#include "mitkIOUtil.h"
+#include "mitkProgressBar.h"
+#include "mitkPropertyListDeserializer.h"
+#include "mitkSerializerMacros.h"
 #include <mitkRenderingModeProperty.h>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
 namespace
 {
-
 typedef std::pair<mitk::DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
 
 bool NodeSortByLayerIsLessThan( const NodesAndParentsPair& left, const NodesAndParentsPair& right )
@@ -52,7 +51,6 @@ bool NodeSortByLayerIsLessThan( const NodesAndParentsPair& left, const NodesAndP
   // question clearly
   return left.first.GetPointer() < right.first.GetPointer();
 }
-
 }
 
 bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, LoadedNodeFileNamesMap* nodeDataFileNameMap)
@@ -73,14 +71,16 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
   DataNodeVector DataNodes;
   unsigned int listSize = 0;
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
+  for (TiXmlElement *element = document.FirstChildElement("node"); element != NULL;
+       element = element->NextSiblingElement("node"))
   {
     ++listSize;
   }
 
   ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
 
-  for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
+  for (TiXmlElement *element = document.FirstChildElement("node"); element != NULL;
+       element = element->NextSiblingElement("node"))
   {
       mitk::DataNode::Pointer newNode = LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error, nodeDataFileNameMap);
       DataNodes.push_back(newNode);
@@ -90,7 +90,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
 
 
   DataNodeVector::iterator nit = DataNodes.begin();
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
+  for (TiXmlElement *element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end();
+       element = element->NextSiblingElement("node"), ++nit)
   {
     mitk::DataNode::Pointer node = *nit;
     // in case dataXmlElement is valid test whether it containts the "properties" child tag
@@ -140,7 +141,8 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
     m_OrderedNodePairs.push_back( std::make_pair( node, std::list<std::string>() ) );
 
     //node->GetIntProperty("layer", layer);
-    for( TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source") )
+    for (TiXmlElement *source = element->FirstChildElement("source"); source != NULL;
+         source = source->NextSiblingElement("source"))
     {
       const char* sourceUID = source->Attribute("UID");
       if (sourceUID)
@@ -157,8 +159,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   m_OrderedNodePairs.sort( &NodeSortByLayerIsLessThan );
 
   // remove all unknown parent UIDs
-  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-       nodesIter != m_OrderedNodePairs.end();
+  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin(); nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)
   {
     for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
@@ -180,14 +181,15 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
   // repeat
   //   for all created nodes
   unsigned int lastMapSize(0);
-  while ( lastMapSize != m_OrderedNodePairs.size()) // this is to prevent infinite loops; each iteration must at least add one node to DataStorage
+  while (lastMapSize !=
+         m_OrderedNodePairs
+           .size()) // this is to prevent infinite loops; each iteration must at least add one node to DataStorage
   {
     lastMapSize = m_OrderedNodePairs.size();
 
     // iterate (layer) ordered nodes backwards
     // we insert the highest layers first
-    for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-         nodesIter != m_OrderedNodePairs.end();
+    for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin(); nodesIter != m_OrderedNodePairs.end();
          ++nodesIter)
     {
       bool addThisNode(true);
@@ -211,7 +213,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
               parentsIter != nodesIter->second.end();
              ++parentsIter)
         {
-          parents->push_back( m_NodeForID[ *parentsIter ] );
+          parents->push_back(m_NodeForID[*parentsIter]);
         }
 
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
@@ -226,13 +228,14 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& 
     }
   }
 
-  // All nodes that are still in m_OrderedNodePairs at this point are not part of a proper directed graph structure. We'll add such nodes without any parent information.
-  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
-       nodesIter != m_OrderedNodePairs.end();
+  // All nodes that are still in m_OrderedNodePairs at this point are not part of a proper directed graph structure.
+  // We'll add such nodes without any parent information.
+  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin(); nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)
   {
     storage->Add( nodesIter->first );
-    MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage without parents.";
+    MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage "
+                 "without parents.";
     error = true;
   }
 
@@ -381,7 +384,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
   assert(nodeElement);
   bool error(false);
 
-  for( TiXmlElement* properties = nodeElement->FirstChildElement("properties"); properties != NULL; properties = properties->NextSiblingElement("properties") )
+  for (TiXmlElement *properties = nodeElement->FirstChildElement("properties"); properties != NULL;
+       properties = properties->NextSiblingElement("properties"))
   {
     const char* propertiesfilea( properties->Attribute("file") );
     std::string propertiesfile( propertiesfilea ? propertiesfilea : "" );
@@ -389,7 +393,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     const char* renderwindowa( properties->Attribute("renderwindow") );
     std::string renderwindow( renderwindowa ? renderwindowa : "" );
 
-    PropertyList::Pointer propertyList = node->GetPropertyList(renderwindow); // DataNode implementation always returns a propertylist
+    PropertyList::Pointer propertyList =
+      node->GetPropertyList(renderwindow); // DataNode implementation always returns a propertylist
     ClearNodePropertyListWithExceptions(*node, *propertyList);
     // clear all properties from node that might be set by DataNodeFactory during loading
 
@@ -409,7 +414,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     }
     else
     {
-      MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
+      MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell "
+                    "your developer.";
       error = true;
     }
   }
@@ -456,10 +462,10 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(DataNode* node, TiXmlEl
   }
   else
   {
-    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element does not contain a 'file' attribute. \n";
+    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element "
+                  "does not contain a 'file' attribute. \n";
     error = true;
   }
 
   return !error;
 }
-

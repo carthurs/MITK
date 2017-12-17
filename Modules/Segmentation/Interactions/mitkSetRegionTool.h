@@ -18,12 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
-
 class Image;
 class StateMachineAction;
 class InteractionEvent;
@@ -47,11 +46,9 @@ class InteractionEvent;
 class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
-
     mitkClassMacro(SetRegionTool, FeedbackContourTool);
 
   protected:
-
     SetRegionTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~SetRegionTool();
 
@@ -70,5 +67,3 @@ class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
 } // namespace
 
 #endif
-
-

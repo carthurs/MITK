@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
 
@@ -23,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>
 
-mitk::PropertyListSerializer::PropertyListSerializer()
-: m_FilenameHint("unnamed")
-, m_WorkingDirectory("")
+mitk::PropertyListSerializer::PropertyListSerializer() : m_FilenameHint("unnamed"), m_WorkingDirectory("")
 {
 }
 
@@ -78,9 +75,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 
   // add XML contents
   const PropertyList::PropertyMap* propmap = m_PropertyList->GetMap();
-  for ( auto iter = propmap->begin();
-        iter != propmap->end();
-        ++iter )
+  for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
   {
     std::string key = iter->first;
     const BaseProperty* property = iter->second;
@@ -104,7 +99,8 @@ std::string mitk::PropertyListSerializer::Serialize()
   // save XML file
   if ( !document.SaveFile( fullname ) )
   {
-    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc()
+               << "'";
     return "";
   }
 
@@ -121,7 +117,8 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   std::string serializername(property->GetNameOfClass());
   serializername += "Serializer";
 
-  std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
+  std::list<itk::LightObject::Pointer> allSerializers =
+    itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
   if (allSerializers.size() < 1)
   {
     MITK_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
@@ -131,9 +128,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
     MITK_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
   }
 
-  for ( auto iter = allSerializers.begin();
-        iter != allSerializers.end();
-        ++iter )
+  for (auto iter = allSerializers.begin(); iter != allSerializers.end(); ++iter)
   {
     if (BasePropertySerializer* serializer = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
     {
@@ -155,7 +150,8 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
     }
     else
     {
-      MITK_ERROR << "Found a serializer called '" << (*iter)->GetNameOfClass() << "' that does not implement the BasePropertySerializer interface.";
+      MITK_ERROR << "Found a serializer called '" << (*iter)->GetNameOfClass()
+                 << "' that does not implement the BasePropertySerializer interface.";
       continue;
   }
   }

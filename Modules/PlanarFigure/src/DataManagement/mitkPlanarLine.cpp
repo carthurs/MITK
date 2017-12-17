@@ -14,17 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarLine.h"
 #include "mitkPlaneGeometry.h"
 
-
-mitk::PlanarLine::PlanarLine()
-: FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
+mitk::PlanarLine::PlanarLine() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
   this->SetNumberOfPolyLines( 1 );
 }
-
 
 void mitk::PlanarLine::GeneratePolyLine()
 {
@@ -39,7 +35,6 @@ void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsig
   // A line does not require a helper object
 }
 
-
 void mitk::PlanarLine::EvaluateFeaturesInternal()
 {
   // Calculate line length
@@ -49,7 +44,6 @@ void mitk::PlanarLine::EvaluateFeaturesInternal()
 
   this->SetQuantity( FEATURE_ID_LENGTH, length );
 }
-
 
 void mitk::PlanarLine::PrintSelf( std::ostream& os, itk::Indent indent) const
 {

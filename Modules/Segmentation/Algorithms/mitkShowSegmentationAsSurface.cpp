@@ -23,18 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-ShowSegmentationAsSurface::ShowSegmentationAsSurface()
-:m_UIDGeneratorSurfaces("Surface_"),
- m_AddToTree(false)
-{
-}
-
-
-ShowSegmentationAsSurface::~ShowSegmentationAsSurface()
-{
-}
-
+  ShowSegmentationAsSurface::ShowSegmentationAsSurface() : m_UIDGeneratorSurfaces("Surface_"), m_AddToTree(false) {}
+  ShowSegmentationAsSurface::~ShowSegmentationAsSurface() {}
 void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
 {
   Superclass::Initialize(other);
@@ -56,7 +46,6 @@ void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
   SetParameter("Wireframe", false );
 }
 
-
 bool ShowSegmentationAsSurface::ReadyToRun()
 {
   try
@@ -71,7 +60,6 @@ bool ShowSegmentationAsSurface::ReadyToRun()
     return false;
   }
 }
-
 
 bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 {
@@ -96,9 +84,9 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   float reductionRate(0.8);
   GetParameter("Decimation rate", reductionRate );
 
-  MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD
-                                         << " median " << applyMedian << " median kernel " << medianKernelSize
-                                         << " mesh reduction " << decimateMesh << " reductionRate " << reductionRate;
+    MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD << " median "
+              << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
+              << " reductionRate " << reductionRate;
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( image );
@@ -115,7 +103,8 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?
   if (applyMedian)
   {
-    surfaceFilter->SetMedianKernelSize(medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
+      surfaceFilter->SetMedianKernelSize(
+        medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
   }
 
   //fix to avoid vtk warnings see bug #5390
@@ -132,14 +121,15 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
   }
 
-surfaceFilter->UpdateLargestPossibleRegion();
+  surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
   m_Surface = surfaceFilter->GetOutput();
 
   vtkPolyData* polyData = m_Surface->GetVtkPolyData();
 
-  if (!polyData) throw std::logic_error("Could not create polygon model");
+    if (!polyData)
+      throw std::logic_error("Could not create polygon model");
 
   polyData->SetVerts(0);
   polyData->SetLines(0);
@@ -175,7 +165,8 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
   GetParameter("Wireframe", wireframe );
   if (wireframe)
   {
-    VtkRepresentationProperty *np = dynamic_cast<VtkRepresentationProperty*>(m_Node->GetProperty("material.representation"));
+      VtkRepresentationProperty *np =
+        dynamic_cast<VtkRepresentationProperty *>(m_Node->GetProperty("material.representation"));
     if (np)
       np->SetRepresentationToWireframe();
   }
@@ -193,7 +184,8 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     //if parameter smooth is set add extension to node name
     bool smooth(true);
     GetParameter("Smooth", smooth);
-    if(smooth) groupNodesName.append("_smoothed");
+      if (smooth)
+        groupNodesName.append("_smoothed");
   }
   m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
 
@@ -234,4 +226,3 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 }
 
 } // namespace
-

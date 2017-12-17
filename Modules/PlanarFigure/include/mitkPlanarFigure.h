@@ -14,20 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_FIGURE_H_
 #define _MITK_PLANAR_FIGURE_H_
 
-#include <MitkPlanarFigureExports.h>
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
+#include <MitkPlanarFigureExports.h>
 
 #include <deque>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -57,8 +54,7 @@ class PlaneGeometry;
 class MITKPLANARFIGURE_EXPORT PlanarFigure : public BaseData
 {
 public:
-  mitkClassMacro( PlanarFigure, BaseData )
-  itkCloneMacro( Self )
+    mitkClassMacro(PlanarFigure, BaseData) itkCloneMacro(Self)
 
   typedef Point2D PolyLineElement;
 
@@ -82,7 +78,6 @@ public:
    *
    * Default is false. The "closed" boolean property must be set in sub-classes. */
   virtual bool IsClosed() const;
-
 
   /** \brief True if the planar figure has been placed (and can be
    * displayed/interacted with). */
@@ -122,10 +117,8 @@ public:
 
   virtual bool SetCurrentControlPoint( const Point2D& point );
 
-
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
-
 
   /** \brief Returns the number of control points automatically filled upon
   * figure placement.
@@ -143,7 +136,6 @@ public:
    */
   virtual unsigned int GetMinimumNumberOfControlPoints() const = 0;
 
-
   /** \brief Returns the maximum number of control points allowed for
   * this figure (e.g. 3 for triangles).
   *
@@ -151,18 +143,14 @@ public:
   */
   virtual unsigned int GetMaximumNumberOfControlPoints() const = 0;
 
-
   /** \brief Selects currently active control points. */
   virtual bool SelectControlPoint( unsigned int index );
-
 
   /** \brief Deselect control point; no control point active. */
   virtual bool DeselectControlPoint();
 
-
   /** \brief Return currently selected control point. */
   virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
-
   /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
 
@@ -209,25 +197,19 @@ public:
   /** \brief Returns the coordinates of the PreviewControlPoint. */
   Point2D GetPreviewControlPoint() const;
 
-
-
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
   virtual unsigned int GetNumberOfFeatures() const;
 
-
   /** \brief Returns the name (identifier) of the specified features. */
   const char *GetFeatureName( unsigned int index ) const;
-
 
   /** \brief Returns the physical unit of the specified features. */
   const char *GetFeatureUnit( unsigned int index ) const;
 
-
   /** Returns quantity of the specified feature (e.g., length, radius,
    * area, ... ) */
   double GetQuantity( unsigned int index ) const;
-
 
   /** \brief Returns true if the feature with the specified index exists and
   * is active (an inactive feature may e.g. be the area of a non-closed
@@ -241,6 +223,8 @@ public:
   * overlay in the RenderWindow */
   void SetFeatureVisible( unsigned int index, bool visible );
 
+    /** \brief Calculates quantities of all features of this planar figure. */
+    virtual void EvaluateFeatures();
 
   /** \brief Intherited from parent */
   virtual void UpdateOutputInformation() override;
@@ -350,7 +334,6 @@ protected:
   /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
   void ClearPolyLines();
 
-
   /** \brief defines the number of HelperPolyLines that will be available */
   void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
 
@@ -369,6 +352,10 @@ protected:
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
 
+    std::vector<PolyLineType> m_PolyLines;
+    std::vector<PolyLineType> m_HelperPolyLines;
+    BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
+
   // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
   // when the mouse cursor is above the figure (and not a control-point) and when the
   // property 'planarfigure.isextendable' is set to true
@@ -381,14 +368,12 @@ protected:
   BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
 private:
-
   // not implemented to prevent PlanarFigure::New() calls which would create an itk::Object.
   static Pointer New();
 
   struct Feature
   {
-    Feature( const char *name, const char *unit )
-    : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true ), Visible( true )
+      Feature(const char *name, const char *unit) : Name(name), Unit(unit), Quantity(0.0), Active(true), Visible(true)
     {
     }
 
@@ -403,7 +388,6 @@ private:
 
   PlaneGeometry *m_PlaneGeometry;
 
-
   mutable bool m_PolyLineUpToDate;
   mutable bool m_HelperLinesUpToDate;
   mutable bool m_FeaturesUpToDate;
@@ -417,11 +401,11 @@ private:
 
   unsigned long m_FeaturesMTime;
 
-  // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight (m_DisplaySize.second)
+    // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight
+    // (m_DisplaySize.second)
   // that the helperPolyLines have been calculated for.
   // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
   mutable std::pair<double, unsigned int> m_DisplaySize;
-
 };
 
 #pragma GCC visibility push(default)
@@ -442,7 +426,10 @@ itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
 #pragma GCC visibility pop
 
 
-MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
+  MITKPLANARFIGURE_EXPORT bool Equal(const mitk::PlanarFigure &leftHandSide,
+                                     const mitk::PlanarFigure &rightHandSide,
+                                     ScalarType eps,
+                                     bool verbose);
 
 } // namespace mitk
 

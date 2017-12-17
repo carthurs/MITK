@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkUnstructuredGrid.h"
 
 #include <vtkUnstructuredGridBase.h>
@@ -116,8 +115,8 @@ mitk::UnstructuredGrid::UnstructuredGrid() : m_CalculateBoundingBox( false )
   this->InitializeEmpty();
 }
 
-mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid &other) :
-BaseData(other),
+mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid &other)
+  : BaseData(other),
 m_LargestPossibleRegion(other.m_LargestPossibleRegion),
 m_CalculateBoundingBox( other.m_CalculateBoundingBox )
 {
@@ -159,7 +158,8 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   TimeGeometry* timeGeometry = GetTimeGeometry();
   if ( timeGeometry->CountTimeSteps() != m_GridSeries.size() )
   {
-    itkExceptionMacro(<<"timeGeometry->CountTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<< "timeGeometry->CountTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with "
+                         "correct number of timeSteps!");
   }
 
   //
@@ -187,7 +187,6 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   itkDebugMacro( << "boundingbox max: "<< bb->GetMaximum());
   m_CalculateBoundingBox = false;
 }
-
 
 void mitk::UnstructuredGrid::SetRequestedRegionToLargestPossibleRegion()
 {
@@ -230,7 +229,9 @@ void mitk::UnstructuredGrid::SetRequestedRegion(const itk::DataObject *data )
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::UnstructuredGrid::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name() << " to " << typeid(UnstructuredGrid*).name() );
+    itkExceptionMacro(<< "mitk::UnstructuredGrid::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name()
+                      << " to "
+                      << typeid(UnstructuredGrid *).name());
   }
 }
 
@@ -243,7 +244,10 @@ void mitk::UnstructuredGrid::SetRequestedRegion(UnstructuredGrid::RegionType *re
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::UnstructuredGrid::SetRequestedRegion(UnstructuredGrid::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(UnstructuredGrid*).name() );
+    itkExceptionMacro(<< "mitk::UnstructuredGrid::SetRequestedRegion(UnstructuredGrid::RegionType*) cannot cast "
+                      << typeid(region).name()
+                      << " to "
+                      << typeid(UnstructuredGrid *).name());
   }
 }
 

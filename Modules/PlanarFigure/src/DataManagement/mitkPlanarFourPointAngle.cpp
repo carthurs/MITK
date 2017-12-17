@@ -14,18 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlaneGeometry.h"
 
-
-mitk::PlanarFourPointAngle::PlanarFourPointAngle()
-: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "deg" ) )
+mitk::PlanarFourPointAngle::PlanarFourPointAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
   // Four point angle has two control points
   this->SetNumberOfPolyLines( 2 );
 }
-
 
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
@@ -65,11 +61,9 @@ void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
   this->SetQuantity( FEATURE_ID_ANGLE, angle );
 }
 
-
 void mitk::PlanarFourPointAngle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
-
 }
 
  bool mitk::PlanarFourPointAngle::Equals(const mitk::PlanarFigure& other) const

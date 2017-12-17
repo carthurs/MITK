@@ -14,17 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_SUBDIVISION_POLYGON_H_
 #define _MITK_PLANAR_SUBDIVISION_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
-#include <MitkPlanarFigureExports.h>
 #include "mitkPlanarPolygon.h"
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,35 +34,18 @@ class MITKPLANARFIGURE_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
 public:
   mitkClassMacro( PlanarSubdivisionPolygon, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   /** \brief How many times should we generate a round of subdivisions? */
-  unsigned int GetSubdivisionRounds() const
-  {
-      return m_SubdivisionRounds;
-  }
-
-  void SetSubdivisionRounds( int subdivisionRounds )
-  {
-    m_SubdivisionRounds = subdivisionRounds;
-  }
-
+    unsigned int GetSubdivisionRounds() const { return m_SubdivisionRounds; }
+    void SetSubdivisionRounds(int subdivisionRounds) { m_SubdivisionRounds = subdivisionRounds; }
   /** \brief Parameter w_tension defines the tension.
    * the higher w_tension, the lower the "tension" on points.
    * Rule: 0 < w_tension < 0.1
    * 0.0625 (1 / 16) seems to be a good value.
    */
-  float GetTensionParameter() const
-  {
-      return m_TensionParameter;
-  }
-
-  void SetTensionParameter(float tensionParameter )
-  {
-    m_TensionParameter = tensionParameter;
-  }
-
+    float GetTensionParameter() const { return m_TensionParameter; }
+    void SetTensionParameter(float tensionParameter) { m_TensionParameter = tensionParameter; }
   std::vector<mitk::Point2D> CheckForLineIntersection( const Point2D& p1, const Point2D& p2 ) const;
 
   void IncreaseSubdivisions();
@@ -86,7 +67,6 @@ protected:
   int m_SubdivisionRounds;
 
 private:
-
 };
 
 } // namespace mitk

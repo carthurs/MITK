@@ -17,17 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPlanarBezierCurve_h
 #define mitkPlanarBezierCurve_h
 
-#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
+#include <mitkPlanarFigure.h>
 
 namespace mitk
 {
   class MITKPLANARFIGURE_EXPORT PlanarBezierCurve : public PlanarFigure
   {
   public:
-    mitkClassMacro(PlanarBezierCurve, PlanarFigure)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(PlanarBezierCurve, PlanarFigure) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
@@ -38,7 +36,6 @@ namespace mitk
     */
     int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
 
-
     virtual unsigned int GetPlacementNumberOfControlPoints() const override { return 1; }
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
@@ -46,7 +43,7 @@ namespace mitk
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure& other) const override;
+    virtual bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarBezierCurve();

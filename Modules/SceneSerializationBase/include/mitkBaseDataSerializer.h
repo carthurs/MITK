@@ -17,15 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSerializeBaseData_h_included
 #define mitkSerializeBaseData_h_included
 
-#include <MitkSceneSerializationBaseExports.h>
 #include "mitkSerializerMacros.h"
+#include <MitkSceneSerializationBaseExports.h>
 
-#include <itkObjectFactoryBase.h>
 #include "mitkBaseData.h"
+#include <itkObjectFactoryBase.h>
 
 namespace mitk
 {
-
 /**
   \brief Base class for objects that serialize BaseData types.
 
@@ -40,7 +39,6 @@ namespace mitk
 class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
 {
   public:
-
     mitkClassMacroItkParent( BaseDataSerializer, itk::Object );
 
     itkSetStringMacro(FilenameHint);
@@ -75,4 +73,3 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
 } // namespace
 
 #endif
-

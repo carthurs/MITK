@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #define PLANARFIGUREINTERACTOR_DBG MITK_DEBUG("PlanarFigureInteractor") << __LINE__ << ": "
 
 #include "mitkPlanarFigureInteractor.h"
+#include "mitkPlanarBezierCurve.h"
+#include "mitkPlanarCircle.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarFigureOperation.h"
-#include "mitkPlanarCircle.h"
-#include "mitkPlanarBezierCurve.h"
 
 #include "mitkInteractionPositionEvent.h"
 #include "mitkInternalEvent.h"
@@ -34,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
-#include "mitkPlaneGeometry.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkPlaneGeometry.h"
 
 #include <memory>
 
@@ -43,11 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //how precise must the user pick the point
 //default value
 mitk::PlanarFigureInteractor::PlanarFigureInteractor()
-: DataInteractor()
-, m_Precision( 6.5 )
-, m_MinimumPointDistance( 25.0 )
-, m_IsHovering( false )
-, m_LastPointWasValid( false )
+  : DataInteractor(), m_Precision(6.5), m_MinimumPointDistance(25.0), m_IsHovering(false), m_LastPointWasValid(false)
 , m_PointMoved(false)
 {
 }
@@ -71,7 +66,6 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("points_can_be_added_or_removed", CheckFigureIsExtendable);
   CONNECT_CONDITION("figure_can_be_deleted", CheckFigureIsDeletable);
   CONNECT_CONDITION("figure_is_editable", CheckFigureIsEditable);
-
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
   CONNECT_FUNCTION( "hide_preview_point", HidePreviewPoint )
@@ -159,8 +153,7 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
   bool isEditable = true;
   GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
 
-  mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>(
-    GetDataNode()->GetData() );
+  mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   const mitk::AbstractTransformGeometry *abstractTransformGeometry =
@@ -172,8 +165,7 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction*, Interac
   // Extract point in 2D world coordinates (relative to PlaneGeometry of
   // PlanarFigure)
   Point2D point2D;
-  if ( !this->TransformPositionEventToPoint2D( positionEvent, planarFigureGeometry, point2D )
-    || !isEditable )
+  if (!this->TransformPositionEventToPoint2D(positionEvent, planarFigureGeometry, point2D) || !isEditable)
   {
     return;
   }
@@ -258,9 +250,9 @@ void mitk::PlanarFigureInteractor::FinalizeFigure()
 
     //////////////////////////////////////////////////////////////////////////
 
-    GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
-    planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
-    planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
+  GetDataNode()->SetBoolProperty("planarfigure.drawcontrolpoints", true);
+  planarFigure->InvokeEvent(EndPlacementPlanarFigureEvent());
+  planarFigure->InvokeEvent(EndInteractionPlanarFigureEvent());
 
 }
 
@@ -315,14 +307,11 @@ void mitk::PlanarFigureInteractor::DeleteFigure( StateMachineAction*, Interactio
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
 
-
-void mitk::PlanarFigureInteractor::PerformPointResetOnSelect( StateMachineAction*,
-                                                              InteractionEvent* )
+void mitk::PlanarFigureInteractor::PerformPointResetOnSelect(StateMachineAction *, InteractionEvent *)
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   planarFigure->ResetOnPointSelect();
 }
-
 
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
@@ -335,7 +324,6 @@ bool mitk::PlanarFigureInteractor::CheckFigureFinished( const InteractionEvent* 
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   return ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints() );
 }
-
 
 bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable( const InteractionEvent* /*interactionEvent*/ )
 {
@@ -361,11 +349,9 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsEditable(const InteractionEvent*
   return isEditable;
 }
 
-
 void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
- GetDataNode()->GetData() );
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   int index = planarFigure->GetSelectedControlPoint();
   const bool wasSelected = planarFigure->DeselectControlPoint();
@@ -400,7 +386,8 @@ void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, Interactio
 
 void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return;
 
@@ -452,16 +439,9 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
 
   if (planarFigure->IsFinalized())
   {
-      // Determine the insertion index if the figure has already been finalized
-    nextIndex = this->IsPositionOverFigure(
-      positionEvent,
-      planarFigure,
-      planarFigureGeometry,
-      projectionPlane,
-      projectedPoint
-      );
+    nextIndex =
+      this->IsPositionOverFigure(positionEvent, planarFigure, planarFigureGeometry, projectionPlane, projectedPoint);
   }
-
 
   // Add point as new control point
 
@@ -521,25 +501,25 @@ void mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   renderer->GetRenderingManager()->RequestUpdateAll();
 }
 
-
 void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return;
 
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
-  const mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
 
   // Invoke event to notify listeners that placement of this PF starts now
   planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
 
   // Use PlaneGeometry of the renderer clicked on for this PlanarFigure
   mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    dynamic_cast< const mitk::PlaneGeometry * >(
-    renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
+    dynamic_cast<const mitk::PlaneGeometry *>(renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry()));
   if ( planeGeometry != nullptr && abstractTransformGeometry == nullptr)
   {
     planarFigureGeometry = planeGeometry;
@@ -590,7 +570,8 @@ void mitk::PlanarFigureInteractor::AddInitialPoint(StateMachineAction*, Interact
 
 void mitk::PlanarFigureInteractor::StartHovering( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return;
 
@@ -612,7 +593,8 @@ void mitk::PlanarFigureInteractor::StartHovering( StateMachineAction*, Interacti
 
 void mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return;
 
@@ -653,17 +635,18 @@ void mitk::PlanarFigureInteractor::HidePreviewPoint( StateMachineAction*, Intera
   renderer->GetRenderingManager()->RequestUpdateAll();
 }
 
-
 bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return false;
 
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
-  mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+  mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
   if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
@@ -674,12 +657,8 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
     return false;
 
   mitk::Point2D pointProjectedOntoLine;
-  int previousControlPoint = this->IsPositionOverFigure( positionEvent,
-                                                         planarFigure,
-                                                         planarFigureGeometry,
-                                                         projectionPlane,
-                                                         pointProjectedOntoLine
-                                                        );
+  int previousControlPoint = this->IsPositionOverFigure(
+    positionEvent, planarFigure, planarFigureGeometry, projectionPlane, pointProjectedOntoLine);
 
   bool isHovering = (previousControlPoint != -1);
 
@@ -695,17 +674,18 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   return false;
 }
 
-
 bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return false;
 
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
-  const mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
   if (renderer->GetMapperID() != mitk::BaseRenderer::Standard2D) {
@@ -716,11 +696,7 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
 
 
   int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
-    positionEvent,
-    planarFigure,
-    planarFigureGeometry,
-    projectionPlane,
-    renderer);
+    positionEvent, planarFigure, planarFigureGeometry, projectionPlane, renderer);
 
   if ( pointIndex >= 0 )
   {
@@ -748,25 +724,23 @@ void mitk::PlanarFigureInteractor::SelectFigure( StateMachineAction*, Interactio
 
 void mitk::PlanarFigureInteractor::SelectPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return;
 
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   const mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
-  const mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
   if (abstractTransformGeometry != nullptr)
     return;
 
   const int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
-    positionEvent,
-    planarFigure,
-    planarFigureGeometry,
-    projectionPlane,
-    renderer);
+    positionEvent, planarFigure, planarFigureGeometry, projectionPlane, renderer);
 
   int prevPointIndex = planarFigure->GetSelectedControlPoint();
   if (prevPointIndex != -1 && m_PointMoved) {
@@ -798,14 +772,14 @@ void mitk::PlanarFigureInteractor::SelectPoint( StateMachineAction*, Interaction
   }
 }
 
-
 bool mitk::PlanarFigureInteractor::CheckPointValidity( const InteractionEvent* interactionEvent )
 {
   // Check if the distance of the current point to the previously set point in display coordinates
   // is sufficient (if a previous point exists)
 
   // Extract display position
-  const mitk::InteractionPositionEvent* positionEvent = dynamic_cast<const mitk::InteractionPositionEvent*>( interactionEvent );
+  const mitk::InteractionPositionEvent *positionEvent =
+    dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
   if ( positionEvent == nullptr )
     return false;
 
@@ -814,8 +788,6 @@ bool mitk::PlanarFigureInteractor::CheckPointValidity( const InteractionEvent* i
   m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
   return m_LastPointWasValid;
 }
-
-
 
 void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
@@ -850,7 +822,6 @@ void mitk::PlanarFigureInteractor::RemoveSelectedPoint(StateMachineAction*, Inte
   HandleEvent( mitk::InternalEvent::New( renderer, this, "Dummy-Event" ), GetDataNode() );
 }
 
-
 void mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
@@ -867,7 +838,6 @@ void mitk::PlanarFigureInteractor::RequestContextMenu(StateMachineAction*, Inter
   planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
 }
 
-
 bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEvent* /*interactionEvent*/ )
 {
   mitk::PlanarFigure *planarFigure = static_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
@@ -879,20 +849,20 @@ bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEve
   return isEditable && planarFigure->ResetOnPointSelectNeeded();
 }
 
-
 bool mitk::PlanarFigureInteractor::CheckFigureOnRenderingGeometry( const InteractionEvent* interactionEvent )
 {
-  const mitk::InteractionPositionEvent* posEvent = dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+  const mitk::InteractionPositionEvent *posEvent =
+    dynamic_cast<const mitk::InteractionPositionEvent *>(interactionEvent);
 
   if ( posEvent == nullptr )
     return false;
 
   const mitk::Point3D worldPoint3D = posEvent->GetPositionInWorld();
-  const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
-    GetDataNode()->GetData() );
+  const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(GetDataNode()->GetData());
 
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
-  const mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::AbstractTransformGeometry *abstractTransformGeometry =
+    dynamic_cast<AbstractTransformGeometry *>(planarFigure->GetGeometry(0));
 
   if ( abstractTransformGeometry != nullptr)
     return false;
@@ -920,12 +890,10 @@ void mitk::PlanarFigureInteractor::SetPrecision( mitk::ScalarType precision )
   m_Precision = precision;
 }
 
-
 void mitk::PlanarFigureInteractor::SetMinimumPointDistance( ScalarType minimumDistance )
 {
   m_MinimumPointDistance = minimumDistance;
 }
-
 
 bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D( const InteractionPositionEvent *positionEvent,
                                                                     const PlaneGeometry *planarFigureGeometry,
@@ -965,6 +933,7 @@ mitk::Point2D mitk::PlanarFigureInteractor::TransformDisplayToObject(
     return result;
 }
 
+
 std::pair<double, mitk::Point2D> mitk::PlanarFigureInteractor::TransformDisplayToObject(double distanceInPixels, 
     const mitk::Point2D &displayPoint,
     const mitk::PlaneGeometry *objectGeometry,
@@ -978,6 +947,7 @@ std::pair<double, mitk::Point2D> mitk::PlanarFigureInteractor::TransformDisplayT
 
     return std::make_pair(pointInObjectCoordinates.EuclideanDistanceTo(
 		TransformDisplayToObject(offsetPoint, objectGeometry, rendererGeometry, renderer)), pointInObjectCoordinates);
+
 
 }
 
@@ -1006,9 +976,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   return polyLineSegmentIndex;
 }
 
-
-int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
-  const InteractionPositionEvent* positionEvent,
+int mitk::PlanarFigureInteractor::IsPositionInsideMarker(const InteractionPositionEvent *positionEvent,
   const PlanarFigure *planarFigure,
   const PlaneGeometry *planarFigureGeometry,
   const PlaneGeometry *rendererGeometry,
@@ -1025,22 +993,18 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
     return planarFigure->FindClosestControlPoint(pointInObjectCoordinates, maxDistanceInObjectCoordinates);
 }
 
-
-void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
-  const PlanarFigure *planarFigure )
+void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(const PlanarFigure *planarFigure)
 {
   MITK_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
   {
-    MITK_INFO << "* " << planarFigure->GetFeatureName( i ) << ": "
-      << planarFigure->GetQuantity( i ) << " " << planarFigure->GetFeatureUnit( i );
+    MITK_INFO << "* " << planarFigure->GetFeatureName(i) << ": " << planarFigure->GetQuantity(i) << " "
+              << planarFigure->GetFeatureUnit(i);
   }
 }
 
-bool
-mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
-    const mitk::InteractionPositionEvent* positionEvent,
-    const PlanarFigure* planarFigure )
+bool mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
+  const mitk::InteractionPositionEvent *positionEvent, const PlanarFigure *planarFigure)
 {
   assert(positionEvent && planarFigure);
 

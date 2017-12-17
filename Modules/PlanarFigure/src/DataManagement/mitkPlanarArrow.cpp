@@ -14,13 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarArrow.h"
 #include "mitkPlaneGeometry.h"
 
-
-mitk::PlanarArrow::PlanarArrow()
-: FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
+mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
   // Directed arrow has two control points
   m_ArrowTipScaleFactor = -1.0;
@@ -32,7 +29,6 @@ mitk::PlanarArrow::PlanarArrow()
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
   m_HelperPolyLinesToBePainted->InsertElement( 1, false );
 }
-
 
 void mitk::PlanarArrow::GeneratePolyLine()
 {
@@ -67,7 +63,6 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   }
   double nonScalingLength = displayHeight * mmPerDisplayUnit * scaleFactor;
 
-
   // Calculate arrow peak
   const Point2D p1 = this->GetControlPoint( 0 );
   const Point2D p2 = this->GetControlPoint( 1 );
@@ -88,7 +83,6 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   this->AppendPointToHelperPolyLine(1, p1);
   this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
 }
-
 
 void mitk::PlanarArrow::EvaluateFeaturesInternal()
 {

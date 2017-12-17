@@ -18,19 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 class SceneReaderV1 : public SceneReader
 {
   public:
-
     mitkClassMacro( SceneReaderV1, SceneReader);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
     virtual bool LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, LoadedNodeFileNamesMap* nodeDataFileNames = nullptr) override;
 
   protected:
-
     /**
       \brief tries to create one DataNode from a given XML <node> element
     */
@@ -64,7 +60,7 @@ class SceneReaderV1 : public SceneReader
 
     typedef std::multimap<int, std::string> UnorderedLayers;
 	typedef std::map<std::string, int> OrderedLayers; 
-	typedef std::pair<DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
+    typedef std::pair<DataNode::Pointer, std::list<std::string>> NodesAndParentsPair;
     typedef std::list< NodesAndParentsPair > OrderedNodesList;
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;
@@ -79,6 +75,4 @@ class SceneReaderV1 : public SceneReader
 
     UIDGenerator m_UIDGen;
 };
-
 }
-

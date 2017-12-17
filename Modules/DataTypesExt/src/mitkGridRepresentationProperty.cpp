@@ -14,10 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include <vtkProperty.h>
 #include "mitkGridRepresentationProperty.h"
-
+#include <vtkProperty.h>
 
 mitk::GridRepresentationProperty::GridRepresentationProperty( )
 {
@@ -25,12 +23,10 @@ mitk::GridRepresentationProperty::GridRepresentationProperty( )
   SetValue( SURFACE );
 }
 
-
 mitk::GridRepresentationProperty::GridRepresentationProperty(const mitk::GridRepresentationProperty& other)
   : mitk::EnumerationProperty(other)
 {
 }
-
 
 mitk::GridRepresentationProperty::GridRepresentationProperty( const IdType& value )
 {
@@ -45,7 +41,6 @@ mitk::GridRepresentationProperty::GridRepresentationProperty( const IdType& valu
   }
 }
 
-
 mitk::GridRepresentationProperty::GridRepresentationProperty( const std::string& value )
 {
   AddRepresentationTypes();
@@ -59,18 +54,15 @@ mitk::GridRepresentationProperty::GridRepresentationProperty( const std::string&
   }
 }
 
-
 void mitk::GridRepresentationProperty::SetRepresentationToPoints()
 {
   SetValue( POINTS );
 }
 
-
 void mitk::GridRepresentationProperty::SetRepresentationToWireframe()
 {
   SetValue( WIREFRAME );
 }
-
 
 void mitk::GridRepresentationProperty::SetRepresentationToSurface()
 {
@@ -89,7 +81,6 @@ void mitk::GridRepresentationProperty::AddRepresentationTypes()
   AddEnum( "Surface", SURFACE );
   //AddEnum( "WireframeSurface", WIREFRAME_SURFACE );
 }
-
 
 bool mitk::GridRepresentationProperty::AddEnum( const std::string& name, const IdType& id )
 {

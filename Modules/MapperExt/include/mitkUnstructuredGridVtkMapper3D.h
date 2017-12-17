@@ -14,20 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_UNSTRUCTURED_GRID_VTK_MAPPER_3D_H_
 #define _MITK_UNSTRUCTURED_GRID_VTK_MAPPER_3D_H_
 
-#include "mitkCommon.h"
 #include "MitkMapperExtExports.h"
-#include "mitkVtkMapper.h"
-#include "mitkUnstructuredGrid.h"
 #include "mitkBaseRenderer.h"
+#include "mitkCommon.h"
+#include "mitkUnstructuredGrid.h"
+#include "mitkVtkMapper.h"
 
-#include <vtkAssembly.h>
 #include <vtkActor.h>
-#include <vtkVolume.h>
+#include <vtkAssembly.h>
 #include <vtkDataSetTriangleFilter.h>
+#include <vtkVolume.h>
 
 #include "vtkUnstructuredGridMapper.h"
 #include <vtkUnstructuredGridVolumeRayCastMapper.h>
@@ -41,7 +40,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-namespace mitk {
+namespace mitk 
+{
 
 //##Documentation
 //## @brief Vtk-based mapper for UnstructuredGrid
@@ -50,11 +50,9 @@ namespace mitk {
 class MITKMAPPEREXT_EXPORT UnstructuredGridVtkMapper3D : public VtkMapper
 {
 public:
-
   mitkClassMacro(UnstructuredGridVtkMapper3D, VtkMapper);
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   virtual const mitk::UnstructuredGrid* GetInput();
 
@@ -67,7 +65,6 @@ public:
   LocalStorageHandler<BaseLocalStorage> m_LSH;
 
 protected:
-
   UnstructuredGridVtkMapper3D();
 
   virtual ~UnstructuredGridVtkMapper3D();

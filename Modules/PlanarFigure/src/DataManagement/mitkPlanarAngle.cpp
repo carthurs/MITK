@@ -14,20 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarAngle.h"
 #include "mitkPlaneGeometry.h"
 
-
-mitk::PlanarAngle::PlanarAngle()
-: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "deg" ) )
+mitk::PlanarAngle::PlanarAngle() : FEATURE_ID_ANGLE(this->AddFeature("Angle", "deg"))
 {
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
 
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
-
 
 void mitk::PlanarAngle::GeneratePolyLine()
 {
@@ -51,7 +47,6 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   const Point2D centerPoint = this->GetControlPoint( 1 );
   const Point2D boundaryPointOne = this->GetControlPoint( 0 );
   const Point2D boundaryPointTwo = this->GetControlPoint( 2 );
-
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPointOne );
   if ( radius > centerPoint.EuclideanDistanceTo( boundaryPointTwo ) )
@@ -132,7 +127,6 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   }
 }
 
-
 void mitk::PlanarAngle::EvaluateFeaturesInternal()
 {
   if ( this->GetNumberOfControlPoints() < 3 )
@@ -155,7 +149,6 @@ void mitk::PlanarAngle::EvaluateFeaturesInternal()
 
   this->SetQuantity( FEATURE_ID_ANGLE, angle );
 }
-
 
 void mitk::PlanarAngle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {

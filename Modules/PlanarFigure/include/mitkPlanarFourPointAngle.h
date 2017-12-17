@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_FOURPOINTANGLE_H_
 #define _MITK_PLANAR_FOURPOINTANGLE_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -37,9 +34,7 @@ class MITKPLANARFIGURE_EXPORT PlanarFourPointAngle : public PlanarFigure
 public:
   mitkClassMacro( PlanarFourPointAngle, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-public:
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) public :
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
 
@@ -50,25 +45,15 @@ public:
    */
   //virtual void Initialize();
 
-
   unsigned int GetPlacementNumberOfControlPoints() const override
   {
       return 2;
   }
 
   /** \brief Four point angle has 4 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 4;
-  }
-
-
+    unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
   /** \brief Four point angle has 4 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 4;
-  }
-
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
  virtual bool Equals(const mitk::PlanarFigure& other) const override ;
 
 protected:
@@ -85,12 +70,9 @@ protected:
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal() override;
 
-
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
-
 private:
-
 };
 
 } // namespace mitk

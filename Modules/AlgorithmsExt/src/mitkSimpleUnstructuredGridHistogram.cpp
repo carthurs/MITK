@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSimpleUnstructuredGridHistogram.h"
 
 #include <mitkUnstructuredGrid.h>
@@ -24,19 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkUnstructuredGrid.h>
 
-namespace mitk {
-
+namespace mitk
+{
 SimpleUnstructuredGridHistogram::SimpleUnstructuredGridHistogram()
   : m_UGHistogram(HistogramType::New()), m_InvMaxFrequency(1)
 {
   //MITK_INFO << "#######  Created a SimpleUnstructuredGridHistogram";
 }
 
-double SimpleUnstructuredGridHistogram::GetMin() const
-{
-  return m_UGHistogram->GetBinMin(0, 0);
-}
-
+  double SimpleUnstructuredGridHistogram::GetMin() const { return m_UGHistogram->GetBinMin(0, 0); }
 double SimpleUnstructuredGridHistogram::GetMax() const
 {
   return m_UGHistogram->GetBinMax(0, m_UGHistogram->GetSize(0)-1);
@@ -147,17 +142,15 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
 
 float SimpleUnstructuredGridHistogram::GetRelativeBin( double start, double end ) const
 {
-
-
   //MITK_INFO << "GetRelativeBin start: " << start << ", end: " << end;
   HistogramType::AbsoluteFrequencyType maxf = 0;
   for(double pos = start; pos < end; pos += m_BinSize)
   {
     HistogramType::AbsoluteFrequencyType f = m_UGHistogram->GetFrequency(m_UGHistogram->GetIndex(pos));
-    if (f > maxf) maxf = f;
+      if (f > maxf)
+        maxf = f;
   }
 
   return log(static_cast<double>(maxf))*m_InvMaxFrequency;
 }
-
 }

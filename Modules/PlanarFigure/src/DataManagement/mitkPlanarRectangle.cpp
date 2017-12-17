@@ -19,10 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 
-
 mitk::PlanarRectangle::PlanarRectangle()
-: FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
+  : FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")), FEATURE_ID_AREA(this->AddFeature("Area", "mm2"))
 {
   // Rectangle has four control points
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
@@ -98,7 +96,6 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
 
-
   // Calculate rectangle area (well, done a bit clumsy...)
   double area = 0.0;
   if ( this->GetPlaneGeometry() != nullptr )
@@ -114,9 +111,7 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
   }
 
   this->SetQuantity( FEATURE_ID_AREA, fabs(area) );
-
 }
-
 
 void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {

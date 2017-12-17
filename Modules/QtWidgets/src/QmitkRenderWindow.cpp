@@ -16,30 +16,30 @@
 
 #include "QmitkRenderWindow.h"
 
+#include "mitkInteractionKeyEvent.h"
+#include "mitkInternalEvent.h"
+#include "mitkMouseDoubleClickEvent.h"
+#include "mitkMouseMoveEvent.h"
+#include "mitkMousePressEvent.h"
+#include "mitkMouseReleaseEvent.h"
+#include "mitkMouseWheelEvent.h"
 #include <QCursor>
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QKeyEvent>
-#include <QResizeEvent>
-#include <QTimer>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QResizeEvent>
 #include <QSurfaceFormat>
+#include <QTimer>
+#include <QWheelEvent>
 #include <QWindow>
-#include "mitkMousePressEvent.h"
-#include "mitkMouseMoveEvent.h"
-#include "mitkMouseDoubleClickEvent.h"
-#include "mitkMouseReleaseEvent.h"
-#include "mitkInteractionKeyEvent.h"
-#include "mitkMouseWheelEvent.h"
-#include "mitkInternalEvent.h"
 
-#include "QmitkRenderWindowMenu.h"
 #include "QmitkMimeTypes.h"
+#include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
-    QString name,
-    mitk::VtkPropRenderer* /*renderer*/,
+                                     QString name,
+                                     mitk::VtkPropRenderer * /*renderer*/,
     mitk::RenderingManager* renderingManager,mitk::BaseRenderer::RenderingMode::Type renderingMode) :
     mitk::QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
@@ -110,16 +110,13 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   mitk::Point2D displayPos = GetMousePosition(me);
   mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
 
-  mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer,
-                                                              displayPos,
-                                                              GetButtonState(me),
-                                                              GetModifiers(me), GetEventButton(me));
+  mitk::MousePressEvent::Pointer mPressEvent =
+    mitk::MousePressEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::QVTKWidget::mousePressEvent(me);
   }
-
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -128,8 +125,8 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer,displayPos, GetButtonState(me),
-    GetModifiers(me), GetEventButton(me));
+  mitk::MouseDoubleClickEvent::Pointer mPressEvent =
+    mitk::MouseDoubleClickEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
@@ -143,8 +140,8 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, displayPos, GetButtonState(me),
-      GetModifiers(me), GetEventButton(me));
+  mitk::MouseReleaseEvent::Pointer mReleaseEvent =
+    mitk::MouseReleaseEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
@@ -161,8 +158,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
   this->AdjustRenderWindowMenuVisibility(me->pos());
 
-  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, displayPos, GetButtonState(me),
-      GetModifiers(me));
+  mitk::MouseMoveEvent::Pointer mMoveEvent =
+    mitk::MouseMoveEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me));
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
@@ -173,8 +170,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   mitk::Point2D displayPos = GetMousePosition(we);
-  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos, GetButtonState(we),
-      GetModifiers(we), GetDelta(we));
+  mitk::MouseWheelEvent::Pointer mWheelEvent =
+    mitk::MouseWheelEvent::New(m_Renderer, displayPos, GetButtonState(we), GetModifiers(we), GetDelta(we));
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
@@ -508,23 +505,23 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
       break;
 
     case Qt::Key_End:
-          key = mitk::InteractionEvent::KeyEnd;
-          break;
+        key = mitk::InteractionEvent::KeyEnd;
+        break;
     case Qt::Key_Home:
-          key = mitk::InteractionEvent::KeyPos1;
-          break;
+        key = mitk::InteractionEvent::KeyPos1;
+        break;
     case Qt::Key_Insert:
-          key = mitk::InteractionEvent::KeyInsert;
-          break;
+        key = mitk::InteractionEvent::KeyInsert;
+        break;
     case Qt::Key_PageDown:
-          key = mitk::InteractionEvent::KeyPageDown;
-          break;
+        key = mitk::InteractionEvent::KeyPageDown;
+        break;
     case Qt::Key_PageUp:
-          key = mitk::InteractionEvent::KeyPageUp;
-          break;
+        key = mitk::InteractionEvent::KeyPageUp;
+        break;
     case Qt::Key_Space:
-          key = mitk::InteractionEvent::KeySpace;
-          break;
+        key = mitk::InteractionEvent::KeySpace;
+        break;
     }
   }
   return key;

@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_RECTANGLE_H_
 #define _MITK_PLANAR_RECTANGLE_H_
 
 #include "mitkPlanarPolygon.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,8 +33,7 @@ class MITKPLANARFIGURE_EXPORT PlanarRectangle : public PlanarFigure
 public:
   mitkClassMacro( PlanarRectangle, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   unsigned int GetPlacementNumberOfControlPoints() const override
   {
@@ -50,18 +46,9 @@ public:
   }
 
   /** \brief Polygon has 2 control points per definition. */
-  virtual unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 4;
-  }
-
-
+    virtual unsigned int GetMinimumNumberOfControlPoints() const override { return 4; }
   /** \brief Polygon maximum number of control points is principally not limited. */
-  virtual unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 4;
-  }
-
+    virtual unsigned int GetMaximumNumberOfControlPoints() const override { return 4; }
   virtual bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
 
 protected:
@@ -86,7 +73,6 @@ protected:
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 private:
-
 };
 
 } // namespace mitk

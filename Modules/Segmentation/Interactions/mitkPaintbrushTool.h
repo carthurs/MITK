@@ -18,15 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPaintbrushTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
-#include "mitkPointSet.h"
-#include "mitkPointOperation.h"
 #include "mitkLegacyAdaptors.h"
+#include "mitkPointOperation.h"
+#include "mitkPointSet.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
-
   class StateMachineAction;
   class InteractionEvent;
   class InteractionPositionEvent;
@@ -50,7 +49,6 @@ namespace mitk
 class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
-
     // sent when the pen size is changed or should be updated in a GUI.
     Message1<int>     SizeChanged;
 
@@ -61,7 +59,6 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
 
 protected:
-
     PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~PaintbrushTool();
 
@@ -82,7 +79,6 @@ protected:
      *       different types of pens
      */
     void UpdateContour( const InteractionPositionEvent* );
-
 
     /**
     *   Little helper function. Returns the upper left corner of the given pixel.
@@ -112,4 +108,3 @@ protected:
 } // namespace
 
 #endif
-

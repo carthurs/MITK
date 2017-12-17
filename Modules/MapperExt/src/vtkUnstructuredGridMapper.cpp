@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "vtkUnstructuredGridMapper.h"
 
-#include "vtkGeometryFilter.h"
 #include "vtkExecutive.h"
 #include "vtkGarbageCollector.h"
+#include "vtkGeometryFilter.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -51,7 +51,6 @@ vtkUnstructuredGridMapper::~vtkUnstructuredGridMapper()
     {
     this->PolyDataMapper->Delete();
     }
-
 }
 
 void vtkUnstructuredGridMapper::SetBoundingObject(mitk::BoundingObject* bo)
@@ -69,8 +68,7 @@ void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGridBase *input)
 vtkUnstructuredGridBase *vtkUnstructuredGridMapper::GetInput()
 {
   //return this->Superclass::GetInputAsDataSet();
-  return vtkUnstructuredGridBase::SafeDownCast(
-      this->GetExecutive()->GetInputData(0, 0));
+  return vtkUnstructuredGrid::SafeDownCast(this->GetExecutive()->GetInputData(0, 0));
 }
 
 //----------------------------------------------------------------------------
@@ -136,9 +134,9 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
 
   if (this->m_BoundingObject)
   {
-    mitk::BoundingBox::BoundsArrayType bounds = this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(0)->GetBounds();
-    this->GeometryExtractor->SetExtent(bounds[0], bounds[1], bounds[2],
-        bounds[3], bounds[4], bounds[5]);
+    mitk::BoundingBox::BoundsArrayType bounds =
+      this->m_BoundingObject->GetGeometry()->CalculateBoundingBoxRelativeToTransform(0)->GetBounds();
+    this->GeometryExtractor->SetExtent(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
     this->GeometryExtractor->ExtentClippingOn();
   }
   else
@@ -152,14 +150,11 @@ void vtkUnstructuredGridMapper::Render(vtkRenderer *ren, vtkActor *act)
   // update ourselves in case something has changed
   this->PolyDataMapper->SetLookupTable(this->GetLookupTable());
   this->PolyDataMapper->SetScalarVisibility(this->GetScalarVisibility());
-  this->PolyDataMapper->SetUseLookupTableScalarRange(
-    this->GetUseLookupTableScalarRange());
+  this->PolyDataMapper->SetUseLookupTableScalarRange(this->GetUseLookupTableScalarRange());
   this->PolyDataMapper->SetScalarRange(this->GetScalarRange());
-  this->PolyDataMapper->SetImmediateModeRendering(
-    this->GetImmediateModeRendering());
+  this->PolyDataMapper->SetImmediateModeRendering(this->GetImmediateModeRendering());
   this->PolyDataMapper->SetColorMode(this->GetColorMode());
-  this->PolyDataMapper->SetInterpolateScalarsBeforeMapping(
-                               this->GetInterpolateScalarsBeforeMapping());
+  this->PolyDataMapper->SetInterpolateScalarsBeforeMapping(this->GetInterpolateScalarsBeforeMapping());
 
   this->PolyDataMapper->SetScalarMode(this->GetScalarMode());
   if ( this->ScalarMode == VTK_SCALAR_MODE_USE_POINT_FIELD_DATA ||
@@ -219,8 +214,7 @@ unsigned long vtkUnstructuredGridMapper::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-int vtkUnstructuredGridMapper::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+int vtkUnstructuredGridMapper::FillInputPortInformation(int vtkNotUsed(port), vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGridBase");
   return 1;
@@ -232,10 +226,7 @@ void vtkUnstructuredGridMapper::ReportReferences(vtkGarbageCollector* collector)
   this->Superclass::ReportReferences(collector);
   // These filters share our input and are therefore involved in a
   // reference loop.
-  vtkGarbageCollectorReport(collector, this->SurfaceExtractor,
-      "SurfaceExtractor");
-  vtkGarbageCollectorReport(collector, this->GeometryExtractor,
-                            "GeometryExtractor");
-  vtkGarbageCollectorReport(collector, this->PolyDataMapper,
-                            "PolyDataMapper");
+  vtkGarbageCollectorReport(collector, this->SurfaceExtractor, "SurfaceExtractor");
+  vtkGarbageCollectorReport(collector, this->GeometryExtractor, "GeometryExtractor");
+  vtkGarbageCollectorReport(collector, this->PolyDataMapper, "PolyDataMapper");
 }

@@ -35,17 +35,12 @@ bool compare(std::pair<double,int> i, std::pair<double, int> j)
   return (i.first>j.first);
 }
 
-mitk::PlaneProposer::PlaneProposer()
-  : m_UseDistances(false)
-  , m_UseLeastSquares(false)
-  , m_NumberOfClustersToUse(3)
+mitk::PlaneProposer::PlaneProposer() : m_UseDistances(false), m_UseLeastSquares(false), m_NumberOfClustersToUse(3)
 {
-
 }
 
 mitk::PlaneProposer::~PlaneProposer()
 {
-
 }
 
 void mitk::PlaneProposer::SetUnstructuredGrids(std::vector<mitk::UnstructuredGrid::Pointer>& grids)
@@ -94,7 +89,8 @@ void mitk::PlaneProposer::CreatePlaneInfo()
   for(unsigned int i=0; i<m_Grids.size();i++)
   {
       mitk::UnstructuredGrid::Pointer cluster = m_Grids.at(i);
-      vtkSmartPointer<vtkDoubleArray> data = dynamic_cast<vtkDoubleArray*>(cluster->GetVtkUnstructuredGrid()->GetPointData()->GetArray(0));
+    vtkSmartPointer<vtkDoubleArray> data =
+      dynamic_cast<vtkDoubleArray *>(cluster->GetVtkUnstructuredGrid()->GetPointData()->GetArray(0));
       double avg = 0.0;
       for(int j=0; j<data->GetSize();j++)
       {
@@ -129,14 +125,13 @@ void mitk::PlaneProposer::CreatePlaneInfo()
 
   if (m_SNC.IsNotNull())
   {
-    m_SNC->ReorientSlices(m_SNC->GetCurrentPlaneGeometry()->GetCenter(),
-                                                       m_ProposedPlaneInfo.x, m_ProposedPlaneInfo.y);
+    m_SNC->ReorientSlices(m_SNC->GetCurrentPlaneGeometry()->GetCenter(), m_ProposedPlaneInfo.x, m_ProposedPlaneInfo.y);
     m_SNC->SelectSliceByPoint(m_ProposedPlaneInfo.pointOnPlane);
   }
 }
 
-mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(const std::vector< std::pair<int,int> >& sizeIDs,
-                                                                           const std::vector< std::pair<double,int> >& avgDistances)
+mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(
+  const std::vector<std::pair<int, int>> &sizeIDs, const std::vector<std::pair<double, int>> &avgDistances)
 {
   for(unsigned int j=0; j<m_NumberOfClustersToUse; j++) //iterate over the clusters
   {
@@ -178,8 +173,8 @@ mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(const
   return planeInfo;
 }
 
-mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByLeastSquares(const std::vector<std::pair<int, int> > &sizeIDs,
-                                                                              const std::vector<std::pair<double, int> > &avgDistances)
+mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByLeastSquares(
+  const std::vector<std::pair<int, int>> &sizeIDs, const std::vector<std::pair<double, int>> &avgDistances)
 {
   //Generate a pointset from UnstructuredGrid for the PlaneFitFilter:
   mitk::PointSet::Pointer pointset = mitk::PointSet::New();

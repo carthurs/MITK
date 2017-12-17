@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarFigure.h"
 #include "mitkPlaneGeometry.h"
 #include <mitkProperties.h>
@@ -46,7 +45,6 @@ mitk::PlanarFigure::PlanarFigure()
   this->InitializeTimeGeometry( 1 );
 }
 
-
 mitk::PlanarFigure::PlanarFigure(const Self& other)
   : BaseData(other),
     m_ControlPoints(other.m_ControlPoints),
@@ -71,9 +69,7 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
   {
     m_HelperPolyLinesToBePainted->InsertElement( i, other.m_HelperPolyLinesToBePainted->GetElement( i ) );
 }
-
 }
-
 
 void mitk::PlanarFigure::SetPlaneGeometry( mitk::PlaneGeometry *geometry )
 {
@@ -81,12 +77,10 @@ void mitk::PlanarFigure::SetPlaneGeometry( mitk::PlaneGeometry *geometry )
   m_PlaneGeometry = dynamic_cast<PlaneGeometry *>(GetGeometry(0));//geometry;
 }
 
-
 const mitk::PlaneGeometry *mitk::PlanarFigure::GetPlaneGeometry() const
 {
   return m_PlaneGeometry;
 }
-
 
 bool mitk::PlanarFigure::IsClosed() const
 {
@@ -97,7 +91,6 @@ bool mitk::PlanarFigure::IsClosed() const
   }
   return false;
 }
-
 
 void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 {
@@ -131,13 +124,14 @@ void mitk::PlanarFigure::SetFinalized(bool finalized)
     this->Modified(); 
 }
 
-bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D& point, int position)
+bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D &point, int position)
 {
     // if we already have the maximum number of control points, do nothing
     if (GetNumberOfControlPoints() < this->GetMaximumNumberOfControlPoints())
     {
         // if position has not been defined or position would be the last control point, just append the new one
-        // we also append a new point if we click onto the line between the first two control-points if the second control-point is selected
+    // we also append a new point if we click onto the line between the first two control-points if the second
+    // control-point is selected
         // -> special case for PlanarCross
         if (position == -1 || position > (int)GetNumberOfControlPoints() - 1 || (position == 1 && m_SelectedControlPoint == 2))
         {
@@ -161,8 +155,7 @@ bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D& point, int positio
     }
 }
 
-
-bool mitk::PlanarFigure::SetControlPoint(unsigned int index, const Point2D& point, bool createIfDoesNotExist)
+bool mitk::PlanarFigure::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
 {
     bool controlPointSetCorrectly = false;
     if (createIfDoesNotExist)
@@ -195,8 +188,7 @@ bool mitk::PlanarFigure::SetControlPoint(unsigned int index, const Point2D& poin
     return controlPointSetCorrectly;
 }
 
-
-bool mitk::PlanarFigure::SetCurrentControlPoint(const Point2D& point)
+bool mitk::PlanarFigure::SetCurrentControlPoint(const Point2D &point)
 {
     if ((m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= (int)GetNumberOfControlPoints()))
     {
@@ -206,12 +198,10 @@ bool mitk::PlanarFigure::SetCurrentControlPoint(const Point2D& point)
     return this->SetControlPoint(m_SelectedControlPoint, point, false);
 }
 
-
 unsigned int mitk::PlanarFigure::GetNumberOfControlPoints() const
 {
     return m_ControlPoints.size();
 }
-
 
 bool mitk::PlanarFigure::SelectControlPoint(unsigned int index)
 {
@@ -226,7 +216,6 @@ bool mitk::PlanarFigure::SelectControlPoint(unsigned int index)
     }
 }
 
-
 bool mitk::PlanarFigure::DeselectControlPoint()
 {
     bool wasSelected = (m_SelectedControlPoint != -1);
@@ -236,7 +225,7 @@ bool mitk::PlanarFigure::DeselectControlPoint()
     return wasSelected;
 }
 
-void mitk::PlanarFigure::SetPreviewControlPoint(const Point2D& point)
+void mitk::PlanarFigure::SetPreviewControlPoint(const Point2D &point)
 {
     m_PreviewControlPoint = point;
     m_PreviewControlPointVisible = true;
@@ -423,7 +412,6 @@ unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
     return m_Features.size();
 }
 
-
 const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
 {
     if (index < m_Features.size())
@@ -436,7 +424,6 @@ const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
     }
 }
 
-
 const char *mitk::PlanarFigure::GetFeatureUnit(unsigned int index) const
 {
     if (index < m_Features.size())
@@ -448,7 +435,6 @@ const char *mitk::PlanarFigure::GetFeatureUnit(unsigned int index) const
     return nullptr;
     }
 }
-
 
 double mitk::PlanarFigure::GetQuantity(unsigned int index) const
 {
@@ -470,7 +456,6 @@ double mitk::PlanarFigure::GetQuantity(unsigned int index) const
         return 0.0;
     }
 }
-
 
 bool mitk::PlanarFigure::IsFeatureActive(unsigned int index) const
 {
@@ -520,28 +505,23 @@ void mitk::PlanarFigure::UpdateOutputInformation()
     this->GetTimeGeometry()->Update();
 }
 
-
 void mitk::PlanarFigure::SetRequestedRegionToLargestPossibleRegion()
 {
 }
-
 
 bool mitk::PlanarFigure::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;
 }
 
-
 bool mitk::PlanarFigure::VerifyRequestedRegion()
 {
     return true;
 }
 
-
 void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject * /*data*/)
 {
 }
-
 
 mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints(unsigned int /*index*/, const Point2D& point)
 {
@@ -554,17 +534,28 @@ mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints(unsigned int /*in
   m_PlaneGeometry->WorldToIndex( point, indexPoint );
 
   BoundingBox::BoundsArrayType bounds = m_PlaneGeometry->GetBounds();
-    if (indexPoint[0] < bounds[0]) { indexPoint[0] = bounds[0]; }
-    if (indexPoint[0] > bounds[1]) { indexPoint[0] = bounds[1]; }
-    if (indexPoint[1] < bounds[2]) { indexPoint[1] = bounds[2]; }
-    if (indexPoint[1] > bounds[3]) { indexPoint[1] = bounds[3]; }
+  if (indexPoint[0] < bounds[0])
+  {
+    indexPoint[0] = bounds[0];
+  }
+  if (indexPoint[0] > bounds[1])
+  {
+    indexPoint[0] = bounds[1];
+  }
+  if (indexPoint[1] < bounds[2])
+  {
+    indexPoint[1] = bounds[2];
+  }
+  if (indexPoint[1] > bounds[3])
+  {
+    indexPoint[1] = bounds[3];
+  }
 
     Point2D constrainedPoint;
   m_PlaneGeometry->IndexToWorld( indexPoint, constrainedPoint );
 
     return constrainedPoint;
 }
-
 
 unsigned int mitk::PlanarFigure::AddFeature(const char *featureName, const char *unitName)
 {
@@ -576,7 +567,6 @@ unsigned int mitk::PlanarFigure::AddFeature(const char *featureName, const char 
     return index;
 }
 
-
 void mitk::PlanarFigure::SetFeatureName(unsigned int index, const char *featureName)
 {
     if (index < m_Features.size())
@@ -584,7 +574,6 @@ void mitk::PlanarFigure::SetFeatureName(unsigned int index, const char *featureN
         m_Features[index].Name = featureName;
     }
 }
-
 
 void mitk::PlanarFigure::SetFeatureUnit(unsigned int index, const char *unitName)
 {
@@ -594,7 +583,6 @@ void mitk::PlanarFigure::SetFeatureUnit(unsigned int index, const char *unitName
     }
 }
 
-
 void mitk::PlanarFigure::SetQuantity(unsigned int index, double quantity)
 {
     if (index < m_Features.size())
@@ -603,7 +591,6 @@ void mitk::PlanarFigure::SetQuantity(unsigned int index, double quantity)
     }
 }
 
-
 void mitk::PlanarFigure::ActivateFeature(unsigned int index)
 {
     if (index < m_Features.size())
@@ -611,7 +598,6 @@ void mitk::PlanarFigure::ActivateFeature(unsigned int index)
         m_Features[index].Active = true;
     }
 }
-
 
 void mitk::PlanarFigure::DeactivateFeature(unsigned int index)
 {
@@ -633,8 +619,7 @@ void mitk::PlanarFigure::InitializeTimeGeometry(unsigned int timeSteps)
     SetTimeGeometry(timeGeometry);
 }
 
-
-void mitk::PlanarFigure::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::PlanarFigure::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
     Superclass::PrintSelf(os, indent);
     os << indent << this->GetNameOfClass() << ":\n";
@@ -657,7 +642,6 @@ void mitk::PlanarFigure::PrintSelf(std::ostream& os, itk::Indent indent) const
   this->GetPlaneGeometry()->Print(os, indent.GetNextIndent());
 }
 
-
 unsigned short mitk::PlanarFigure::GetPolyLinesSize() const
 {
     if (!m_PolyLineUpToDate)
@@ -668,18 +652,15 @@ unsigned short mitk::PlanarFigure::GetPolyLinesSize() const
     return m_PolyLines.size();
 }
 
-
 unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize() const
 {
     return m_HelperPolyLines.size();
 }
 
-
 bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index) const
 {
     return m_HelperPolyLinesToBePainted->GetElement(index);
 }
-
 
 bool mitk::PlanarFigure::ResetOnPointSelect()
 {
@@ -731,7 +712,8 @@ void mitk::PlanarFigure::AppendPointToPolyLine(unsigned int index, PolyLineEleme
     }
     else
     {
-        MITK_ERROR << "Tried to add point to PolyLine " << index + 1 << ", although only " << m_PolyLines.size() << " exists";
+    MITK_ERROR << "Tried to add point to PolyLine " << index + 1 << ", although only " << m_PolyLines.size()
+               << " exists";
     }
 }
 
@@ -744,7 +726,8 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine(unsigned int index, PolyLin
     }
     else
     {
-        MITK_ERROR << "Tried to add point to HelperPolyLine " << index + 1 << ", although only " << m_HelperPolyLines.size() << " exists";
+    MITK_ERROR << "Tried to add point to HelperPolyLine " << index + 1 << ", although only " << m_HelperPolyLines.size()
+               << " exists";
     }
 }
 
@@ -896,7 +879,8 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
       }
       if( itThis->Name.compare(itOther->Name) != 0 )
       {
-        MITK_ERROR << "Name of Measure is Different " << itThis->Name << "/ " << itOther->Name;;
+        MITK_ERROR << "Name of Measure is Different " << itThis->Name << "/ " << itOther->Name;
+        ;
         return false;
       }
 
@@ -908,7 +892,10 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   return true;
 }
 
-bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType /*eps*/, bool /*verbose*/ )
+bool mitk::Equal(const mitk::PlanarFigure &leftHandSide,
+                 const mitk::PlanarFigure &rightHandSide,
+                 ScalarType /*eps*/,
+                 bool /*verbose*/)
 {
   // FIXME: use eps and verbose
   return leftHandSide.Equals(rightHandSide);

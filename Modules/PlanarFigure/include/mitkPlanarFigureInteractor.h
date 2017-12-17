@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
 #define MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
 
 #include <MitkPlanarFigureExports.h>
 
 #include "mitkCommon.h"
-#include "mitkNumericTypes.h"
 #include "mitkDataInteractor.h"
+#include "mitkNumericTypes.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -30,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 class DataNode;
 class PlaneGeometry;
 class PlanarFigure;
@@ -38,6 +36,21 @@ class PositionEvent;
 class BaseRenderer;
 class InteractionPositionEvent;
 class StateMachineAction;
+
+#pragma GCC visibility push(default)
+
+  // Define events for PlanarFigure interaction notifications
+  itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
+  itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+
+#pragma GCC visibility pop
 
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
@@ -48,8 +61,7 @@ class MITKPLANARFIGURE_EXPORT PlanarFigureInteractor : public DataInteractor
 {
 public:
   mitkClassMacro(PlanarFigureInteractor, DataInteractor);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   /** \brief Sets the amount of precision */
   void SetPrecision( ScalarType precision );
@@ -60,7 +72,6 @@ public:
   void FinalizeFigure();
 
 protected:
-
   PlanarFigureInteractor();
   virtual ~PlanarFigureInteractor();
 
@@ -90,7 +101,6 @@ protected:
   bool CheckFigureIsDeletable( const InteractionEvent* interactionEvent );
 
   bool CheckFigureIsEditable( const InteractionEvent* interactionEvent );
-
 
   ////////  Actions ////////
 
@@ -129,13 +139,12 @@ protected:
 
   void EndInteraction( StateMachineAction*, InteractionEvent* interactionEvent );
 
-
   bool FilterEvents(InteractionEvent* interactionEvent, DataNode*) override;
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
     */
-    
-  bool IsMousePositionAcceptableAsNewControlPoint( const mitk::InteractionPositionEvent* positionEvent, const PlanarFigure* );
+    bool IsMousePositionAcceptableAsNewControlPoint(const mitk::InteractionPositionEvent *positionEvent,
+                                                    const PlanarFigure *);
 
   bool TransformPositionEventToPoint2D( const InteractionPositionEvent* positionEvent,
                                         const PlaneGeometry *planarFigureGeometry,
@@ -147,14 +156,22 @@ protected:
     const mitk::PlaneGeometry *rendererGeometry,
     const mitk::BaseRenderer *renderer) const;
 
-  mitk::Point2D TransformDisplayToObject(const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
+    mitk::Point2D TransformDisplayToObject(const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
+    /** \brief Returns true if the first specified point is in proximity of the line defined
+     * the other two point; false otherwise.
+     *
+     * Proximity is defined as the rectangle around the line with pre-defined distance
+     * from the line. */
+    bool IsPointNearLine(const mitk::Point2D &point,
+                         const mitk::Point2D &startPoint,
+                         const mitk::Point2D &endPoint,
+                         mitk::Point2D &projectedPoint) const;
 
-  std::pair<double, mitk::Point2D> TransformDisplayToObject(double distanceInPixels, const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
+    std::pair<double, mitk::Point2D> TransformDisplayToObject(double distanceInPixels, const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::BaseRenderer * renderer) const;
 
   /** \brief Returns true if the point contained in the passed event (in display coordinates)
    * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
-  int IsPositionOverFigure(
-    const InteractionPositionEvent* positionEvent,
+    int IsPositionOverFigure(const InteractionPositionEvent *positionEvent,
     PlanarFigure *planarFigure,
     const PlaneGeometry *planarFigureGeometry,
     const PlaneGeometry *rendererGeometry,
@@ -163,8 +180,7 @@ protected:
   /** \brief Returns the index of the marker (control point) over which the point contained
    * in the passed event (in display coordinates) currently is; -1 if the point is not over
    * a marker. */
-  int IsPositionInsideMarker(
-    const InteractionPositionEvent* positionEvent,
+    int IsPositionInsideMarker(const InteractionPositionEvent *positionEvent,
     const PlanarFigure *planarFigure,
     const PlaneGeometry *planarFigureGeometry,
     const PlaneGeometry *rendererGeometry,
@@ -202,7 +218,6 @@ private:
 
   //mitk::PlanarFigure::Pointer m_PlanarFigure;
 };
-
 }
 
 #endif // MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED

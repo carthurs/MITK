@@ -20,19 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
-#include "mitkLegacyAdaptors.h"
 #include "mitkLabelSetImage.h"
+#include "mitkLegacyAdaptors.h"
 
 #include <mitkITKImageImport.h>
-#include <mitkImageToContourModelFilter.h>
 #include <mitkImagePixelReadAccessor.h>
+#include <mitkImageToContourModelFilter.h>
 
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
 
 mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
-:FeedbackContourTool("PressMoveRelease"),
- m_PaintingPixelValue(paintingPixelValue)
+  : FeedbackContourTool("PressMoveRelease"), m_PaintingPixelValue(paintingPixelValue)
 {
 }
 
@@ -61,14 +60,16 @@ void mitk::SetRegionTool::Deactivated()
 void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return;
+  if (!positionEvent)
+    return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
-  if ( workingSlice.IsNull() ) return; // can't do anything without the segmentation
+  if (workingSlice.IsNull())
+    return; // can't do anything without the segmentation
 
   // if click was outside the image, don't continue
   const BaseGeometry* sliceGeometry = workingSlice->GetGeometry();
@@ -112,7 +113,8 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   resultImage->SetGeometry(workingSlice->GetGeometry());
   // Get the current working color
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return;
+  if (!workingNode)
+    return;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
@@ -135,21 +137,25 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return;
+  if (!positionEvent)
+    return;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
-  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
+  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's
+  // working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
   int timeStep = positionEvent->GetSender()->GetTimeStep();
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return;
+  if (!workingNode)
+    return;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || !planeGeometry ) return;
+  if (!image || !planeGeometry)
+    return;
 
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
@@ -160,9 +166,11 @@ void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   }
 
   ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
+  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
+    slice, feedbackContour, false, false); // false: don't add 0.5 (done by FillContourInSlice)
   // false: don't constrain the contour to the image's inside
-  if (projectedContour.IsNull()) return;
+  if (projectedContour.IsNull())
+    return;
 
   LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
   int activeColor = 1;
@@ -171,7 +179,8 @@ void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
     activeColor = labelImage->GetActiveLabel()->GetValue();
   }
 
-  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, slice, image, m_PaintingPixelValue*activeColor);
+  mitk::ContourModelUtils::FillContourInSlice(
+    projectedContour, timeStep, slice, image, m_PaintingPixelValue * activeColor);
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 }

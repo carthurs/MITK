@@ -14,12 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarCircle.h"
 #include "mitkPlaneGeometry.h"
 
 #include "mitkProperties.h"
-
 
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
@@ -63,10 +61,22 @@ mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int inde
   this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
   const BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
-  if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
-  if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
-  if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
-  if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
+  if (indexPoint[0] < bounds[0])
+  {
+    indexPoint[0] = bounds[0];
+  }
+  if (indexPoint[0] > bounds[1])
+  {
+    indexPoint[0] = bounds[1];
+  }
+  if (indexPoint[1] < bounds[2])
+  {
+    indexPoint[1] = bounds[2];
+  }
+  if (indexPoint[1] > bounds[3])
+  {
+    indexPoint[1] = bounds[3];
+  }
 
   Point2D constrainedPoint;
   this->GetPlaneGeometry()->IndexToWorld( indexPoint, constrainedPoint );
@@ -147,7 +157,6 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
   this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference);
   this->SetQuantity(FEATURE_ID_AREA, area);
 }
-
 
 void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {

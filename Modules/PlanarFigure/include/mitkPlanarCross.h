@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_CROSS_H_
 #define _MITK_PLANAR_CROSS_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -59,8 +56,7 @@ class MITKPLANARFIGURE_EXPORT PlanarCross : public PlanarFigure
 public:
   mitkClassMacro( PlanarCross, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
    * orthogonal cross. */
@@ -74,29 +70,19 @@ public:
   * orthogonal cross. */
   itkBooleanMacro( SingleLineMode ); // No need to reimplement; calls SetSingleLineMode()
 
-
   unsigned int GetPlacementNumberOfControlPoints() const override
   {
       return 2;
   }
 
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return this->GetSingleLineMode() ? 2 : 4;
-  }
-
+    unsigned int GetMinimumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return this->GetSingleLineMode() ? 2 : 4;
-  }
-
+    unsigned int GetMaximumNumberOfControlPoints() const override { return this->GetSingleLineMode() ? 2 : 4; }
   /** \brief The cross shall be reset to a single line when a control point is selected. */
   virtual bool ResetOnPointSelect() override;
 
   virtual bool ResetOnPointSelectNeeded() const override;
-
 
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const override;
@@ -119,7 +105,6 @@ protected:
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal() override;
 
-
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
   // Feature identifiers
@@ -127,11 +112,8 @@ protected:
   const unsigned int FEATURE_ID_SHORTAXISDIAMETER;
 
 private:
-
   /** Internal method for applying spatial constraints. */
   virtual Point2D InternalApplyControlPointConstraints( unsigned int index, const Point2D& point );
-
-
 };
 
 } // namespace mitk

@@ -14,17 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
 #include "mitkPlanarArrow.h"
 #include "mitkPlaneGeometry.h"
-
+#include "mitkTestingMacros.h"
 
 class mitkPlanarArrowTestClass
 {
-
 public:
-
-
 static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
 {
   // Test for correct minimum number of control points in cross-mode
@@ -35,12 +31,14 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
 
   // Initial placement of PlanarArrow
   mitk::Point2D p0;
-  p0[0] = 00.0; p0[1] = 0.0;
+    p0[0] = 00.0;
+    p0[1] = 0.0;
   PlanarArrow->PlaceFigure( p0 );
 
   // Add second control point
   mitk::Point2D p1;
-  p1[0] = 50.0; p1[1] = 00.0;
+    p1[0] = 50.0;
+    p1[1] = 00.0;
   PlanarArrow->SetControlPoint(1, p1 );
 
   // Test for number of control points
@@ -51,17 +49,14 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
   auto iter = polyLine0.begin();
   MITK_TEST_CONDITION( PlanarArrow->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
-
   // Get polylines and check if the generated coordinates are OK
   const mitk::Point2D& pp0 = *iter;
   iter++;
   const mitk::Point2D& pp1 = *iter;
   MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1), "Correct polyline 1" );
 
-
   // Test for number of measurement features
   // none yet
-
 }
 };
 /**
@@ -118,7 +113,6 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
       identical &= polyLine.at(j) == PlanarArrow->GetPolyLine(i).at(j);
     }
   }
-
 
   MITK_TEST_CONDITION_REQUIRED( identical, "Cloning completely successful" );
 

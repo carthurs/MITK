@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_ARROW_H_
 #define _MITK_PLANAR_ARROW_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,9 +33,7 @@ class MITKPLANARFIGURE_EXPORT PlanarArrow : public PlanarFigure
 public:
   mitkClassMacro( PlanarArrow, PlanarFigure );
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -46,7 +41,6 @@ public:
    * Must be implemented in sub-classes.
    */
   //virtual void Initialize();
-
 
   unsigned int GetPlacementNumberOfControlPoints() const override
   {
@@ -59,13 +53,8 @@ public:
     return 2;
   }
 
-
   /** \brief Line has 2 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 2;
-  }
-
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
   void SetArrowTipScaleFactor( float scale );
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
@@ -84,7 +73,6 @@ protected:
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal() override;
 
-
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
   // Feature identifiers
@@ -93,9 +81,7 @@ protected:
   // ScaleFactor defining size of helper-lines in relation to display size
   float m_ArrowTipScaleFactor;
 
-
 private:
-
 };
 
 } // namespace mitk

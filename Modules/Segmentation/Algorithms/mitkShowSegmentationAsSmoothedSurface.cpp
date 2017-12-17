@@ -15,28 +15,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkShowSegmentationAsSmoothedSurface.h"
-#include "mitkImageToItk.h"
-#include "mitkImageCast.h"
 #include "itkIntelligentBinaryClosingFilter.h"
-#include <mitkUIDGenerator.h>
-#include <mitkGeometry3D.h>
-#include <mitkProgressBar.h>
-#include <mitkStatusBar.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkImageToSurfaceFilter.h>
-#include <mitkVtkRepresentationProperty.h>
-#include <itkImageRegionIteratorWithIndex.h>
-#include <itkRegionOfInterestImageFilter.h>
-#include <itkConstantPadImageFilter.h>
+#include "mitkImageCast.h"
+#include "mitkImageToItk.h"
+#include <itkAddImageFilter.h>
 #include <itkBinaryMedianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkDiscreteGaussianImageFilter.h>
-#include <itkMultiplyImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
-#include <itkAddImageFilter.h>
-#include <vtkQuadricDecimation.h>
+#include <itkConstantPadImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkMultiplyImageFilter.h>
+#include <itkRegionOfInterestImageFilter.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkProgressBar.h>
+#include <mitkStatusBar.h>
+#include <mitkUIDGenerator.h>
+#include <mitkVtkRepresentationProperty.h>
 #include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkQuadricDecimation.h>
 
 using namespace mitk;
 using namespace std;
@@ -467,8 +467,8 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
   if (wireframe)
   {
-    VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
-      node->GetProperty("material.representation"));
+    VtkRepresentationProperty *representation =
+      dynamic_cast<VtkRepresentationProperty *>(node->GetProperty("material.representation"));
 
     if (representation != nullptr)
       representation->SetRepresentationToWireframe();

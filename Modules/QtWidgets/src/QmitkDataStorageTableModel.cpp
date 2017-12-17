@@ -17,27 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDataStorageTableModel.h"
 
 //# Own includes
+#include "QmitkCustomVariants.h"
+#include "QmitkEnums.h"
 #include "mitkNodePredicateBase.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
-#include "QmitkEnums.h"
-#include "QmitkCustomVariants.h"
 #include <QmitkNodeDescriptorManager.h>
 
 //# Toolkit includes
-#include <itkCommand.h>
-#include <QIcon>
 #include <QFile>
+#include <QIcon>
+#include <itkCommand.h>
 
 //#CTORS/DTOR
-QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage
-                                                       , mitk::NodePredicateBase* _Predicate
-                                                       , QObject* parent )
-: QAbstractTableModel(parent)
-, m_DataStorage(nullptr)
-, m_Predicate(nullptr)
-, m_BlockEvents(false)
-, m_SortDescending(false)
+QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage,
+                                                       mitk::NodePredicateBase *_Predicate,
+                                                       QObject *parent)
+  : QAbstractTableModel(parent),
+    m_DataStorage(nullptr),
+    m_Predicate(nullptr),
+    m_BlockEvents(false),
+    m_SortDescending(false)
 {
   this->SetPredicate(_Predicate);
   this->SetDataStorage(_DataStorage);
@@ -72,9 +72,7 @@ mitk::DataNode::Pointer QmitkDataStorageTableModel::GetNode( const QModelIndex &
   return node;
 }
 
-
-QVariant QmitkDataStorageTableModel::headerData(int section, Qt::Orientation orientation,
-                                                int role) const
+QVariant QmitkDataStorageTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   QVariant headerData;
 
@@ -157,14 +155,11 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
     }
     else if (index.column() == 1)
     {
-
-      QmitkNodeDescriptor* nodeDescriptor
-        = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
+      QmitkNodeDescriptor *nodeDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
 
       // get type property of mitk::BaseData
       if (role == Qt::DisplayRole)
       {
-
         data = nodeDescriptor->GetNameOfClass();
       }
       // show some nice icons for datatype
@@ -208,11 +203,13 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     // if a data storage was set before remove old event listeners
     if(m_DataStorage.IsNotNull())
     {
-      this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
+      this->m_DataStorage->AddNodeEvent.RemoveListener(
+        mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTableModel::AddNode));
 
-      this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
+      this->m_DataStorage->RemoveNodeEvent.RemoveListener(
+        mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTableModel::RemoveNode));
     }
 
     // set new data storage
@@ -222,18 +219,19 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     if(m_DataStorage.IsNotNull())
     {
       // subscribe for node added/removed events
-      this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
+      this->m_DataStorage->AddNodeEvent.AddListener(
+        mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTableModel::AddNode));
 
-      this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
+      this->m_DataStorage->RemoveNodeEvent.AddListener(
+        mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
+          this, &QmitkDataStorageTableModel::RemoveNode));
     }
 
     // Reset model (even if datastorage is 0->will be checked in Reset())
     this->Reset();
   }
 }
-
 
 void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
 {
@@ -249,8 +247,8 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
       return;
 
     // create listener commands to listen to changes in the name or the visibility of the node
-    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand
-      = itk::MemberCommand<QmitkDataStorageTableModel>::New();
+    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand =
+      itk::MemberCommand<QmitkDataStorageTableModel>::New();
     propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
 
     mitk::BaseProperty* tempProperty = nullptr;
@@ -258,13 +256,13 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
     // add listener for properties
     tempProperty = node->GetProperty("visible");
     if(tempProperty)
-      m_VisiblePropertyModifiedObserverTags[tempProperty]
-        = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+      m_VisiblePropertyModifiedObserverTags[tempProperty] =
+        tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
 
     tempProperty = node->GetProperty("name");
     if(tempProperty)
-      m_NamePropertyModifiedObserverTags[tempProperty]
-        = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+      m_NamePropertyModifiedObserverTags[tempProperty] =
+        tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
 
     // emit beginInsertRows event
     beginInsertRows(QModelIndex(), m_NodeSet.size(), m_NodeSet.size());
@@ -283,8 +281,7 @@ void QmitkDataStorageTableModel::RemoveNode( const mitk::DataNode* node )
   if(!m_BlockEvents)
   {
     // find corresponding node
-    auto nodeIt
-      = std::find(m_NodeSet.begin(), m_NodeSet.end(), node);
+    auto nodeIt = std::find(m_NodeSet.begin(), m_NodeSet.end(), node);
 
     if(nodeIt != m_NodeSet.end())
     {
@@ -364,8 +361,7 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
   }
 }
 
-bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVariant &value,
-  int role)
+bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
   bool noErr = false;
 
@@ -438,13 +434,11 @@ void QmitkDataStorageTableModel::Reset()
     }
 
     // finally add all nodes to the model
-    for(auto it=_NodeSet->begin(); it!=_NodeSet->end()
-      ; it++)
+    for (auto it = _NodeSet->begin(); it != _NodeSet->end(); it++)
     {
       // save node
       this->AddNode(*it);
     }
-
   }
 }
 
@@ -459,18 +453,16 @@ void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::A
 
     //m_SortDescending = sortDescending;
 
-    DataNodeCompareFunction::CompareCriteria _CompareCriteria
-      = DataNodeCompareFunction::CompareByName;
+  DataNodeCompareFunction::CompareCriteria _CompareCriteria = DataNodeCompareFunction::CompareByName;
 
-    DataNodeCompareFunction::CompareOperator _CompareOperator
-      = sortDescending ? DataNodeCompareFunction::Greater: DataNodeCompareFunction::Less;
+  DataNodeCompareFunction::CompareOperator _CompareOperator =
+    sortDescending ? DataNodeCompareFunction::Greater : DataNodeCompareFunction::Less;
 
     if(column == 1)
       _CompareCriteria = DataNodeCompareFunction::CompareByClassName;
 
     else if(column == 2)
       _CompareCriteria = DataNodeCompareFunction::CompareByVisibility;
-
 
     DataNodeCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
     std::sort(m_NodeSet.begin(), m_NodeSet.end(), compareFunc);
@@ -485,16 +477,14 @@ std::vector<mitk::DataNode*> QmitkDataStorageTableModel::GetNodeSet() const
   return m_NodeSet;
 }
 
-QmitkDataStorageTableModel::DataNodeCompareFunction::DataNodeCompareFunction( CompareCriteria _CompareCriteria
-                                                                                          , CompareOperator _CompareOperator )
-                                                                                          : m_CompareCriteria(_CompareCriteria)
-                                                                                          , m_CompareOperator(_CompareOperator)
+QmitkDataStorageTableModel::DataNodeCompareFunction::DataNodeCompareFunction(CompareCriteria _CompareCriteria,
+                                                                             CompareOperator _CompareOperator)
+  : m_CompareCriteria(_CompareCriteria), m_CompareOperator(_CompareOperator)
 {
 }
 
-bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()
-( const mitk::DataNode::Pointer& _Left
- , const mitk::DataNode::Pointer& _Right ) const
+bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()(const mitk::DataNode::Pointer &_Left,
+                                                                     const mitk::DataNode::Pointer &_Right) const
 {
   switch(m_CompareCriteria)
   {
@@ -507,7 +497,6 @@ bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()
 
   case CompareByVisibility:
     {
-
       bool _LeftVisibility = false;
       bool _RightVisibility = false;
       _Left->GetVisibility(_LeftVisibility, nullptr);
@@ -529,4 +518,3 @@ bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()
     break;
   }
 }
-

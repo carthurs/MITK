@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_ELLIPSE_H_
 #define _MITK_PLANAR_ELLIPSE_H_
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
-
 namespace mitk
 {
-
 class PlaneGeometry;
 
 /**
@@ -36,9 +33,7 @@ class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
 public:
   mitkClassMacro( PlanarEllipse, PlanarFigure )
 
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
+      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true ) override;
 
@@ -62,44 +57,20 @@ public:
 
   /** \brief Sets the minimum radius
   */
-  void SetMinimumRadius( double radius )
-  {
-      m_MinRadius = radius;
-  }
-
+    void SetMinimumRadius(double radius) { m_MinRadius = radius; }
   /** \brief Gets the minimum radius
   */
-  double GetMinimumRadius()
-  {
-      return m_MinRadius;
-  }
-
+    double GetMinimumRadius() { return m_MinRadius; }
   /** \brief Sets the maximum radius
   */
-  void SetMaximumRadius( double radius )
-  {
-      m_MaxRadius = radius;
-  }
-
+    void SetMaximumRadius(double radius) { m_MaxRadius = radius; }
   /** \brief Gets the minimum radius
   */
-  double GetMaximumRadius()
-  {
-      return m_MaxRadius;
-  }
-
-  void ActivateMinMaxRadiusContstraints( bool active )
-  {
-      m_MinMaxRadiusContraintsActive = active;
-  }
-
+    double GetMaximumRadius() { return m_MaxRadius; }
+    void ActivateMinMaxRadiusContstraints(bool active) { m_MinMaxRadiusContraintsActive = active; }
   /** \brief Treat ellipse as circle (equal radii)
   */
-  void SetTreatAsCircle( bool active )
-  {
-      m_TreatAsCircle = active;
-  }
-
+    void SetTreatAsCircle(bool active) { m_TreatAsCircle = active; }
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
   // Feature identifiers
@@ -134,7 +105,6 @@ protected:
   bool m_TreatAsCircle;
 
 private:
-
 };
 
 } // namespace mitk

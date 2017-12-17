@@ -16,19 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindowMenu.h"
 
-#include "mitkResliceMethodProperty.h"
 #include "mitkProperties.h"
+#include "mitkResliceMethodProperty.h"
 
 #include <QHBoxLayout>
-#include <QSpacerItem>
-#include <QSize>
 #include <QPainter>
+#include <QSize>
+#include <QSpacerItem>
 
+#include <QAction>
 #include<QGroupBox>
+#include <QLabel>
+#include <QLine>
 #include<QRadioButton>
-#include<QAction>
-#include<QLine>
-#include<QLabel>
 #include<QWidgetAction>
 
 #include <QTimer>
@@ -36,8 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 
 //#include"iconClose.xpm"
+#include "iconCrosshairMode.xpm"
 #include"iconFullScreen.xpm"
-#include"iconCrosshairMode.xpm"
 //#include"iconHoriSplit.xpm"
 #include"iconSettings.xpm"
 //#include"iconVertiSplit.xpm"
@@ -46,11 +46,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
+                                             Qt::WindowFlags f,
+                                             mitk::BaseRenderer *b,
+                                             QmitkStdMultiWidget *mw)
 :QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
+                                             Qt::WindowFlags f,
+                                             mitk::BaseRenderer *b,
+                                             QmitkStdMultiWidget *mw)
 :QWidget(parent,f),
 #endif
 
@@ -65,7 +71,6 @@ m_Renderer(b),
 m_MultiWidget(mw),
 m_Parent(parent)
 {
-
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
 
   //Create Menu Widget
@@ -113,8 +118,6 @@ QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
   if( m_AutoRotationTimer.isActive() )
     m_AutoRotationTimer.stop();
 }
-
-
 
 void QmitkRenderWindowMenu::CreateMenuWidget()
 {
@@ -222,11 +225,15 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   connect( m_Widget2LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget2(bool)) );
   connect( m_Widget3LayoutAction  , SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget3(bool)) );
   connect( m_RowWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToRowWidget3And4(bool)) );
-  connect( m_ColumnWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)) );
-  connect( m_SmallUpperWidget2Big3and4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToSmallUpperWidget2Big3and4(bool)) );
+  connect(
+    m_ColumnWidget3And4LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)));
+  connect(m_SmallUpperWidget2Big3and4LayoutAction,
+          SIGNAL(triggered(bool)),
+          this,
+          SLOT(OnChangeLayoutToSmallUpperWidget2Big3and4(bool)));
   connect( m_2x2Dand3DWidgetLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutTo2x2Dand3DWidget(bool)) );
-  connect( m_Left2Dand3DRight2DLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToLeft2Dand3DRight2D(bool)) );
-
+  connect(
+    m_Left2Dand3DRight2DLayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToLeft2Dand3DRight2D(bool)));
 }
 
 void QmitkRenderWindowMenu::paintEvent( QPaintEvent*  /*e*/ )
@@ -253,7 +260,6 @@ void QmitkRenderWindowMenu::ShowMenu( )
   MITK_DEBUG << "menu showMenu";
   DeferredShowMenu();
 }
-
 
 void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
 {
@@ -293,11 +299,9 @@ void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
  the renderWindowMenu when mouse cursor moves along the renderWindowMenu*/
 void QmitkRenderWindowMenu::smoothHide()
 {
-
   MITK_DEBUG<< "menu leaveEvent";
   m_HideTimer.start(10);
 }
-
 
 void QmitkRenderWindowMenu::ChangeFullScreenMode( bool state )
 {
@@ -341,7 +345,6 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
 
     //change icon
     this->ChangeFullScreenIcon();
-
   }
   else
   {
@@ -356,9 +359,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
   }
 
   DeferredShowMenu( );
-
 }
-
 
 /// \brief
 void QmitkRenderWindowMenu::OnSettingsButton( bool  /*checked*/ )
@@ -381,7 +382,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
   emit SignalChangeLayoutDesign( LAYOUT_2DIMAGEUP );
 
   DeferredShowMenu( );
-
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 {
@@ -404,12 +404,10 @@ void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
   emit SignalChangeLayoutDesign( LAYOUT_DEFAULT );
 
   DeferredShowMenu( );
-
 }
 
 void QmitkRenderWindowMenu::DeferredShowMenu()
 {
-
   MITK_DEBUG << "deferred show menu";
   m_HideTimer.stop();
 
@@ -437,7 +435,6 @@ void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
   emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
 
   DeferredShowMenu( );
-
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
@@ -749,8 +746,10 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 
   this->move( X+pos.x(), Y+pos.y() );
 
-  if(opacity<0) opacity=0;
-  else if(opacity>1) opacity=1;
+  if (opacity < 0)
+    opacity = 0;
+  else if (opacity > 1)
+    opacity = 1;
 
   this->setWindowOpacity(opacity);
 #else
@@ -762,9 +761,7 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()
 {
-  m_FullScreenButton->setIcon(m_FullScreenMode
-    ? QPixmap(iconLeaveFullScreen_xpm)
-    : QPixmap(iconFullScreen_xpm));
+  m_FullScreenButton->setIcon(m_FullScreenMode ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
 }
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
@@ -780,9 +777,15 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
     mitk::DataNode *n;
     if(this->m_MultiWidget)
     {
-      n = this->m_MultiWidget->GetWidgetPlane1(); if(n) n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane2(); if(n) n->SetVisibility(state);
-      n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane1();
+      if (n)
+        n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane2();
+      if (n)
+        n->SetVisibility(state);
+      n = this->m_MultiWidget->GetWidgetPlane3();
+      if (n)
+        n->SetVisibility(state);
       m_Renderer->GetRenderingManager()->RequestUpdateAll();
     }
   }
@@ -796,23 +799,27 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
   {
     if(num==0)
     {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
+                                                                  mitk::ResliceMethodProperty::New(0));
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
+                                                                  mitk::IntProperty::New(num));
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(false));
     }
     else
     {
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( true ) );
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices",
+                                                                  mitk::ResliceMethodProperty::New(1));
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.num",
+                                                                  mitk::IntProperty::New(num));
+      m_Renderer->GetCurrentWorldPlaneGeometryNode()->SetProperty("reslice.thickslices.showarea",
+                                                                  mitk::BoolProperty::New(true));
     }
     m_TSLabel->setText(QString::number(num*2+1));
     m_Renderer->SendUpdateSlice();
     m_Renderer->GetRenderingManager()->RequestUpdateAll();
   }
 }
-
-
 
 void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 {
@@ -835,12 +842,29 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
       mitk::DataNode *n;
       if(ds)
       {
-        n = this->m_MultiWidget->GetWidgetPlane1(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = this->m_MultiWidget->GetWidgetPlane2(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
-        n = this->m_MultiWidget->GetWidgetPlane3(); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = this->m_MultiWidget->GetWidgetPlane1();
+        if (n)
+        {
+          bool v;
+          if (n->GetVisibility(v, 0))
+            currentState &= v;
+      }
+        n = this->m_MultiWidget->GetWidgetPlane2();
+        if (n)
+        {
+          bool v;
+          if (n->GetVisibility(v, 0))
+            currentState &= v;
+    }
+        n = this->m_MultiWidget->GetWidgetPlane3();
+        if (n)
+        {
+          bool v;
+          if (n->GetVisibility(v, 0))
+            currentState &= v;
+        }
       }
     }
-
 
     QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
     showHideCrosshairVisibilityAction->setText("Show crosshair");
@@ -892,7 +916,8 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     swivelMode->setData( 3 );
     crosshairModesMenu->addAction( swivelMode );
 
-    connect( rotationModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnCrosshairRotationModeSelected(QAction*)) );
+    connect(
+      rotationModeActionGroup, SIGNAL(triggered(QAction *)), this, SLOT(OnCrosshairRotationModeSelected(QAction *)));
   }
 
   // auto rotation support
@@ -921,19 +946,23 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     int currentMode = 0;
     {
-      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices" ));
+      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty *>(
+        m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty("reslice.thickslices"));
       if( m.IsNotNull() )
         currentMode = m->GetValueAsId();
     }
 
     int currentNum = 1;
     {
-      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty( "reslice.thickslices.num" ));
+      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty *>(
+        m_Renderer->GetCurrentWorldPlaneGeometryNode()->GetProperty("reslice.thickslices.num"));
       if( m.IsNotNull() )
       {
         currentNum = m->GetValue();
-        if(currentNum < 1) currentNum = 1;
-        if(currentNum > 10) currentNum = 10;
+        if (currentNum < 1)
+          currentNum = 1;
+        if (currentNum > 10)
+          currentNum = 10;
       }
     }
 
@@ -988,4 +1017,3 @@ void QmitkRenderWindowMenu::AutoRotateNextStep()
   if(m_Renderer->GetCameraRotationController())
     m_Renderer->GetCameraRotationController()->GetSlice()->Next();
 }
-
