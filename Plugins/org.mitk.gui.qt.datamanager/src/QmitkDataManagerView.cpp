@@ -444,9 +444,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   QString className = confElem->GetAttribute("class");
   QString smoothed = confElem->GetAttribute("smoothed");
 
+  contextMenuAction->SetDataStorage(this->GetDataStorage());
+
   if(className == "QmitkCreatePolygonModelAction")
   {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
     if(smoothed == "false")
     {
       contextMenuAction->SetSmoothed(false);
@@ -461,10 +462,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   {
     contextMenuAction->SetFunctionality(this);
   }
-  else if(className == "QmitkCreateSimulationAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
+
   contextMenuAction->Run( this->GetCurrentSelection() ); // run the action
 }
 
