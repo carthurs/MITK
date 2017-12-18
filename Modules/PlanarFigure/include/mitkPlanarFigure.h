@@ -223,9 +223,6 @@ public:
   * overlay in the RenderWindow */
   void SetFeatureVisible( unsigned int index, bool visible );
 
-    /** \brief Calculates quantities of all features of this planar figure. */
-    virtual void EvaluateFeatures();
-
   /** \brief Intherited from parent */
   virtual void UpdateOutputInformation() override;
 
@@ -351,10 +348,6 @@ protected:
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
-
-    std::vector<PolyLineType> m_PolyLines;
-    std::vector<PolyLineType> m_HelperPolyLines;
-    BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
   // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
   // when the mouse cursor is above the figure (and not a control-point) and when the

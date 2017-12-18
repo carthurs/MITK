@@ -1,7 +1,4 @@
 set(SRC_CPP_FILES
-  QmitkPropertyItemDelegate.cpp
-  QmitkPropertyItem.cpp
-  QmitkPropertyItemModel.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -21,8 +18,6 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/QmitkPropertiesPreferencePage.h
   src/internal/org_mitk_gui_qt_properties_Activator.h
-  src/QmitkPropertyItemDelegate.h
-  src/QmitkPropertyItemModel.h
   src/internal/QmitkPropertyItemSortFilterProxyModel.h
   src/internal/QmitkPropertyTreeView.h
   src/internal/QmitkAddNewPropertyDialog.h

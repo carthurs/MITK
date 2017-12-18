@@ -37,21 +37,6 @@ class BaseRenderer;
 class InteractionPositionEvent;
 class StateMachineAction;
 
-#pragma GCC visibility push(default)
-
-  // Define events for PlanarFigure interaction notifications
-  itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
-  itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
-  itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
-
-#pragma GCC visibility pop
-
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
   *

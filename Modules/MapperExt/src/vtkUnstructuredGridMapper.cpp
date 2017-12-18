@@ -68,7 +68,7 @@ void vtkUnstructuredGridMapper::SetInput(vtkUnstructuredGridBase *input)
 vtkUnstructuredGridBase *vtkUnstructuredGridMapper::GetInput()
 {
   //return this->Superclass::GetInputAsDataSet();
-  return vtkUnstructuredGrid::SafeDownCast(this->GetExecutive()->GetInputData(0, 0));
+  return vtkUnstructuredGridBase::SafeDownCast(this->GetExecutive()->GetInputData(0, 0));
 }
 
 //----------------------------------------------------------------------------
