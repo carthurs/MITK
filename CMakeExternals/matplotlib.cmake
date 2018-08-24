@@ -25,6 +25,10 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     string(REPLACE ${sep} ${_platform_sep} matplotlib_LIBPNG_INCLUDE_DIR__platform_sep ${matplotlib_LIBPNG_INCLUDE_DIR})
     
     # setup build environment and disable fortran, blas and lapack
+    string(REPLACE "\\" "/" inc "$ENV{${_include_env_var}}")
+    string(REPLACE ";" "\\;" inc "${inc}")
+    string(REPLACE "\\" "/" lib "$ENV{${_lib_env_var}}")
+    string(REPLACE ";" "\\;" lib "${lib}")
     set(_matplotlib_env
         "
         set(ENV{F77} \"\")
@@ -39,8 +43,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         set(ENV{CFLAGS} \"${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}\")
         set(ENV{CXX} \"${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}\")
         set(ENV{CXXFLAGS} \"${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}\")
-        set(ENV{${_include_env_var}} \"${matplotlib_ZLIB_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}/freetype2\")
-        set(ENV{${_lib_env_var}} \"${matplotlib_ZLIB_LIBRARY_DIR}${_platform_sep}${matplotlib_LIBPNG_LIBRARY_DIR}${_platform_sep}${matplotlib_FREETYPE_LIBRARY_DIR}\")
+        set(ENV{${_include_env_var}} \"${inc}${_platform_sep}${matplotlib_ZLIB_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_LIBPNG_INCLUDE_DIR__platform_sep}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}${_platform_sep}${matplotlib_FREETYPE_INCLUDE_DIR}/freetype2\")
+        set(ENV{${_lib_env_var}} \"${lib}${matplotlib_ZLIB_LIBRARY_DIR}${_platform_sep}${matplotlib_LIBPNG_LIBRARY_DIR}${_platform_sep}${matplotlib_FREETYPE_LIBRARY_DIR}\")
         ")
 
     set(_matplotlib_build_step ${MITK_SOURCE_DIR}/CMake/mitkFunctionExternalPythonBuildStep.cmake)
