@@ -122,14 +122,14 @@ bool mitk::PlanarEllipse::SetControlPoint(unsigned int index, const Point2D &poi
     return true;
   }
   return false;
+}
+
+
+mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
+{
+	if (!m_FigureFinalized) {
+		return point;
 	}
-
-
-	mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
-	{
-		if (!m_FigureFinalized) {
-  return point;
-		}
 
   Point2D indexPoint;
   this->GetPlaneGeometry()->WorldToIndex(point, indexPoint);

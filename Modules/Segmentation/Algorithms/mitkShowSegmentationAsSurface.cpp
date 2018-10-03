@@ -136,7 +136,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
 
   if (smooth || applyMedian || decimateMesh)
   {
-    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
+    /*vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
 
     normalsGen->AutoOrientNormalsOn();
     normalsGen->FlipNormalsOff();
@@ -146,6 +146,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
 
     normalsGen->Delete();
+	*/
 
 	//m_Surface->SetVtkPolyData(polyData);
   }
