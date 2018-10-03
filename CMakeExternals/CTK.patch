@@ -44,6 +44,19 @@ index 5e61d97..1d3fc28 100644
  set(PYTHONQT_LIBRARY)
  if(PYTHONQT_LIBRARY_RELEASE)
    list(APPEND PYTHONQT_LIBRARY optimized ${PYTHONQT_LIBRARY_RELEASE})
+diff --git a/CMake/ctkMacroSetupQt.cmake b/CMake/ctkMacroSetupQt.cmake
+index 0b5d89c..c26b2ba 100644
+--- a/CMake/ctkMacroSetupQt.cmake
++++ b/CMake/ctkMacroSetupQt.cmake
+@@ -73,8 +73,6 @@ macro(ctkMacroSetupQt)
+       message(FATAL_ERROR "error: Qt4 was not found on your system. You probably need to set the QT_QMAKE_EXECUTABLE variable")
+     endif()
+ 
+-  else()
+-    message(FATAL_ERROR "error: Qt4 was not found on your system. You probably need to set the QT_QMAKE_EXECUTABLE variable")
+   endif()
+ 
+   mark_as_superbuild(CTK_QT_VERSION)
 diff --git a/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp b/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp
 index 66f5240..547f5e6 100644
 --- a/Libs/Scripting/Python/Core/ctkAbstractPythonManager.cpp

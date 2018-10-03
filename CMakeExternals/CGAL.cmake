@@ -10,7 +10,7 @@ if(MITK_USE_CGAL)
   endif()
 
   set(proj CGAL)
-  set(proj_DEPENDENCIES Boost)
+  set(proj_DEPENDENCIES Boost Eigen)
   set(CGAL_DEPENDS ${proj})
 
   if(NOT DEFINED CGAL_ROOT AND NOT MITK_USE_SYSTEM_CGAL)
@@ -27,7 +27,8 @@ if(MITK_USE_CGAL)
 
    ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL https://gforge.inria.fr/frs/download.php/file/34898/CGAL-4.6.1.tar.gz
+      #URL https://gforge.inria.fr/frs/download.php/file/34898/CGAL-4.6.1.tar.gz
+      URL https://github.com/CGAL/cgal/releases/download/releases%2FCGAL-4.12/CGAL-4.12.tar.xz
       #URL_MD5 a744cf167b05d72335f27c88115f211d
       # We use in-source builds for CGAL
     CMAKE_GENERATOR ${gen}
@@ -37,6 +38,8 @@ if(MITK_USE_CGAL)
       -DWITH_CGAL_ImageIO:BOOL=OFF
       -DWITH_CGAL_Qt3:BOOL=OFF
       -DWITH_CGAL_Qt4:BOOL=OFF
+      -DWITH_Eigen3:BOOL=ON
+      -DEigen3_DIR:PATH=${Eigne_DIR}
       -DCMAKE_DEBUG_POSTFIX:STRING=
       ${additional_cmake_args}
       CMAKE_CACHE_ARGS
