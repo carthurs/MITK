@@ -351,6 +351,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( colorAction, SIGNAL( changed() )
     , this, SLOT( ColorActionChanged() ) );
 
+  unknownDataNodeDescriptor->AddAction(colorAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, colorAction));
+
   { // only give the color context menu option where appropriate
     if (imageDataNodeDescriptor != NULL)
     {
