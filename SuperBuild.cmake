@@ -242,6 +242,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
 
+  MITK_USE_Python
   MITK_USE_Qt5
   MITK_USE_Qt5_WebEngine
   MITK_USE_SYSTEM_Boost
