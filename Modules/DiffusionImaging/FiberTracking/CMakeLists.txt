@@ -7,13 +7,17 @@ mitk_check_module_dependencies(
 )
 
 if(NOT _missing_deps)
-
+  #[AJM]  The server that this file comes from gives us a quite slow download (< 64 Kb/s) and the former timeout of 60 was frequently hit!
+  #
+  #       Note that timeout in cmake means "if the download didn't finish in <TIMEOUT> seconds, consider it a failure", 
+  #       NOT "if the download had no activity after 60 seconds, consider it a failure"
+  #       https://cmake.org/cmake/help/latest/command/file.html#download
   set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
   set(lut_tarball ${CMAKE_CURRENT_BINARY_DIR}/FibertrackingLUT.tar.gz)
   message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}
        EXPECTED_MD5 38ecb6d4a826c9ebb0f4965eb9aeee44
-       TIMEOUT 60
+       TIMEOUT 600 #600 seconds, or 10 minutes
        STATUS status
        SHOW_PROGRESS
       )
