@@ -1,6 +1,10 @@
 set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  message(FATAL_ERROR "CRIMSON requires Python components, but MITK Python cannot be compiled as a Debug build.")
+endif()
+
 #-----------------------------------------------------------------------------
 # See http://www.cmake.org/cmake/help/v3.5/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
