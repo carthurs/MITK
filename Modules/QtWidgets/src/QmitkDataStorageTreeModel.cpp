@@ -745,7 +745,7 @@ bool IsEmptyOrWhiteSpace(const QString& str)
     return IsWhitespaceRegEx.exactMatch(str);
 }
 
-bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNode, const QVariant& data)
+bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNode, const QVariant& data) const
 {
   if(QVariant::String != data.type() )
   {
@@ -753,7 +753,7 @@ bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNo
     return false;
   }
 
-  QString newQName = data.toString();
+  const QString newQName = data.toString();
 
   // MITK originally did allow pure whitespace names for nodes, so I will allow it too.
   if(newQName.isEmpty())
@@ -762,21 +762,27 @@ bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNo
     return false;
   }
 
-  if(nullptr = changedNode)
+  if(nullptr == changedNode)
   {
     return true;
   }
 
-  mitk::DataNode* parent = GetParentNode(changedNode);
+  const mitk::DataNode* const parent = GetParentNode(changedNode);
 
   if(nullptr == parent)
   {
     return true;
   }
 
-  if(!parent->GetBoolProperty("uniquechildnames"))
   {
-    return true;
+    bool propertyValue = false;
+    const bool propertyOK = parent->GetBoolProperty("uniquechildnames", propertyValue);
+    const bool useUniqueChildNames = propertyOK && propertyValue;
+
+    if (!useUniqueChildNames)
+    {
+      return true;
+    }
   }
 
   // for nodes that have the property I added, I'm going to add an additional check to reject all whitespace names
@@ -788,18 +794,38 @@ bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNo
   }
 
   // is this safe? What encoding does the data node use?
-  std::string newStdName = newQName.toStdString();
+  const std::string newStdName = newQName.toStdString();
 
-  std::vector<std::string> existingChildNodeNames;
+  const TreeItem * const parentTreeItem = m_Root->Find(parent);
+
+  if (nullptr == parentTreeItem)
+  {
+    MITK_ERROR << "Unexpected error: Parent data node '" << parent->GetName() << "' exists but has no tree item.";
+    return false;
+  }
 
   // now check if the name is a duplicate
-  const int childCount = parent->GetChildCount();
+  const int childCount = parentTreeItem->GetChildCount();
 
   for (int childIndex = 0; childIndex < childCount; childIndex++)
   {
-    const mitk::DataNode* const child = parent->GetChild(childIndex);
+    const TreeItem* const child = parentTreeItem->GetChild(childIndex);
 
-    std::string childName = child->GetName();
+    if (nullptr == child)
+    {
+      MITK_ERROR << "Unexpected error: Child node of parent '" << parent->GetName() << "' is null.";
+      continue;
+    }
+
+    const mitk::DataNode::Pointer childDataNode = child->GetDataNode();
+
+    if (nullptr == childDataNode)
+    {
+      MITK_ERROR << "Unexpected error: Child node of parent '" << parent->GetName() << "' has a null DataNode.";
+      continue;
+    }
+
+    const std::string childName = childDataNode->GetName();
 
     if(childName == newStdName)
     {
@@ -820,7 +846,7 @@ bool QmitkDataStorageTreeModel::setData(const QModelIndex &index, const QVariant
 
   if(Qt::EditRole == role)
   {
-    bool nameOK = CheckForDuplicateChildNames(dataNode, value);
+    bool nameOK = NodeNameOK(dataNode, value);
 
     if(!nameOK)
     {

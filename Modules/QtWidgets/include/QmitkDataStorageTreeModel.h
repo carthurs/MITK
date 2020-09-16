@@ -257,6 +257,8 @@ protected:
   /// with that one.
   bool m_AllowHierarchyChange;
 
+  bool NodeNameOK(const mitk::DataNode* const changedNode, const QVariant& data) const;
+
 private:
   void AddNodeInternal(const mitk::DataNode *);
   void RemoveNodeInternal(const mitk::DataNode *);
