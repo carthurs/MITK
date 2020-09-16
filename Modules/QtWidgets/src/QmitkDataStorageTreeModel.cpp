@@ -734,16 +734,105 @@ mitk::DataNode *QmitkDataStorageTreeModel::GetParentNode(const mitk::DataNode *n
   return dataNode;
 }
 
+bool IsEmptyOrWhiteSpace(const QString& str)
+{
+    if(str.isEmpty())
+    {
+        return true;
+    }
+
+    static const QRegExp IsWhitespaceRegEx = QRegExp("\\s*");
+    return IsWhitespaceRegEx.exactMatch(str);
+}
+
+bool QmitkDataStorageTreeModel::NodeNameOK(const mitk::DataNode* const changedNode, const QVariant& data)
+{
+  if(QVariant::String != data.type() )
+  {
+    MITK_ERROR << "Invalid node name: Attempted to rename a node with non-string data.";
+    return false;
+  }
+
+  QString newQName = data.toString();
+
+  // MITK originally did allow pure whitespace names for nodes, so I will allow it too.
+  if(newQName.isEmpty())
+  {
+    MITK_ERROR << "Invalid node name: Node name was empty.";
+    return false;
+  }
+
+  if(nullptr = changedNode)
+  {
+    return true;
+  }
+
+  mitk::DataNode* parent = GetParentNode(changedNode);
+
+  if(nullptr == parent)
+  {
+    return true;
+  }
+
+  if(!parent->GetBoolProperty("uniquechildnames"))
+  {
+    return true;
+  }
+
+  // for nodes that have the property I added, I'm going to add an additional check to reject all whitespace names
+
+  if(IsEmptyOrWhiteSpace(newQName))
+  {
+    MITK_ERROR << "Invalid node name: Child node under parent '" << parent->GetName() << "' has a name that is all whitespace.";
+    return false;
+  }
+
+  // is this safe? What encoding does the data node use?
+  std::string newStdName = newQName.toStdString();
+
+  std::vector<std::string> existingChildNodeNames;
+
+  // now check if the name is a duplicate
+  const int childCount = parent->GetChildCount();
+
+  for (int childIndex = 0; childIndex < childCount; childIndex++)
+  {
+    const mitk::DataNode* const child = parent->GetChild(childIndex);
+
+    std::string childName = child->GetName();
+
+    if(childName == newStdName)
+    {
+      MITK_ERROR << "Invalid node name: Child node under parent '" << parent->GetName() << "'. New node name '" << newStdName << "' is already in use.";
+      return false;
+    }
+  }
+
+  return true;
+
+}
+
 bool QmitkDataStorageTreeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
   mitk::DataNode *dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if (!dataNode)
     return false;
 
-  if (role == Qt::EditRole && !value.toString().isEmpty())
+  if(Qt::EditRole == role)
   {
-    auto name = value.toString().toStdString();
+    bool nameOK = CheckForDuplicateChildNames(dataNode, value);
+
+    if(!nameOK)
+    {
+      return false;
+    }
+
+    // Strips Qt string encoding
+    std::string name = value.toString().toStdString();
+
+    // Is this valid? What encoding is the node expecting for this property?
     dataNode->SetStringProperty("name", name.c_str());
+
     auto propagateNameToData = false;
     dataNode->GetBoolProperty("propagate_name_to_data", propagateNameToData);
     if (propagateNameToData && dataNode->GetData() != nullptr) {
