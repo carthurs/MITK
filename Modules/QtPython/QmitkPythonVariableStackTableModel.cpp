@@ -119,7 +119,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               if ( rx.indexIn(varName) == 0)
                 varName.prepend("_").prepend(MITK_SURFACE_VAR_NAME);
 
-              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName;
+              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
 
               if( m_PythonService->IsVtkPythonWrappingAvailable() )
               {
