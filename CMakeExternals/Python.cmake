@@ -163,7 +163,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
         # Python (and Numpy) do not like different shared library names
         -DCMAKE_DEBUG_POSTFIX:STRING=
-        -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
+        -DGIT_EXECUTABLE:STRING=${GIT_EXECUTABLE}
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
       DEPENDS
