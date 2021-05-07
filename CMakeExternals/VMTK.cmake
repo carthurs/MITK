@@ -45,7 +45,7 @@ if(MITK_USE_VMTK)
   
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/vtkVmtk-vtk6-CRIMSON.tar.bz2     
+      URL https://github.com/CRIMSONCardiovascularModelling/vtkVmtk/archive/refs/tags/vtk6-CRIMSON.tar.gz       
 	  PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
 	  INSTALL_COMMAND ""
       #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtkVmtk-7fa3faf6.tar.bz2

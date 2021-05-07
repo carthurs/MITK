@@ -84,7 +84,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\${_install_dir})
        ")
 
-    set(matplotlib_URL http://www.isd.kcl.ac.uk/cafa/CRIMSON-superbuild/matplotlib-1.1.0.zip)
+    set(matplotlib_URL https://github.com/CRIMSONCardiovascularModelling/matplotlib/archive/refs/tags/1.1.0.tar.gz)
     #set(matplotlib_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/matplotlib-1.4.1.tar.gz)
     #set(matplotlib_MD5 "5c7b5349dc3161763f7f366ceb96516b")
     #set(matplotlib_MD5 "a1ed53432dbcd256398898d35bc8e645")
