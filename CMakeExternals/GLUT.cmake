@@ -32,7 +32,7 @@ if(MITK_USE_GLUT)
 
       ExternalProject_Add(${proj}
          LIST_SEPARATOR ${sep}
-         URL http://mitk.org/download/thirdparty/freeglut-2.8.1.tar.gz
+         URL http://mitk.org/download/thirdparty/freeglut-2.8.1.tar.gz # [AJM] I don't have a backup of this, I don't think our build uses it.
          URL_MD5 918ffbddcffbac83c218bc52355b6d5a
          PATCH_COMMAND ${patch_cmd}
          CMAKE_GENERATOR ${gen}
