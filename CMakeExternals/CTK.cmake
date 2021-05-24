@@ -105,8 +105,8 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        -DqRestAPI_URL:STRING="https://github.com/Crimson-MITK-ThirdParty/qRestAPI/archive/refs/tags/c5e4c2a7_patched.tar.gz"
-        -DPythonQt_URL:STRING="https://github.com/Crimson-MITK-ThirdParty/PythonQt/archive/refs/tags/a081f9d6.tar.gz"
+        -DqRestAPI_URL:STRING=https://github.com/Crimson-MITK-ThirdParty/qRestAPI/archive/refs/tags/c5e4c2a7_patched.tar.gz
+        -DPythonQt_URL:STRING=https://github.com/Crimson-MITK-ThirdParty/PythonQt/archive/refs/tags/a081f9d6.tar.gz
         # See bug 19073
         #-DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
         #-DPythonQt_REVISION_TAG:STRING=origin/patched-5
