@@ -11,7 +11,6 @@ if(NOT _missing_deps)
   set(lut_tarball ${CMAKE_CURRENT_BINARY_DIR}/FibertrackingLUT.tar.gz)
   message("Downloading FiberTracking LUT ${lut_url}...")
   file(DOWNLOAD ${lut_url} ${lut_tarball}
-       EXPECTED_MD5 38ecb6d4a826c9ebb0f4965eb9aeee44
        TIMEOUT 600 #600 seconds, or 10 minutes
        STATUS status
        SHOW_PROGRESS
