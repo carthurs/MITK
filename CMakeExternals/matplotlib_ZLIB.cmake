@@ -22,14 +22,12 @@ if(MITK_USE_matplotlib_ZLIB)
         set(additional_cmake_args  -DCMAKE_C_FLAGS:STRING=-fPIC -DCMAKE_CXX_FLAGS:STRING=-fPIC)
     endif()
 
-    # Using the ZLIB from CTK:
-    # https://github.com/commontk/ZLIB
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       BUILD_COMMAND ${matplotlib_ZLIB_build_command} 
       INSTALL_COMMAND ${matplotlib_ZLIB_install_command} 
       URL ${ZLIB_URL}
-      URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
+
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

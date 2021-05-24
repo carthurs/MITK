@@ -18,8 +18,6 @@ if(MITK_USE_ZLIB)
       )
     endif()
 
-    # Using the ZLIB from CTK:
-    # https://github.com/commontk/zlib
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${ZLIB_URL}
