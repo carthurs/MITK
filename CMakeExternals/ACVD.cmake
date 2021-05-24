@@ -23,7 +23,7 @@ if(MITK_USE_ACVD)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388-patched.tar.gz
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388-patched.tar.gz # [AJM] I do not have a backup of this, it doesn't seem like it's used in our build
       URL_MD5 a59e658c8309f6a7004705d86d520d12
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

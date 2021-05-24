@@ -28,8 +28,7 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20160216.tar.gz
-      URL_MD5 273c8a544b9fe09b8a4fb4eb51df8e52
+      URL "https://github.com/Crimson-MITK-ThirdParty/dcmtk/archive/refs/tags/3.6.1_20160216.tar.gz"
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

@@ -80,13 +80,13 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-7.0.0.tar.gz)
-  set(VTK_URL_MD5 5fe35312db5fb2341139b8e4955c367d)
+  set(VTK_URL "https://github.com/Crimson-MITK-ThirdParty/VTK/archive/refs/tags/7.0.0.tar.gz")
+
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
-    URL_MD5 ${VTK_URL_MD5}
+
     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS

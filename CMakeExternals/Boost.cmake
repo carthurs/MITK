@@ -138,8 +138,7 @@ include(mitkFunctionGetMSVCVersion)
     endif()
 
   ExternalProject_Add(${proj}-download
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
-      URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
+      URL "https://github.com/Crimson-MITK-ThirdParty/boost/archive/refs/tags/1_60_0.tar.gz"
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""

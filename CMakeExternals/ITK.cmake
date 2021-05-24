@@ -56,8 +56,7 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.9.0.tar.xz
-     URL_MD5 0ce83c0f3c08f8ee992675fca4401572
+     URL "https://github.com/Crimson-MITK-ThirdParty/InsightToolkit/archive/refs/tags/4.9.0.tar.gz"
      # work with external GDCM
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch
      CMAKE_GENERATOR ${gen}

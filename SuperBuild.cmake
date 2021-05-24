@@ -4,9 +4,11 @@ include(mitkFunctionInstallExternalCMakeProject)
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
 
-if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
-  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
-endif()
+
+# As of 5/24/2021, this site appears to be having issues, and all the dependencies that came from it should be backed up on Github
+#if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
+#  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+#endif()
 
 macro(downloadFile url dest)
   file(DOWNLOAD ${url} ${dest} STATUS status)
@@ -41,7 +43,7 @@ endif()
 # if not patch program is found.
 find_program(PATCH_COMMAND patch)
 if((NOT PATCH_COMMAND OR NOT EXISTS ${PATCH_COMMAND}) AND WIN32)
-  downloadFile(${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/patch.exe
+  downloadFile("https://raw.githubusercontent.com/Crimson-MITK-ThirdParty/patch/main/patch.exe"
                ${CMAKE_CURRENT_BINARY_DIR}/patch.exe)
   find_program(PATCH_COMMAND patch ${CMAKE_CURRENT_BINARY_DIR})
 endif()

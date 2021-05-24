@@ -23,7 +23,6 @@ if(MITK_USE_ZLIB)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${ZLIB_URL}
-      URL_MD5 "4c3f572b487ae7947fd88ec363533bc5"
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}

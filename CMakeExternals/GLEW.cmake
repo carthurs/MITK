@@ -24,8 +24,7 @@ if(NOT DEFINED GLEW_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/glew-1.10.0.tgz
-     URL_MD5 2f09e5e6cb1b9f3611bcac79bc9c2d5d
+     URL "https://github.com/Crimson-MITK-ThirdParty/glew/archive/refs/tags/1.10.0.tar.gz"
      PATCH_COMMAND ${patch_cmd}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS

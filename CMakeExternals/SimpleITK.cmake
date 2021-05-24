@@ -61,8 +61,8 @@ if(MITK_USE_SimpleITK)
 
     ExternalProject_Add(${proj}
        LIST_SEPARATOR ${sep}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SimpleITK-0.8.1.tar.gz
-       URL_MD5 9126ab2eda9e88f598a962c02a705c43
+       URL "https://github.com/Crimson-MITK-ThirdParty/SimpleITK/archive/refs/tags/0.8.1.tar.gz"
+
        PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/SimpleITK-0.8.1.patch
        CMAKE_ARGS
          ${ep_common_args}

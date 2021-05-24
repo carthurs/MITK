@@ -34,7 +34,7 @@ if(MITK_USE_Vigra)
     endif()
 
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vigra-1.10.0-src.tar.gz
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vigra-1.10.0-src.tar.gz # [AJM] I don't have a backup for this, I don't think it's used in our build
        URL_MD5 4f963f0be4fcb8b06271c2aa40baa9be
        PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Vigra.patch
        CMAKE_GENERATOR ${gen}

@@ -26,8 +26,7 @@ if(MITK_USE_ANN)
 
     ExternalProject_Add(${proj}
        LIST_SEPARATOR ${sep}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ann_1.1.2.tar.gz
-       URL_MD5 7ffaacc7ea79ca39d4958a6378071365
+       URL "https://github.com/Crimson-MITK-ThirdParty/ann/archive/refs/tags/1.1.2.tar.gz"
        PATCH_COMMAND ${patch_cmd}
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS

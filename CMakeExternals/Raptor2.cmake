@@ -24,7 +24,7 @@ if(NOT DEFINED Raptor2_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/raptor2-2.0.15.tar.gz #[AJM] I don't have a backup for this, I don't think it's used in our build
      URL_MD5 a39f6c07ddb20d7dd2ff1f95fa21e2cd
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Raptor2-2.0.15.patch
      CMAKE_GENERATOR ${gen}

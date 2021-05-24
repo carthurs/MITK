@@ -1,1 +1,1 @@
-set(ZLIB_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/zlib-66a75305.tar.gz)
+set(ZLIB_URL "https://github.com/Crimson-MITK-ThirdParty/zlib/archive/refs/tags/66a75305.tar.gz")

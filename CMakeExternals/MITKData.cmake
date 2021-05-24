@@ -17,7 +17,7 @@ if(BUILD_TESTING)
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${proj}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz #[AJM] I don't have a backup of this, I don't think it's used in our build
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

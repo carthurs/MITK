@@ -75,10 +75,8 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      #GIT_REPOSITORY https://github.com/commontk/CTK.git
-      #GIT_TAG origin/master
-      URL_MD5 2c04925496e6818706ccffa8a71afaae
+      URL "https://github.com/Crimson-MITK-ThirdParty/CTK/archive/refs/tags/9440d3c9.tar.gz"
+
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
@@ -107,8 +105,8 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_c5e4c2a7_patched.tar.gz
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_a081f9d6.tar.gz
+        -DqRestAPI_URL:STRING="https://github.com/Crimson-MITK-ThirdParty/qRestAPI/archive/refs/tags/c5e4c2a7_patched.tar.gz"
+        -DPythonQt_URL:STRING="https://github.com/Crimson-MITK-ThirdParty/PythonQt/archive/refs/tags/a081f9d6.tar.gz"
         # See bug 19073
         #-DPythonQt_GIT_REPOSITORY:STRING=https://github.com/rkhlebnikov/PythonQt
         #-DPythonQt_REVISION_TAG:STRING=origin/patched-5

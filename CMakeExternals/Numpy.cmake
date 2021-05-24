@@ -69,11 +69,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         mitkFunctionExternalPythonBuildStep(${proj} install \"${PYTHON_EXECUTABLE}\" \"${CMAKE_BINARY_DIR}\" setup.py install --prefix=\${_install_dir})
        ")
 
-    set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.9.2.tar.gz)
-    #set(Numpy_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/numpy-1.4.1.tar.gz)
-    #set(Numpy_MD5 "5c7b5349dc3161763f7f366ceb96516b")
-    set(Numpy_MD5 "a1ed53432dbcd256398898d35bc8e645")
-
+    set(Numpy_URL "https://github.com/Crimson-MITK-ThirdParty/numpy/archive/refs/tags/1.9.2.tar.gz")
     # escape spaces
     if(UNIX)
       STRING(REPLACE " " "\ " _configure_step ${_configure_step})
@@ -84,7 +80,6 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${Numpy_URL}
-      URL_MD5 ${Numpy_MD5}
       BUILD_IN_SOURCE 1
       CONFIGURE_COMMAND ${CMAKE_COMMAND} -P ${_configure_step}
       BUILD_COMMAND   ${CMAKE_COMMAND} -P ${_build_step}

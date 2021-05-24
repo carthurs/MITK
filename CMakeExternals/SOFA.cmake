@@ -79,7 +79,7 @@ if(MITK_USE_SOFA)
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/SOFA-${rev}.tar.gz #[AJM] I don't have a backup for this, I don't think it's used in our build
       URL_MD5 45ba5a931855f06e30405a60229938ca
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""

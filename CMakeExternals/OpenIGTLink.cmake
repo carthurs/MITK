@@ -28,7 +28,7 @@ if(MITK_USE_OpenIGTLink)
     endif()
 
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz #[AJM] I don't have a backup of this, I don't think it's used in our build
        URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
        PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-54df50de.patch
        CMAKE_GENERATOR ${gen}

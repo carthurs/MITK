@@ -23,8 +23,7 @@ if(MITK_USE_SWIG)
 
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(${proj}
-        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swigwin-${SWIG_TARGET_VERSION}.zip
-        URL_MD5 "3f18de4fc09ab9abb0d3be37c11fbc8f"
+        URL "https://github.com/Crimson-MITK-ThirdParty/swigwin/archive/refs/tags/3.0.2.tar.gz"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -45,7 +44,7 @@ if(MITK_USE_SWIG)
 
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
-        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz # [AJM] I don't have a backup for this.
         # Custom install dir for SWIG
         INSTALL_DIR ${ep_prefix}/src/${proj}-install
         URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"

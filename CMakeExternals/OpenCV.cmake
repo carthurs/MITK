@@ -66,7 +66,7 @@ if(MITK_USE_OpenCV)
       )
     endif()
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-2.4.13.2.tar.gz)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-2.4.13.2.tar.gz) #[AJM] I don't have a backup of this, I don't think it's used in our build
     set(opencv_url_md5 80a4a3bee0e98898bbbc68986ca73655)
 
     ExternalProject_Add(${proj}

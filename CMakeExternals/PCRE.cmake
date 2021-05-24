@@ -53,8 +53,7 @@ if(MITK_USE_PCRE)
 
     ExternalProject_add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.35.tar.gz
-      URL_MD5 "ed58bcbe54d3b1d59e9f5415ef45ce1c"
+      URL "https://github.com/Crimson-MITK-ThirdParty/pcre/archive/refs/tags/8.35.tar.gz"
       ${configure_cmd}
       DEPENDS "${${proj}_DEPENDENCIES}"
       )

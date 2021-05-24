@@ -17,8 +17,7 @@ if(MITK_USE_Eigen)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/eigen-eigen-07105f7124f9.tar.bz2
-      URL_MD5 9e3bfaaab3db18253cfd87ea697b3ab1
+      URL "https://github.com/Crimson-MITK-ThirdParty/eigen/archive/refs/tags/07105f7124f9.tar.gz"
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Eigen.patch
       CMAKE_ARGS
         ${ep_common_args}
